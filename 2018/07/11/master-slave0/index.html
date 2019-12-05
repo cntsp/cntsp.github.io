@@ -1,0 +1,1392 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+
+
+<head>
+    <meta charset="utf-8">
+    <meta name="keywords" content="master-slave0, 阿培">
+    <meta name="description" content="搭建一主两从的mysql5.7.22数据库架构(阿里云ECS云主机centos7.3系统)
+192.168.1.102  DB1  master    写入，数据节点192.168.1.103  DB2  slave1    读，数据节点1">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="renderer" content="webkit|ie-stand|ie-comp">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>master-slave0 | 阿培</title>
+    <link rel="icon" type="image/x-icon, image/vnd.microsoft.icon" href="/favicon.ico">
+
+    <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
+    <link rel="stylesheet" type="text/css" href="/libs/materialize/materialize.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/aos/aos.css">
+    <link rel="stylesheet" type="text/css" href="/libs/animate/animate.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/lightGallery/css/lightgallery.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/matery.css">
+    <link rel="stylesheet" type="text/css" href="/css/my.css">
+    
+    <script src="/libs/jquery/jquery.min.js"></script>
+    
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+
+<body>
+    <header class="navbar-fixed">
+    <nav id="headNav" class="bg-color nav-transparent">
+        <div id="navContainer" class="nav-wrapper head-container">
+            <div class="brand-logo">
+                <a href="/" class="waves-effect waves-light">
+                    
+                    <img src="/medias/logo.png" class="logo-img" alt="LOGO">
+                    
+                    <span class="logo-span">阿培</span>
+                </a>
+            </div>
+            
+
+<a href="#" data-target="mobile-nav" class="sidenav-trigger button-collapse"><i class="fas fa-bars"></i></a>
+<ul class="right nav-menu">
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/" class="waves-effect waves-light">
+      
+      <i class="fas fa-home" style="zoom: 0.6;"></i>
+      
+      <span>首页</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/tags" class="waves-effect waves-light">
+      
+      <i class="fas fa-tags" style="zoom: 0.6;"></i>
+      
+      <span>标签</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/categories" class="waves-effect waves-light">
+      
+      <i class="fas fa-bookmark" style="zoom: 0.6;"></i>
+      
+      <span>分类</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/archives" class="waves-effect waves-light">
+      
+      <i class="fas fa-archive" style="zoom: 0.6;"></i>
+      
+      <span>归档</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/about" class="waves-effect waves-light">
+      
+      <i class="fas fa-user-circle" style="zoom: 0.6;"></i>
+      
+      <span>关于</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/contact" class="waves-effect waves-light">
+      
+      <i class="fas fa-comments" style="zoom: 0.6;"></i>
+      
+      <span>留言板</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/friends" class="waves-effect waves-light">
+      
+      <i class="fas fa-address-book" style="zoom: 0.6;"></i>
+      
+      <span>友情链接</span>
+    </a>
+    
+  </li>
+  
+  <li>
+    <a href="#searchModal" class="modal-trigger waves-effect waves-light">
+      <i id="searchIcon" class="fas fa-search" title="搜索" style="zoom: 0.85;"></i>
+    </a>
+  </li>
+</ul>
+
+<div id="mobile-nav" class="side-nav sidenav">
+
+    <div class="mobile-head bg-color">
+        
+        <img src="/medias/logo.png" class="logo-img circle responsive-img">
+        
+        <div class="logo-name">阿培</div>
+        <div class="logo-desc">
+            
+            Never really desperate, only the lost of the soul.
+            
+        </div>
+    </div>
+
+    
+
+    <ul class="menu-list mobile-menu-list">
+        
+        <li class="m-nav-item">
+	  
+		<a href="/" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-home"></i>
+			
+			首页
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/tags" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-tags"></i>
+			
+			标签
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/categories" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-bookmark"></i>
+			
+			分类
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/archives" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-archive"></i>
+			
+			归档
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/about" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-user-circle"></i>
+			
+			关于
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/contact" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-comments"></i>
+			
+			Contact
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/friends" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-address-book"></i>
+			
+			友情链接
+		</a>
+          
+        </li>
+        
+        
+        <li><div class="divider"></div></li>
+        <li>
+            <a href="https://github.com/blinkfox/hexo-theme-matery" class="waves-effect waves-light" target="_blank">
+                <i class="fab fa-github-square fa-fw"></i>Fork Me
+            </a>
+        </li>
+        
+    </ul>
+</div>
+
+        </div>
+
+        
+            <style>
+    .nav-transparent .github-corner {
+        display: none !important;
+    }
+
+    .github-corner {
+        position: absolute;
+        z-index: 10;
+        top: 0;
+        right: 0;
+        border: 0;
+        transform: scale(1.1);
+    }
+
+    .github-corner svg {
+        color: #0f9d58;
+        fill: #fff;
+        height: 64px;
+        width: 64px;
+    }
+
+    .github-corner:hover .octo-arm {
+        animation: a 0.56s ease-in-out;
+    }
+
+    .github-corner .octo-arm {
+        animation: none;
+    }
+
+    @keyframes a {
+        0%,
+        to {
+            transform: rotate(0);
+        }
+        20%,
+        60% {
+            transform: rotate(-25deg);
+        }
+        40%,
+        80% {
+            transform: rotate(10deg);
+        }
+    }
+</style>
+
+<a href="https://github.com/blinkfox/hexo-theme-matery" class="github-corner tooltipped hide-on-med-and-down" target="_blank"
+   data-tooltip="Fork Me" data-position="left" data-delay="50">
+    <svg viewBox="0 0 250 250" aria-hidden="true">
+        <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
+        <path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2"
+              fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path>
+        <path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z"
+              fill="currentColor" class="octo-body"></path>
+    </svg>
+</a>
+        
+    </nav>
+
+</header>
+
+    
+
+
+
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/20.jpg')">
+    <div class="container" style="right: 0px;left: 0px;">
+        <div class="row">
+            <div class="col s12 m12 l12">
+                <div class="brand">
+                    <div class="description center-align post-title">
+                        master-slave0
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<main class="post-container content">
+
+    
+    <link rel="stylesheet" href="/libs/tocbot/tocbot.css">
+<style>
+    #articleContent h1::before,
+    #articleContent h2::before,
+    #articleContent h3::before,
+    #articleContent h4::before,
+    #articleContent h5::before,
+    #articleContent h6::before {
+        display: block;
+        content: " ";
+        height: 100px;
+        margin-top: -100px;
+        visibility: hidden;
+    }
+
+    #articleContent :focus {
+        outline: none;
+    }
+
+    .toc-fixed {
+        position: fixed;
+        top: 64px;
+    }
+
+    .toc-widget {
+        width: 345px;
+        padding-left: 20px;
+    }
+
+    .toc-widget .toc-title {
+        margin: 35px 0 15px 0;
+        padding-left: 17px;
+        font-size: 1.5rem;
+        font-weight: bold;
+        line-height: 1.5rem;
+    }
+
+    .toc-widget ol {
+        padding: 0;
+        list-style: none;
+    }
+
+    #toc-content {
+        height: calc(100vh - 250px);
+        overflow: auto;
+    }
+
+    #toc-content ol {
+        padding-left: 10px;
+    }
+
+    #toc-content ol li {
+        padding-left: 10px;
+    }
+
+    #toc-content .toc-link:hover {
+        color: #42b983;
+        font-weight: 700;
+        text-decoration: underline;
+    }
+
+    #toc-content .toc-link::before {
+        background-color: transparent;
+        max-height: 25px;
+    }
+
+    #toc-content .is-active-link {
+        color: #42b983;
+    }
+
+    #toc-content .is-active-link::before {
+        background-color: #42b983;
+    }
+
+    #floating-toc-btn {
+        position: fixed;
+        right: 15px;
+        bottom: 76px;
+        padding-top: 15px;
+        margin-bottom: 0;
+        z-index: 998;
+    }
+
+    #floating-toc-btn .btn-floating {
+        width: 48px;
+        height: 48px;
+    }
+
+    #floating-toc-btn .btn-floating i {
+        line-height: 48px;
+        font-size: 1.4rem;
+    }
+</style>
+<div class="row">
+    <div id="main-content" class="col s12 m12 l9">
+        <!-- 文章内容详情 -->
+<div id="artDetail">
+    <div class="card">
+        <div class="card-content article-info">
+            <div class="row tag-cate">
+                <div class="col s7">
+                    
+                    <div class="article-tag">
+                        
+                            <a href="/tags/MySQL%E4%B8%80%E4%B8%BB%E4%B8%A4%E4%BB%8E%E9%85%8D%E7%BD%AE/">
+                                <span class="chip bg-color">MySQL一主两从配置</span>
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+                <div class="col s5 right-align">
+                    
+                    <div class="post-cate">
+                        <i class="fas fa-bookmark fa-fw icon-category"></i>
+                        
+                            <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" class="post-category">
+                                数据库
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+            </div>
+
+            <div class="post-info">
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
+                    2018-07-11
+                </div>
+                
+
+                
+
+                
+
+                
+				
+                
+            </div>
+            
+        </div>
+        <hr class="clearfix">
+        <div class="card-content article-card-content">
+            <div id="articleContent">
+                <p>搭建一主两从的mysql5.7.22数据库架构(阿里云ECS云主机centos7.3系统)</p>
+<p>192.168.1.102  DB1  master    写入，数据节点<br>192.168.1.103  DB2  slave1    读，数据节点<br>192.168.1.104  DB3  slave2    读，数据节点</p>
+<p>三个数据库服务器上都关闭selinux,编辑/etc/selinux/config文件，使SELINUX=disabled,<br>阿里云的ECS云主机默认selinux和防火墙firewall已经设置了关闭。</p>
+<a id="more"></a>
+<p>设置主机名：</p>
+<pre class=" language-bash"><code class="language-bash">登录192.168.1.102上：
+hostnamectl set-hostname DB01
+
+登录192.168.1.103上：
+hostnamectl set-hostname DB02
+
+登录192.168.1.104上：
+hostnamectl set-hostname DB03
+
+
+编辑三个主机的/etc/hosts文件
+<span class="token function">cat</span> <span class="token operator">>></span>/etc/hosts <span class="token operator">&lt;&lt;</span><span class="token string">EOF
+192.168.1.102 DB01
+192.168.1.103 DB02
+192.168.1.104 DB03
+EOF</span></code></pre>
+<p>设置三台机器相互之间的免密钥登录<br>登录到DB1上：</p>
+<pre class=" language-bash"><code class="language-bash">ssh-keygen -t rsa
+ssh-copy-id DB01
+ssh-copy-id DB02
+ssh-copy-id DB03
+
+登录到DB2上：
+ssh-keygen -t rsa
+ssh-copy-id DB01
+ssh-copy-id DB02
+ssh-copy-id DB03
+
+登录到DB3上：
+ssh-keygen -t rsa
+ssh-copy-id DB01
+ssh-copy-id DB02
+ssh-copy-id DB03</code></pre>
+<p>同时连上DB01、DB02、DB03<br>安装前准备：<br>卸载centos7系统自带的mariadb,由于我们需要指定mysql数据库的数据存放目录，故不采用yum安装的方法。</p>
+<pre class=" language-bash"><code class="language-bash">rpm -qa <span class="token operator">|</span><span class="token function">grep</span> mariadb
+rpm -e --nodeps mariadb-libs-5.5.52-1.el7.x86_64
+
+<span class="token comment" spellcheck="true"># 删除etc目录下数据库的配置文件my.cnf</span>
+<span class="token function">rm</span> /etc/my.cnf</code></pre>
+<p>检查mysql是否存在</p>
+<pre class=" language-bash"><code class="language-bash">rpm -qa <span class="token operator">|</span><span class="token function">grep</span> mysql
+<span class="token function">cat</span> /etc/group  <span class="token operator">|</span><span class="token function">grep</span> mysql
+<span class="token function">cat</span> /etc/passwd <span class="token operator">|</span><span class="token function">grep</span> mysql
+
+<span class="token comment" spellcheck="true"># 如果不存在，创建数据库用户mysql</span>
+<span class="token function">groupadd</span> -g 1001 mysql  <span class="token comment" spellcheck="true">#-g:用于指定GID，默认为使用当前组大的GID+1</span>
+<span class="token function">useradd</span> -m -u 1001 -g mysql mysql <span class="token comment" spellcheck="true">#-m:创建用户的家目录  -g GROUP:指定新用户的主组，-u UID:指定新用户的主组</span></code></pre>
+<p>三台云主机都下载mysql-5.7.22-linux-glibc2.12-x86_64.tar.gz</p>
+<pre class=" language-bash"><code class="language-bash"><span class="token function">cd</span> /usr/local/
+<span class="token function">wget</span> https://dev.mysql.com/get/Downloads/MySQL-5.7/mysql-5.7.22-linux-glibc2.12-x86_64.tar.gz
+<span class="token function">tar</span> -zxf mysql-5.7.22-linux-glibc2.12-x86_64.tar.gz
+<span class="token function">mv</span> mysql-5.7.22-linux-glibc2.12-x86_64 mysql/
+<span class="token function">chown</span> -R mysql:mysql mysql/
+<span class="token function">cd</span> /home/mysql <span class="token operator">&amp;&amp;</span> <span class="token function">mkdir</span> data
+<span class="token function">chown</span> -R mysql:mysql mysql/
+<span class="token function">cd</span> /usr/local/mysql
+bin/mysql_install_db   --user<span class="token operator">=</span>mysql --basedir<span class="token operator">=</span>/usr/local/mysql --datadir<span class="token operator">=</span>/home/mysql/data/
+<span class="token function">cp</span> ./support-files/mysql.server   /etc/init.d/mysqld
+<span class="token function">chmod</span> a+x /etc/init.d/mysqld
+/etc/init.d/mysqld start
+<span class="token function">netstat</span> -lntp <span class="token operator">|</span><span class="token function">grep</span> mysqld
+<span class="token function">cd</span> /etc/profile.d/
+<span class="token function">vi</span> mysql.sh
+<span class="token function">export</span> PATH<span class="token operator">=</span><span class="token variable">$PATH</span>:/usr/local/mysql/bin
+<span class="token function">source</span> mysql.sh</code></pre>
+<p>获取root的初始密码：</p>
+<pre class=" language-bash"><code class="language-bash"><span class="token function">cat</span> /root/.mysql_secret</code></pre>
+<p>登录修改root密码(内网一般%变为192.168.1.%)：</p>
+<pre class=" language-bash"><code class="language-bash">mysql -uroot -p
+mysql<span class="token operator">>></span>ALTER USER <span class="token string">'root'</span>@<span class="token string">'localhost'</span> identified by <span class="token string">'TANGshupei1!'</span><span class="token punctuation">;</span>
+mysql<span class="token operator">>></span>GRANT ALL PRIVILEGES ON *.* TO <span class="token string">'root'</span>@<span class="token string">'%'</span> IDENTIFIED BY <span class="token string">'TANGshupei1!'</span> WITH GRANT OPTION<span class="token punctuation">;</span>
+mysql<span class="token operator">>></span>FLUSH PRIVILEGES<span class="token punctuation">;</span>
+mysql<span class="token operator">>></span>exit
+
+<span class="token function">killall</span> mysqld
+/etc/init.d/mysqld restart
+<span class="token comment" spellcheck="true">#设置开机自启动</span>
+<span class="token function">chkconfig</span> --add mysqld
+<span class="token function">chkconfig</span> --level 35 mysqld on
+<span class="token function">chkconfig</span> --list mysqld
+<span class="token function">service</span> mysqld status</code></pre>
+<p>主从配置<br>登录DB01主库<br>mysql -uroot -p</p>
+<p>创建replication用户并设置密码为replication</p>
+<pre class=" language-bash"><code class="language-bash"><span class="token operator">>></span><span class="token operator">></span>CREATE USER replication IDENTIFIED BY <span class="token string">'replication'</span><span class="token punctuation">;</span>
+
+<span class="token operator">>></span><span class="token operator">></span>GRANT REPLICATION SLAVE ON *.* TO <span class="token string">'replication'</span>@<span class="token string">'%'</span> IDENTIFIED BY <span class="token string">'replication'</span> <span class="token punctuation">;</span>
+<span class="token operator">>></span><span class="token operator">></span>exit</code></pre>
+<p>修改DB01的/etc/my.cnf配置文件<br>对DB01 DB02 DB03的/etc/my.cnf配置文件进行修改<br>DB01 Master</p>
+<pre class=" language-bash"><code class="language-bash"><span class="token function">cat</span> <span class="token operator">></span>/etc/my.cnf <span class="token operator">&lt;&lt;</span><span class="token string">EOF
+
+[mysql]
+default-character-set=utf8 
+[mysqld]
+server-id=001
+user=mysql
+port = 3306 
+basedir=/usr/local/mysql
+datadir=/home/mysql/data
+
+# Logsetting
+# relay-log=DB01-relay-bin
+# relay-log-index=DB01-relay-bin.index
+# read_only=1
+log-bin=mysql-bin   
+binlog-ignore-db=mysql 
+sync_binlog = 1    
+max_binlog_size=1024M
+max_binlog_cache_size=4096M
+binlog_stmt_cache_size=1M
+binlog_checksum = none 
+binlog_format = mixed
+binlog_cache_size=4M
+expire_logs_days=30
+relay_log_purge=0
+skip-name-resolve
+
+# InnoDBSetting
+innodb_buffer_pool_size=16384M
+innodb_log_file_size=512M
+innodb_log_buffer_size=16M
+innodb_log_files_in_group=3
+innodb_flush_log_at_trx_commit=1
+innodb_stats_on_metadata=OFF
+innodb_flush_method=O_DIRECT
+table_open_cache=4096
+sort_buffer_size=2M
+
+
+# 允许最大连接数
+max_connections=800
+# 服务端使用的字符集默认为8比特编码的latin1字符集
+character-set-server=utf8
+# 创建新表时将使用的默认存储引擎
+default-storage-engine=INNODB 
+lower_case_table_names=1
+max_allowed_packet=16M
+EOF</span></code></pre>
+<p>重启DB01数据库</p>
+<pre class=" language-bash"><code class="language-bash"><span class="token function">service</span> mysqld restart
+<span class="token comment" spellcheck="true">#登录数据库查询master_log_file和master_log_position</span>
+mysql -uroot -p
+password:********
+<span class="token punctuation">(</span>root@192.168.1.102:3306<span class="token punctuation">)</span> <span class="token punctuation">[</span><span class="token punctuation">(</span>none<span class="token punctuation">)</span><span class="token punctuation">]</span><span class="token operator">></span>show master status\G<span class="token punctuation">;</span>
+*************************** 1. row ***************************
+             File: mysql-bin.000004
+         Position: 1631
+     Binlog_Do_DB: 
+ Binlog_Ignore_DB: 
+Executed_Gtid_Set: 
+1 row <span class="token keyword">in</span> <span class="token keyword">set</span> <span class="token punctuation">(</span>0.01 sec<span class="token punctuation">)</span>
+ERROR: 
+No query specified
+</code></pre>
+<p>记录下来：File文件名和Position的位置</p>
+<p>配置DB02从库<br>修改/etc/my.cnf文件</p>
+<pre class=" language-bash"><code class="language-bash"><span class="token function">cat</span> <span class="token operator">></span>/etc/my.cnf <span class="token operator">&lt;&lt;</span><span class="token string">EOF
+[mysql]
+default-character-set=utf8 
+[mysqld]
+server-id=002
+user=mysql
+port = 3306 
+basedir=/usr/local/mysql
+datadir=/home/mysql/data
+
+# Logsetting
+relay-log=DB02-relay-bin
+relay-log-index=DB02-relay-bin.index
+#read_only=1
+log-bin=mysql-bin   
+binlog-ignore-db=mysql 
+sync_binlog = 1    
+max_binlog_size=1024M
+max_binlog_cache_size=4096M
+binlog_stmt_cache_size=1M
+binlog_checksum = none 
+binlog_format = mixed
+binlog_cache_size=4M
+expire_logs_days=30
+relay_log_purge=0
+skip-name-resolve
+
+# InnoDBSetting
+innodb_buffer_pool_size=16384M
+innodb_log_file_size=512M
+innodb_log_buffer_size=16M
+innodb_log_files_in_group=3
+innodb_flush_log_at_trx_commit=1
+innodb_stats_on_metadata=OFF
+innodb_flush_method=O_DIRECT
+table_open_cache=4096
+sort_buffer_size=2M
+
+
+# 允许最大连接数
+max_connections=800
+# 服务端使用的字符集默认为8比特编码的latin1字符集
+character-set-server=utf8
+# 创建新表时将使用的默认存储引擎
+default-storage-engine=INNODB 
+lower_case_table_names=1
+max_allowed_packet=16M
+EOF</span></code></pre>
+<p>重启MySQL<br>service mysqld restart </p>
+<p>登录DB02数据库</p>
+<pre class=" language-bash"><code class="language-bash"><span class="token operator">>></span><span class="token operator">></span>CHANGE MASTER TO master_host<span class="token operator">=</span><span class="token string">'192.168.1.102'</span>,master_port<span class="token operator">=</span>3306,master_user<span class="token operator">=</span><span class="token string">'replication'</span>,master_password<span class="token operator">=</span><span class="token string">'replication'</span>,master_log_file<span class="token operator">=</span><span class="token string">'mysql-bin.000004'</span>,master_log_pos<span class="token operator">=</span>1631<span class="token punctuation">;</span>
+<span class="token operator">>></span><span class="token operator">></span>START SLAVE<span class="token punctuation">;</span>
+<span class="token operator">>></span><span class="token operator">></span>SHOW SLAVE STATUS\G<span class="token punctuation">;</span></code></pre>
+<p>配置DB03从库<br>修改/etc/my.cnf文件</p>
+<pre class=" language-bash"><code class="language-bash"><span class="token function">cat</span> <span class="token operator">></span>/etc/my.cnf <span class="token operator">&lt;&lt;</span><span class="token string">EOF
+[mysql]
+default-character-set=utf8 
+[mysqld]
+server-id=003
+user=mysql
+port = 3306 
+basedir=/usr/local/mysql
+datadir=/home/mysql/data
+
+# Logsetting
+relay-log=DB03-relay-bin
+relay-log-index=DB03-relay-bin.index
+#read_only=1
+log-bin=mysql-bin   
+binlog-ignore-db=mysql 
+sync_binlog = 1    
+max_binlog_size=1024M
+max_binlog_cache_size=4096M
+binlog_stmt_cache_size=1M
+binlog_checksum = none 
+binlog_format = mixed
+binlog_cache_size=4M
+expire_logs_days=30
+relay_log_purge=0
+skip-name-resolve
+
+# InnoDBSetting
+innodb_buffer_pool_size=16384M
+innodb_log_file_size=512M
+innodb_log_buffer_size=16M
+innodb_log_files_in_group=3
+innodb_flush_log_at_trx_commit=1
+innodb_stats_on_metadata=OFF
+innodb_flush_method=O_DIRECT
+table_open_cache=4096
+sort_buffer_size=2M
+
+
+# 允许最大连接数
+max_connections=800
+# 服务端使用的字符集默认为8比特编码的latin1字符集
+character-set-server=utf8
+# 创建新表时将使用的默认存储引擎
+default-storage-engine=INNODB 
+lower_case_table_names=1
+max_allowed_packet=16M
+EOF</span></code></pre>
+<p>重启MySQL</p>
+<pre class=" language-bash"><code class="language-bash"><span class="token function">service</span> mysqld restart </code></pre>
+<p>登录DB03数据库</p>
+<pre class=" language-bash"><code class="language-bash"><span class="token operator">>></span><span class="token operator">></span>CHANGE MASTER TO master_host<span class="token operator">=</span><span class="token string">'192.168.1.102'</span>,master_port<span class="token operator">=</span>3306,master_user<span class="token operator">=</span><span class="token string">'replication'</span>,master_password<span class="token operator">=</span><span class="token string">'replication'</span>,master_log_file<span class="token operator">=</span><span class="token string">'mysql-bin.000002'</span>,master_log_pos<span class="token operator">=</span>2247<span class="token punctuation">;</span>
+<span class="token operator">>></span><span class="token operator">></span>START SLAVE<span class="token punctuation">;</span>
+<span class="token operator">>></span><span class="token operator">></span>SHOW SLAVE STATUS\G<span class="token punctuation">;</span></code></pre>
+<p>补充：–master-data 和–single-transaction 在mysqldump中使用–master-data=2，会记录binlog文件和position的信息 。–single-transaction会将隔离级别设置成repeatable-commited</p>
+<p>mysqldump -uroot -pTANGshupei1! –master-data=2 –single-transaction -R –triggers test_db1 &gt; test_db1.sql</p>
+
+            </div>
+            <hr/>
+
+            
+
+    <div class="reprint" id="reprint-statement">
+        
+            <div class="reprint__author">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-user">
+                        文章作者:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="https://cntsp.github.io" rel="external nofollow noreferrer">阿培</a>
+                </span>
+            </div>
+            <div class="reprint__type">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-link">
+                        文章链接:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="https://cntsp.github.io/2018/07/11/master-slave0/">https://cntsp.github.io/2018/07/11/master-slave0/</a>
+                </span>
+            </div>
+            <div class="reprint__notice">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-copyright">
+                        版权声明:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    本博客所有文章除特別声明外，均采用
+                    <a href="https://creativecommons.org/licenses/by/4.0/deed.zh" rel="external nofollow noreferrer" target="_blank">CC BY 4.0</a>
+                    许可协议。转载请注明来源
+                    <a href="https://cntsp.github.io" target="_blank">阿培</a>
+                    !
+                </span>
+            </div>
+        
+    </div>
+
+    <script async defer>
+      document.addEventListener("copy", function (e) {
+        let toastHTML = '<span>复制成功，请遵循本文的转载规则</span><button class="btn-flat toast-action" onclick="navToReprintStatement()" style="font-size: smaller">查看</a>';
+        M.toast({html: toastHTML})
+      });
+
+      function navToReprintStatement() {
+        $("html, body").animate({scrollTop: $("#reprint-statement").offset().top - 80}, 800);
+      }
+    </script>
+
+
+
+            <div class="tag_share" style="display: block;">
+                <div class="post-meta__tag-list" style="display: inline-block;">
+                    
+                        <div class="article-tag">
+                            
+                                <a href="/tags/MySQL%E4%B8%80%E4%B8%BB%E4%B8%A4%E4%BB%8E%E9%85%8D%E7%BD%AE/">
+                                    <span class="chip bg-color">MySQL一主两从配置</span>
+                                </a>
+                            
+                        </div>
+                    
+                </div>
+                <div class="post_share" style="zoom: 80%; width: fit-content; display: inline-block; float: right; margin: -0.15rem 0;">
+                    <link rel="stylesheet" type="text/css" href="/libs/share/css/share.min.css">
+
+<div id="article-share">
+    
+    
+    <div class="social-share" data-sites="twitter,facebook,google,qq,qzone,wechat,weibo,douban,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
+    <script src="/libs/share/js/social-share.min.js"></script>
+    
+
+    
+
+</div>
+
+                </div>
+            </div>
+            
+                <style>
+    #reward {
+        margin: 40px 0;
+        text-align: center;
+    }
+
+    #reward .reward-link {
+        font-size: 1.4rem;
+        line-height: 38px;
+    }
+
+    #reward .btn-floating:hover {
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2), 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    #rewardModal {
+        width: 320px;
+        height: 350px;
+    }
+
+    #rewardModal .reward-title {
+        margin: 15px auto;
+        padding-bottom: 5px;
+    }
+
+    #rewardModal .modal-content {
+        padding: 10px;
+    }
+
+    #rewardModal .close {
+        position: absolute;
+        right: 15px;
+        top: 15px;
+        color: rgba(0, 0, 0, 0.5);
+        font-size: 1.3rem;
+        line-height: 20px;
+        cursor: pointer;
+    }
+
+    #rewardModal .close:hover {
+        color: #ef5350;
+        transform: scale(1.3);
+        -moz-transform:scale(1.3);
+        -webkit-transform:scale(1.3);
+        -o-transform:scale(1.3);
+    }
+
+    #rewardModal .reward-tabs {
+        margin: 0 auto;
+        width: 210px;
+    }
+
+    .reward-tabs .tabs {
+        height: 38px;
+        margin: 10px auto;
+        padding-left: 0;
+    }
+
+    .reward-content ul {
+        padding-left: 0 !important;
+    }
+
+    .reward-tabs .tabs .tab {
+        height: 38px;
+        line-height: 38px;
+    }
+
+    .reward-tabs .tab a {
+        color: #fff;
+        background-color: #ccc;
+    }
+
+    .reward-tabs .tab a:hover {
+        background-color: #ccc;
+        color: #fff;
+    }
+
+    .reward-tabs .wechat-tab .active {
+        color: #fff !important;
+        background-color: #22AB38 !important;
+    }
+
+    .reward-tabs .alipay-tab .active {
+        color: #fff !important;
+        background-color: #019FE8 !important;
+    }
+
+    .reward-tabs .reward-img {
+        width: 210px;
+        height: 210px;
+    }
+</style>
+
+<div id="reward">
+    <a href="#rewardModal" class="reward-link modal-trigger btn-floating btn-medium waves-effect waves-light red">赏</a>
+
+    <!-- Modal Structure -->
+    <div id="rewardModal" class="modal">
+        <div class="modal-content">
+            <a class="close modal-close"><i class="fas fa-times"></i></a>
+            <h4 class="reward-title">你的赏识是我前进的动力</h4>
+            <div class="reward-content">
+                <div class="reward-tabs">
+                    <ul class="tabs row">
+                        <li class="tab col s6 alipay-tab waves-effect waves-light"><a href="#alipay">支付宝</a></li>
+                        <li class="tab col s6 wechat-tab waves-effect waves-light"><a href="#wechat">微 信</a></li>
+                    </ul>
+                    <div id="alipay">
+                        <img src="/medias/reward/alipay.jpg" class="reward-img" alt="支付宝打赏二维码">
+                    </div>
+                    <div id="wechat">
+                        <img src="/medias/reward/wechat.png" class="reward-img" alt="微信打赏二维码">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $('.tabs').tabs();
+    });
+</script>
+            
+        </div>
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+<article id="prenext-posts" class="prev-next articles">
+    <div class="row article-row">
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge left-badge text-color">
+                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
+            <div class="card">
+                <a href="/2018/07/11/mha%E5%8E%9F%E7%90%86/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/5.jpg" class="responsive-img" alt="mha原理">
+                        
+                        <span class="card-title">mha原理</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            转载至：MHA原理：MHA(Master High Availability)目前在MySQL高可用方面是一个相对成熟的解决方案，它由日本人youshimaton开发，是一套优秀的作为MySQL高可用性环境下故障切换和主从提升的高可用软件。
+                        
+                    </div>
+                    <div class="publish-info">
+                        <span class="publish-date">
+                            <i class="far fa-clock fa-fw icon-date"></i>2018-07-11
+                        </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" class="post-category">
+                                    数据库
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/master-high-availability/">
+                        <span class="chip bg-color">master high availability</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
+            </div>
+            <div class="card">
+                <a href="/2018/07/11/master-slave1/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/19.jpg" class="responsive-img" alt="master-slave1">
+                        
+                        <span class="card-title">master-slave1</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            转载至：
+MySQL主从复制及配置实现一 什么是MySQL主从复制MySQL主从复制是其最重要的功能之一，主从复制是指一台服务器充当主数据库服务器，另一台或多台服务器充当从数据库服务器，主服务器中的数据自动复制到从服务器中。对于多级复制，数
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2018-07-11
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" class="post-category">
+                                    数据库
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/MySQL%E4%B8%BB%E4%BB%8E%E5%8E%9F%E7%90%86/">
+                        <span class="chip bg-color">MySQL主从原理</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+    </div>
+</article>
+
+</div>
+
+
+
+<!-- 代码块功能依赖 -->
+<script type="text/javascript" src="/libs/codeBlock/codeBlockFuction.js"></script>
+
+<!-- 代码语言 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeLang.js"></script>
+
+    
+<!-- 代码块复制 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeCopy.js"></script>
+
+
+<!-- 代码块收缩 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeShrink.js"></script>
+
+
+<!-- 代码块折行 -->
+
+<style type="text/css">
+code[class*="language-"], pre[class*="language-"] { white-space: pre !important; }
+</style>
+
+    </div>
+    <div id="toc-aside" class="expanded col l3 hide-on-med-and-down">
+        <div class="toc-widget">
+            <div class="toc-title"><i class="far fa-list-alt"></i>&nbsp;&nbsp;目录</div>
+            <div id="toc-content"></div>
+        </div>
+    </div>
+</div>
+
+<!-- TOC 悬浮按钮. -->
+
+<div id="floating-toc-btn" class="hide-on-med-and-down">
+    <a class="btn-floating btn-large bg-color">
+        <i class="fas fa-list-ul"></i>
+    </a>
+</div>
+
+
+<script src="/libs/tocbot/tocbot.min.js"></script>
+<script>
+    $(function () {
+        tocbot.init({
+            tocSelector: '#toc-content',
+            contentSelector: '#articleContent',
+            headingsOffset: -($(window).height() * 0.4 - 45),
+            collapseDepth: Number('0'),
+            headingSelector: 'h2, h3, h4'
+        });
+
+        // modify the toc link href to support Chinese.
+        let i = 0;
+        let tocHeading = 'toc-heading-';
+        $('#toc-content a').each(function () {
+            $(this).attr('href', '#' + tocHeading + (++i));
+        });
+
+        // modify the heading title id to support Chinese.
+        i = 0;
+        $('#articleContent').children('h2, h3, h4').each(function () {
+            $(this).attr('id', tocHeading + (++i));
+        });
+
+        // Set scroll toc fixed.
+        let tocHeight = parseInt($(window).height() * 0.4 - 64);
+        let $tocWidget = $('.toc-widget');
+        $(window).scroll(function () {
+            let scroll = $(window).scrollTop();
+            /* add post toc fixed. */
+            if (scroll > tocHeight) {
+                $tocWidget.addClass('toc-fixed');
+            } else {
+                $tocWidget.removeClass('toc-fixed');
+            }
+        });
+
+        
+        /* 修复文章卡片 div 的宽度. */
+        let fixPostCardWidth = function (srcId, targetId) {
+            let srcDiv = $('#' + srcId);
+            if (srcDiv.length === 0) {
+                return;
+            }
+
+            let w = srcDiv.width();
+            if (w >= 450) {
+                w = w + 21;
+            } else if (w >= 350 && w < 450) {
+                w = w + 18;
+            } else if (w >= 300 && w < 350) {
+                w = w + 16;
+            } else {
+                w = w + 14;
+            }
+            $('#' + targetId).width(w);
+        };
+
+        // 切换TOC目录展开收缩的相关操作.
+        const expandedClass = 'expanded';
+        let $tocAside = $('#toc-aside');
+        let $mainContent = $('#main-content');
+        $('#floating-toc-btn .btn-floating').click(function () {
+            if ($tocAside.hasClass(expandedClass)) {
+                $tocAside.removeClass(expandedClass).hide();
+                $mainContent.removeClass('l9');
+            } else {
+                $tocAside.addClass(expandedClass).show();
+                $mainContent.addClass('l9');
+            }
+            fixPostCardWidth('artDetail', 'prenext-posts');
+        });
+        
+    });
+</script>
+
+    
+
+</main>
+
+
+
+    <footer class="page-footer bg-color">
+    <div class="container row center-align">
+        <div class="col s12 m8 l8 copy-right">
+            Copyright&nbsp;&copy;
+            <span id="year">年份</span>
+            <a href="https://cntsp.github.io" target="_blank">阿培</a>
+            |&nbsp;Powered by&nbsp;<a href="https://hexo.io/" target="_blank">Hexo</a>
+            |&nbsp;Theme&nbsp;<a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
+            <br>
+            
+            
+            
+            
+            
+            
+            <span id="busuanzi_container_site_pv">
+                |&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;<span id="busuanzi_value_site_pv"
+                    class="white-color"></span>&nbsp;次
+            </span>
+            
+            
+            <span id="busuanzi_container_site_uv">
+                |&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;<span id="busuanzi_value_site_uv"
+                    class="white-color"></span>&nbsp;人
+            </span>
+            
+            <br>
+            
+            <span id="sitetime">载入运行时间...</span>
+            <script>
+                function siteTime() {
+                    window.setTimeout("siteTime()", 1000);
+                    var seconds = 1000;
+                    var minutes = seconds * 60;
+                    var hours = minutes * 60;
+                    var days = hours * 24;
+                    var years = days * 365;
+                    var today = new Date();
+                    var startYear = "2019";
+                    var startMonth = "6";
+                    var startDate = "28";
+                    var startHour = "0";
+                    var startMinute = "0";
+                    var startSecond = "0";
+                    var todayYear = today.getFullYear();
+                    var todayMonth = today.getMonth() + 1;
+                    var todayDate = today.getDate();
+                    var todayHour = today.getHours();
+                    var todayMinute = today.getMinutes();
+                    var todaySecond = today.getSeconds();
+                    var t1 = Date.UTC(startYear, startMonth, startDate, startHour, startMinute, startSecond);
+                    var t2 = Date.UTC(todayYear, todayMonth, todayDate, todayHour, todayMinute, todaySecond);
+                    var diff = t2 - t1;
+                    var diffYears = Math.floor(diff / years);
+                    var diffDays = Math.floor((diff / days) - diffYears * 365);
+                    var diffHours = Math.floor((diff - (diffYears * 365 + diffDays) * days) / hours);
+                    var diffMinutes = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours) /
+                        minutes);
+                    var diffSeconds = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours -
+                        diffMinutes * minutes) / seconds);
+                    if (startYear == todayYear) {
+                        document.getElementById("year").innerHTML = todayYear;
+                        document.getElementById("sitetime").innerHTML = "本站已安全运行 " + diffDays + " 天 " + diffHours +
+                            " 小时 " + diffMinutes + " 分钟 " + diffSeconds + " 秒";
+                    } else {
+                        document.getElementById("year").innerHTML = startYear + " - " + todayYear;
+                        document.getElementById("sitetime").innerHTML = "本站已安全运行 " + diffYears + " 年 " + diffDays +
+                            " 天 " + diffHours + " 小时 " + diffMinutes + " 分钟 " + diffSeconds + " 秒";
+                    }
+                }
+                setInterval(siteTime, 1000);
+            </script>
+            
+            <br>
+            
+        </div>
+        <div class="col s12 m4 l4 social-link social-statis">
+    <a href="https://github.com/cntsp" class="tooltipped" target="_blank" data-tooltip="访问我的GitHub" data-position="top" data-delay="50">
+        <i class="fab fa-github"></i>
+    </a>
+
+
+
+    <a href="mailto:1909873483@qq.com" class="tooltipped" target="_blank" data-tooltip="邮件联系我" data-position="top" data-delay="50">
+        <i class="fas fa-envelope-open"></i>
+    </a>
+
+
+
+
+
+
+
+    <a href="tencent://AddContact/?fromId=50&fromSubId=1&subcmd=all&uin=1909873483" class="tooltipped" target="_blank" data-tooltip="QQ联系我: 1909873483" data-position="top" data-delay="50">
+        <i class="fab fa-qq"></i>
+    </a>
+
+
+
+
+
+
+
+    <a href="/atom.xml" class="tooltipped" target="_blank" data-tooltip="RSS 订阅" data-position="top" data-delay="50">
+        <i class="fas fa-rss"></i>
+    </a>
+
+</div>
+    </div>
+</footer>
+
+<div class="progress-bar"></div>
+
+
+    <!-- 搜索遮罩框 -->
+<div id="searchModal" class="modal">
+    <div class="modal-content">
+        <div class="search-header">
+            <span class="title"><i class="fas fa-search"></i>&nbsp;&nbsp;搜索</span>
+            <input type="search" id="searchInput" name="s" placeholder="请输入搜索的关键字"
+                   class="search-input">
+        </div>
+        <div id="searchResult"></div>
+    </div>
+</div>
+
+<script src="/js/search.js"></script>
+<script type="text/javascript">
+$(function () {
+    searchFunc("/" + "search.xml", 'searchInput', 'searchResult');
+});
+</script>
+    <!-- 回到顶部按钮 -->
+<div id="backTop" class="top-scroll">
+    <a class="btn-floating btn-large waves-effect waves-light" href="#!">
+        <i class="fas fa-arrow-up"></i>
+    </a>
+</div>
+
+
+    <script src="/libs/materialize/materialize.min.js"></script>
+    <script src="/libs/masonry/masonry.pkgd.min.js"></script>
+    <script src="/libs/aos/aos.js"></script>
+    <script src="/libs/scrollprogress/scrollProgress.min.js"></script>
+    <script src="/libs/lightGallery/js/lightgallery-all.min.js"></script>
+    <script src="/js/matery.js"></script>
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    <script src="/libs/others/clicklove.js" async="async"></script>
+    
+    
+    <script async src="/libs/others/busuanzi.pure.mini.js"></script>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    
+    
+    <script src="/libs/instantpage/instantpage.js" type="module"></script>
+    
+
+</body>
+
+</html>

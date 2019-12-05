@@ -1,0 +1,2844 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+
+
+<head>
+    <meta charset="utf-8">
+    <meta name="keywords" content="kubernetes之阿里云部署, 阿培">
+    <meta name="description" content="阿里云K8S高可用部署(我们需要准备六台阿里云的ECS,选择有公网IP的)
+二进制搭建k8s多master集群之第一篇(集群环境和各个组件功能介绍)规划如下：
+master01:172.24.150.85(内网)  kube-apiserv">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="renderer" content="webkit|ie-stand|ie-comp">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>kubernetes之阿里云部署 | 阿培</title>
+    <link rel="icon" type="image/x-icon, image/vnd.microsoft.icon" href="/favicon.ico">
+
+    <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
+    <link rel="stylesheet" type="text/css" href="/libs/materialize/materialize.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/aos/aos.css">
+    <link rel="stylesheet" type="text/css" href="/libs/animate/animate.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/lightGallery/css/lightgallery.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/matery.css">
+    <link rel="stylesheet" type="text/css" href="/css/my.css">
+    
+    <script src="/libs/jquery/jquery.min.js"></script>
+    
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+
+<body>
+    <header class="navbar-fixed">
+    <nav id="headNav" class="bg-color nav-transparent">
+        <div id="navContainer" class="nav-wrapper head-container">
+            <div class="brand-logo">
+                <a href="/" class="waves-effect waves-light">
+                    
+                    <img src="/medias/logo.png" class="logo-img" alt="LOGO">
+                    
+                    <span class="logo-span">阿培</span>
+                </a>
+            </div>
+            
+
+<a href="#" data-target="mobile-nav" class="sidenav-trigger button-collapse"><i class="fas fa-bars"></i></a>
+<ul class="right nav-menu">
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/" class="waves-effect waves-light">
+      
+      <i class="fas fa-home" style="zoom: 0.6;"></i>
+      
+      <span>首页</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/tags" class="waves-effect waves-light">
+      
+      <i class="fas fa-tags" style="zoom: 0.6;"></i>
+      
+      <span>标签</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/categories" class="waves-effect waves-light">
+      
+      <i class="fas fa-bookmark" style="zoom: 0.6;"></i>
+      
+      <span>分类</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/archives" class="waves-effect waves-light">
+      
+      <i class="fas fa-archive" style="zoom: 0.6;"></i>
+      
+      <span>归档</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/about" class="waves-effect waves-light">
+      
+      <i class="fas fa-user-circle" style="zoom: 0.6;"></i>
+      
+      <span>关于</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/contact" class="waves-effect waves-light">
+      
+      <i class="fas fa-comments" style="zoom: 0.6;"></i>
+      
+      <span>留言板</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/friends" class="waves-effect waves-light">
+      
+      <i class="fas fa-address-book" style="zoom: 0.6;"></i>
+      
+      <span>友情链接</span>
+    </a>
+    
+  </li>
+  
+  <li>
+    <a href="#searchModal" class="modal-trigger waves-effect waves-light">
+      <i id="searchIcon" class="fas fa-search" title="搜索" style="zoom: 0.85;"></i>
+    </a>
+  </li>
+</ul>
+
+<div id="mobile-nav" class="side-nav sidenav">
+
+    <div class="mobile-head bg-color">
+        
+        <img src="/medias/logo.png" class="logo-img circle responsive-img">
+        
+        <div class="logo-name">阿培</div>
+        <div class="logo-desc">
+            
+            Never really desperate, only the lost of the soul.
+            
+        </div>
+    </div>
+
+    
+
+    <ul class="menu-list mobile-menu-list">
+        
+        <li class="m-nav-item">
+	  
+		<a href="/" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-home"></i>
+			
+			首页
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/tags" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-tags"></i>
+			
+			标签
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/categories" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-bookmark"></i>
+			
+			分类
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/archives" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-archive"></i>
+			
+			归档
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/about" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-user-circle"></i>
+			
+			关于
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/contact" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-comments"></i>
+			
+			Contact
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/friends" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-address-book"></i>
+			
+			友情链接
+		</a>
+          
+        </li>
+        
+        
+        <li><div class="divider"></div></li>
+        <li>
+            <a href="https://github.com/blinkfox/hexo-theme-matery" class="waves-effect waves-light" target="_blank">
+                <i class="fab fa-github-square fa-fw"></i>Fork Me
+            </a>
+        </li>
+        
+    </ul>
+</div>
+
+        </div>
+
+        
+            <style>
+    .nav-transparent .github-corner {
+        display: none !important;
+    }
+
+    .github-corner {
+        position: absolute;
+        z-index: 10;
+        top: 0;
+        right: 0;
+        border: 0;
+        transform: scale(1.1);
+    }
+
+    .github-corner svg {
+        color: #0f9d58;
+        fill: #fff;
+        height: 64px;
+        width: 64px;
+    }
+
+    .github-corner:hover .octo-arm {
+        animation: a 0.56s ease-in-out;
+    }
+
+    .github-corner .octo-arm {
+        animation: none;
+    }
+
+    @keyframes a {
+        0%,
+        to {
+            transform: rotate(0);
+        }
+        20%,
+        60% {
+            transform: rotate(-25deg);
+        }
+        40%,
+        80% {
+            transform: rotate(10deg);
+        }
+    }
+</style>
+
+<a href="https://github.com/blinkfox/hexo-theme-matery" class="github-corner tooltipped hide-on-med-and-down" target="_blank"
+   data-tooltip="Fork Me" data-position="left" data-delay="50">
+    <svg viewBox="0 0 250 250" aria-hidden="true">
+        <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
+        <path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2"
+              fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path>
+        <path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z"
+              fill="currentColor" class="octo-body"></path>
+    </svg>
+</a>
+        
+    </nav>
+
+</header>
+
+    
+
+
+
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/15.jpg')">
+    <div class="container" style="right: 0px;left: 0px;">
+        <div class="row">
+            <div class="col s12 m12 l12">
+                <div class="brand">
+                    <div class="description center-align post-title">
+                        kubernetes之阿里云部署
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<main class="post-container content">
+
+    
+    <link rel="stylesheet" href="/libs/tocbot/tocbot.css">
+<style>
+    #articleContent h1::before,
+    #articleContent h2::before,
+    #articleContent h3::before,
+    #articleContent h4::before,
+    #articleContent h5::before,
+    #articleContent h6::before {
+        display: block;
+        content: " ";
+        height: 100px;
+        margin-top: -100px;
+        visibility: hidden;
+    }
+
+    #articleContent :focus {
+        outline: none;
+    }
+
+    .toc-fixed {
+        position: fixed;
+        top: 64px;
+    }
+
+    .toc-widget {
+        width: 345px;
+        padding-left: 20px;
+    }
+
+    .toc-widget .toc-title {
+        margin: 35px 0 15px 0;
+        padding-left: 17px;
+        font-size: 1.5rem;
+        font-weight: bold;
+        line-height: 1.5rem;
+    }
+
+    .toc-widget ol {
+        padding: 0;
+        list-style: none;
+    }
+
+    #toc-content {
+        height: calc(100vh - 250px);
+        overflow: auto;
+    }
+
+    #toc-content ol {
+        padding-left: 10px;
+    }
+
+    #toc-content ol li {
+        padding-left: 10px;
+    }
+
+    #toc-content .toc-link:hover {
+        color: #42b983;
+        font-weight: 700;
+        text-decoration: underline;
+    }
+
+    #toc-content .toc-link::before {
+        background-color: transparent;
+        max-height: 25px;
+    }
+
+    #toc-content .is-active-link {
+        color: #42b983;
+    }
+
+    #toc-content .is-active-link::before {
+        background-color: #42b983;
+    }
+
+    #floating-toc-btn {
+        position: fixed;
+        right: 15px;
+        bottom: 76px;
+        padding-top: 15px;
+        margin-bottom: 0;
+        z-index: 998;
+    }
+
+    #floating-toc-btn .btn-floating {
+        width: 48px;
+        height: 48px;
+    }
+
+    #floating-toc-btn .btn-floating i {
+        line-height: 48px;
+        font-size: 1.4rem;
+    }
+</style>
+<div class="row">
+    <div id="main-content" class="col s12 m12 l9">
+        <!-- 文章内容详情 -->
+<div id="artDetail">
+    <div class="card">
+        <div class="card-content article-info">
+            <div class="row tag-cate">
+                <div class="col s7">
+                    
+                    <div class="article-tag">
+                        
+                            <a href="/tags/kubernetes/">
+                                <span class="chip bg-color">kubernetes</span>
+                            </a>
+                        
+                            <a href="/tags/%E9%98%BF%E9%87%8C%E4%BA%91/">
+                                <span class="chip bg-color">阿里云</span>
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+                <div class="col s5 right-align">
+                    
+                    <div class="post-cate">
+                        <i class="fas fa-bookmark fa-fw icon-category"></i>
+                        
+                            <a href="/categories/%E5%AE%B9%E5%99%A8%E6%8A%80%E6%9C%AF/" class="post-category">
+                                容器技术
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+            </div>
+
+            <div class="post-info">
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
+                    2019-07-10
+                </div>
+                
+
+                
+
+                
+
+                
+				
+                
+            </div>
+            
+        </div>
+        <hr class="clearfix">
+        <div class="card-content article-card-content">
+            <div id="articleContent">
+                <p>阿里云K8S高可用部署(我们需要准备六台阿里云的ECS,选择有公网IP的)</p>
+<h1 id="二进制搭建k8s多master集群之第一篇-集群环境和各个组件功能介绍"><a href="#二进制搭建k8s多master集群之第一篇-集群环境和各个组件功能介绍" class="headerlink" title="二进制搭建k8s多master集群之第一篇(集群环境和各个组件功能介绍)"></a>二进制搭建k8s多master集群之第一篇(集群环境和各个组件功能介绍)</h1><p>规划如下：</p>
+<pre class=" language-bash"><code class="language-bash">master01:172.24.150.85<span class="token punctuation">(</span>内网<span class="token punctuation">)</span>  kube-apiserver  kube-conroller-manager etcd        flannel  docker
+master02:172.24.150.86<span class="token punctuation">(</span>内网<span class="token punctuation">)</span>  kube-apiserver  kube-conroller-manager etcd        flannel     docker        
+master03:172.24.150.87<span class="token punctuation">(</span>内网<span class="token punctuation">)</span>    kube-apiserver  kube-conroller-manager etcd        flannel     docker
+node01:172.24.150.88<span class="token punctuation">(</span>内网<span class="token punctuation">)</span>    kube-proxy  kubelet        flannel     docker
+node02:172.24.150.89<span class="token punctuation">(</span>内网<span class="token punctuation">)</span>    kube-proxy  kubelet        flannel     docker
+haproxyharbor:172.24.150.90<span class="token punctuation">(</span>内网<span class="token punctuation">)</span>        haproxy harbor</code></pre>
+<h1 id="一-组件版本"><a href="#一-组件版本" class="headerlink" title="一     组件版本"></a>一     组件版本</h1><blockquote>
+<ul>
+<li>kubernetes 1.12.3</li>
+<li>Docker 18.06.1-ce</li>
+<li>Etcd 3.3.10<ul>
+<li>Flanneld 0.10.0</li>
+</ul>
+</li>
+<li>插件<ul>
+<li>CoreDNS</li>
+<li>Dashboard</li>
+<li>Heapster(influxdb,grafana)</li>
+<li>Metrics-Server</li>
+<li>EFK(elasticsearch,fluentd,kibana)<ul>
+<li>镜像仓库</li>
+</ul>
+</li>
+<li>docker registry</li>
+<li>harbor</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<h1 id="二-主要配置策略"><a href="#二-主要配置策略" class="headerlink" title="二    主要配置策略"></a>二    主要配置策略</h1><p>kube-apiserver:<br>    &gt;    * 使用keepalived和haproxy实现3节点高可用;<br>    &gt;    * 关闭非安全端口8080和匿名访问;<br>    &gt;    * 在安全端口6443接收https请求；<br>    &gt;     * 严格的认证和授权策略(x509,token,RBAC)<br>    &gt;    * 开启bootstrap token认证，支持kubelet TLS bootstrapping;<br>    &gt;    * 使用https访问kubelet,etcd,加密通信；<br>kube-scheduler:<br>    &gt;    * 3节点高可用;<br>    &gt;    * 使用kubeconfig访问apiserver的安全端口;</p>
+<p>kubelet:<br>    &gt;    * 使用kubeadm动态创建bootstrap token，而不是在apiserver中静态配置;<br>    &gt;    * 使用TLS bootstrap机制自动生成client和server证书，过期后自动轮转;<br>    &gt;    * 在KubeletConfiguration类型的JSON文件配置主要参数;<br>    &gt;    * 关闭只读端口，在安全端口10250接收https请求，对请求进行认证和授权，拒绝匿名访问和非授权访问;<br>    &gt;    * 使用kubeconfig访问apiserver的安全端口;<br>kube-proxy:<br>    &gt;    * 使用kubeconfig访问apiserver的安全端口;<br>    &gt;    * 在kubeProxyConfiguration类型的JSON文件配置主要参数;<br>    &gt;    * IPVS代理模式;<br>集群插件:<br>    &gt;    * DNS：使用功能、性能更好的coredns;<br>    &gt;    * Dashboard:支持登录认证<br>    &gt;    * Metric:heapster,metrics-server,使用https访问kubelet安全端口;<br>    &gt;    * Log:Elasticsearch,Fluend,Kibana;<br>    &gt;    * Registry镜像库：docker-registry,harbor;</p>
+<h1 id="三-系统初始化"><a href="#三-系统初始化" class="headerlink" title="三    系统初始化"></a>三    系统初始化</h1><h2 id="1-主机名修改-5个节点都操作"><a href="#1-主机名修改-5个节点都操作" class="headerlink" title="1    主机名修改(5个节点都操作)"></a>1    主机名修改(5个节点都操作)</h2><p>例如：master01<br>hostnamectl set-hostname master01</p>
+<h2 id="2-本地hosts解析-5个节点都操作-至于我为啥多加了etcd01-etcd02-etcd03，为啥etcd三节点集群中的命名而已"><a href="#2-本地hosts解析-5个节点都操作-至于我为啥多加了etcd01-etcd02-etcd03，为啥etcd三节点集群中的命名而已" class="headerlink" title="2    本地hosts解析(5个节点都操作)(至于我为啥多加了etcd01,etcd02,etcd03，为啥etcd三节点集群中的命名而已)"></a>2    本地hosts解析(5个节点都操作)(至于我为啥多加了etcd01,etcd02,etcd03，为啥etcd三节点集群中的命名而已)</h2><pre class=" language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@master01 ~<span class="token punctuation">]</span> <span class="token function">cat</span> <span class="token operator">>></span>/etc/hosts <span class="token operator">&lt;&lt;</span><span class="token string">EOF
+172.24.150.85  master01 etcd01
+172.24.150.86  master02 etcd02
+172.24.150.87  master03 etcd03
+172.24.150.88  node01
+172.24.150.89  node02
+172.24.150.90  haproxyhabor
+EOF</span></code></pre>
+<h2 id="3-master01免密码登录其它节点-由于下面的很多操作都是单独在master01-192-168-1-145-上完成的-即设置master01免密登录其它节点"><a href="#3-master01免密码登录其它节点-由于下面的很多操作都是单独在master01-192-168-1-145-上完成的-即设置master01免密登录其它节点" class="headerlink" title="3    master01免密码登录其它节点(由于下面的很多操作都是单独在master01(192.168.1.145)上完成的,即设置master01免密登录其它节点)"></a>3    master01免密码登录其它节点(由于下面的很多操作都是单独在master01(192.168.1.145)上完成的,即设置master01免密登录其它节点)</h2><p>配置master01可以免密SSH登录其它节点，方便远程分发文件及执行命令</p>
+<pre class=" language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@master01 ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># ssh-keygen -t rsa            #生成公钥和私钥，一路Enter键                        </span>
+<span class="token punctuation">[</span>root@master01 ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># ssh-copy-id root@master01    #分发公钥到master01上，这里需要输入一次master01的密码</span>
+<span class="token punctuation">[</span>root@master01 ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># ssh-copy-id root@master02    #分发公钥到master02上，这里需要输入一次master02的密码</span>
+<span class="token punctuation">[</span>root@master01 ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># ssh-copy-id root@master03    #分发公钥到master03上，这里需要输入一次master03的密码</span>
+<span class="token punctuation">[</span>root@master01 ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># ssh-copy-id root@node01        #分发公钥到node01上，这里需要输入一次node01的密码</span>
+<span class="token punctuation">[</span>root@master01 ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># ssh-copy-id root@node02        #分发公钥到node02上，这里需要输入一次node02的密码</span></code></pre>
+<h2 id="4-关闭防火墙firewall-5个节点都操作"><a href="#4-关闭防火墙firewall-5个节点都操作" class="headerlink" title="4    关闭防火墙firewall(5个节点都操作)"></a>4    关闭防火墙firewall(5个节点都操作)</h2><pre class=" language-bash"><code class="language-bash">    systemctl stop firewalld          （root权限）
+    systemctl disable firewalld         <span class="token punctuation">(</span>设置开启未启动模式 <span class="token punctuation">)</span>
+    iptables -P FORWARD ACCEPT         <span class="token punctuation">(</span>设置FORWARD链为接收模式,要对4表5链有了解哦！<span class="token punctuation">)</span></code></pre>
+<h2 id="5-关闭swap分区"><a href="#5-关闭swap分区" class="headerlink" title="5    关闭swap分区"></a>5    关闭swap分区</h2><pre class=" language-bash"><code class="language-bash">swapoff -a 
+<span class="token function">sed</span> -i <span class="token string">'/ swap / s/^\(.*\)$/#\1/g'</span> /etc/fstab <span class="token punctuation">(</span>不太明白哦<span class="token punctuation">)</span></code></pre>
+<h2 id="6-关闭SELinux"><a href="#6-关闭SELinux" class="headerlink" title="6    关闭SELinux"></a>6    关闭SELinux</h2><pre class=" language-bash"><code class="language-bash">setenforce 0
+<span class="token function">grep</span> SELINUX /etc/selinux/config
+SELINUX<span class="token operator">=</span>disabled</code></pre>
+<h2 id="7-加载内核模块"><a href="#7-加载内核模块" class="headerlink" title="7    加载内核模块"></a>7    加载内核模块</h2><pre class=" language-bash"><code class="language-bash">modprobe br-netfilter
+modprobe ip_vs</code></pre>
+<h2 id="8-设置系统参数"><a href="#8-设置系统参数" class="headerlink" title="8    设置系统参数"></a>8    设置系统参数</h2><pre class=" language-bash"><code class="language-bash"><span class="token function">cat</span> <span class="token operator">></span> kubernetes.conf <span class="token operator">&lt;&lt;</span><span class="token string">EOF
+net.bridge.bridge-nf-call-iptables=1
+net.bridge.bridge-nf-call-ip6tables=1
+net.ipv4.ip_forward=1
+net.ipv4.tcp_tw_recycle=0
+vm.swappiness=0
+vm.overcommit_memory=1
+vm.panic_on_oom=0
+fs.inotify.max_user_watches=89100
+fs.file-max=52706963
+fs.nr_open=52706963
+net.ipv6.conf.all.disable_ipv6=1
+net.netfilter.nf_conntrack_max=2310720
+EOF</span>
+使上面内容生效：
+sysctl -p /etc/sysctl.d/kubernetes.conf</code></pre>
+<p>tcp_tw_recycle和Kubernetes的NAT冲突，必须关闭,<br>关闭不适用的IPV6协议栈，防止触发docker BUG;</p>
+<h2 id="9-检查系统内核和模块适不适合运行docker-centos系统"><a href="#9-检查系统内核和模块适不适合运行docker-centos系统" class="headerlink" title="9    检查系统内核和模块适不适合运行docker(centos系统)"></a>9    检查系统内核和模块适不适合运行docker(centos系统)</h2><pre class=" language-bash"><code class="language-bash">curl https://raw.githubusercontent.com/docker/docker/master/contrib/check-config.sh <span class="token operator">></span> check-config.sh
+./check-config.sh</code></pre>
+<h1 id="四-环境介绍"><a href="#四-环境介绍" class="headerlink" title="四    环境介绍"></a>四    环境介绍</h1><p>##############################<br>##############################<br>二进制搭建k8s多master集群之第二篇(使用TLS证书搭建etcd三节点高可用集群)<br>下面本文etcd集群才用三台centos7.5搭建完成。<br>etcd01(master01):     172.24.150.85<br>etcd02(master02):    172.24.150.86<br>etcd03(master03):     172.24.150.87</p>
+<h2 id="一-创建CA证书和密钥"><a href="#一-创建CA证书和密钥" class="headerlink" title="一 创建CA证书和密钥"></a>一 创建CA证书和密钥</h2><p>k8s系统各组件间需要使用TLS证书对通信进行加密，本文档使用CloudFlare的PKI工具集<strong>cfssl</strong>来生成Certificate Authority(CA)证书和密钥文件，CA是自签名证书，用来签名后续创建的其它TLS证书。由于第一篇我们做了master01(etcd01)到master02(etcd02),master03(etcd03)的免密验证，因此下面步骤中我们只需要在master01上操作，然后把证书和工具命令拷贝到其它节点上就可以了，有些需要其它节点必须登录操作的，我会红色标记提醒的</p>
+<h3 id="1-安装CFSSL-master01操作"><a href="#1-安装CFSSL-master01操作" class="headerlink" title="1 安装CFSSL(master01操作)"></a>1 安装CFSSL(master01操作)</h3><pre class=" language-bash"><code class="language-bash">curl -o /usr/local/bin/cfssl https://pkg.cfssl.org/R1.2/cfssl_linux-amd64
+curl -o /usr/local/bin/cfssljson https://pkg.cfssl.org/R1.2/cfssljson_linux-amd64
+<span class="token function">chmod</span> +x /usr/local/bin/cfssl*</code></pre>
+<h3 id="2-创建CA配置文件"><a href="#2-创建CA配置文件" class="headerlink" title="2 创建CA配置文件"></a>2 创建CA配置文件</h3><p>先创建存放证书的目录<br>mkdir -p /etc/kubernetes/cert &amp;&amp; cd /etc/kubernetes/cert   (master01,master02,master03都需要操作一遍)</p>
+<pre class=" language-bash"><code class="language-bash"><span class="token function">cat</span> <span class="token operator">></span> ca-config.json <span class="token operator">&lt;&lt;</span><span class="token string">EOF
+{
+  "signing": {
+    "default": {
+      "expiry": "87600h"
+    },
+    "profiles": {
+      "kubernetes": {
+        "usages": [
+            "signing",
+            "key encipherment",
+            "server auth",
+            "client auth"
+        ],
+        "expiry": "87600h"
+      }
+    }
+  }
+}
+EOF</span>
+
+简要介绍：
+    ca-config.json：可以定义多个 profiles，分别指定不同的过期时间、使用场景等参数；后续在签名证书时使用某个 profile； 
+    signing：表示该证书可用于签名其它证书；生成的 ca.pem 证书中 CA<span class="token operator">=</span>TRUE； 
+    server auth：表示 client 可以用该 CA 对 server 提供的证书进行验证； 
+    client auth：表示 server 可以用该 CA 对 client 提供的证书进行验证；</code></pre>
+<h3 id="3-创建CA证书签名请求"><a href="#3-创建CA证书签名请求" class="headerlink" title="3 创建CA证书签名请求"></a>3 创建CA证书签名请求</h3><pre class=" language-bash"><code class="language-bash"><span class="token function">cat</span> <span class="token operator">></span> ca-csr.json <span class="token operator">&lt;&lt;</span><span class="token string">EOF
+{
+  "CN": "kubernetes",
+  "key": {
+    "algo": "rsa",
+    "size": 2048
+  },
+  "names": [
+    {
+      "C": "CN",
+      "ST": "BeiJing",
+      "L": "BeiJing",
+      "O": "k8s",
+      "OU": "yunwei"
+    }
+  ]
+}
+EOF</span>
+
+简要介绍:
+    CN：Common Name，kube-apiserver 从证书中提取该字段作为请求的用户名 <span class="token punctuation">(</span>User Name<span class="token punctuation">)</span>，浏览器使用该字段验证网站是否合法；
+    O：Organization，kube-apiserver 从证书中提取该字段作为请求用户所属的组 <span class="token punctuation">(</span>Group<span class="token punctuation">)</span>；
+    kube-apiserver 将提取的 User、Group 作为 RBAC 授权的用户标识；</code></pre>
+<p>生成CA证书和私钥:</p>
+<pre class=" language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@master01 cert<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># cfssl gencert -initca ca-csr.json | cfssljson -bare ca</span>
+2019/07/07 10:53:30 <span class="token punctuation">[</span>INFO<span class="token punctuation">]</span> generating a new CA key and certificate from CSR
+2019/07/07 10:53:30 <span class="token punctuation">[</span>INFO<span class="token punctuation">]</span> generate received request
+2019/07/07 10:53:30 <span class="token punctuation">[</span>INFO<span class="token punctuation">]</span> received CSR
+2019/07/07 10:53:30 <span class="token punctuation">[</span>INFO<span class="token punctuation">]</span> generating key: rsa-2048
+2019/07/07 10:53:30 <span class="token punctuation">[</span>INFO<span class="token punctuation">]</span> encoded CSR
+2019/07/07 10:53:30 <span class="token punctuation">[</span>INFO<span class="token punctuation">]</span> signed certificate with serial number 605272635170936057386255196971681816888287295153
+<span class="token punctuation">[</span>root@master01 cert<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># ls</span>
+ca-config.json  ca.csr  ca-csr.json  ca-key.pem  ca.pem</code></pre>
+<h3 id="4-创建etcd证书签名请求文件"><a href="#4-创建etcd证书签名请求文件" class="headerlink" title="4 创建etcd证书签名请求文件"></a>4 创建etcd证书签名请求文件</h3><pre class=" language-bash"><code class="language-bash"><span class="token function">cat</span> <span class="token operator">></span> etcd-csr.json <span class="token operator">&lt;&lt;</span><span class="token string">EOF
+{
+  "CN": "etcd",
+  "hosts": [
+    "127.0.0.1",
+    "172.24.150.85",
+    "172.24.150.86",
+    "172.24.150.87"
+  ],
+  "key": {
+    "algo": "rsa",
+    "size": 2048
+  },
+  "names": [
+    {
+      "C": "CN",
+      "ST": "BeiJing",
+      "L": "BeiJing",
+      "O": "k8s",
+      "OU": "yunwei"
+    }
+  ]
+}
+EOF</span>
+
+简要介绍：
+    hosts 字段指定授权使用该证书的 etcd 节点 IP 或域名列表，这里将 etcd 集群的三个节点 IP 都列在其中<span class="token punctuation">;</span></code></pre>
+<p>生成CA证书和私钥：</p>
+<pre class=" language-bash"><code class="language-bash">cfssl gencert -ca<span class="token operator">=</span>/etc/kubernetes/cert/ca.pem \
+    -ca-key<span class="token operator">=</span>/etc/kubernetes/cert/ca-key.pem \
+    -config<span class="token operator">=</span>/etc/kubernetes/cert/ca-config.json \
+    -profile<span class="token operator">=</span>kubernetes etcd-csr.json <span class="token operator">|</span> cfssljson -bare etcd</code></pre>
+<h3 id="5-将-pem证书分发到其它两台etcd主机节点上即etcd02-master02-、-etcd03-master03"><a href="#5-将-pem证书分发到其它两台etcd主机节点上即etcd02-master02-、-etcd03-master03" class="headerlink" title="5 将*.pem证书分发到其它两台etcd主机节点上即etcd02(master02)、 etcd03(master03)"></a>5 将*.pem证书分发到其它两台etcd主机节点上即etcd02(master02)、 etcd03(master03)</h3><p>另外ca证书也要分发到node01，node02上，因为创建flanneld网络时要用到</p>
+<pre class=" language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@master01 cert<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># scp *.pem master02:/etc/kubernetes/cert</span>
+<span class="token punctuation">[</span>root@master01 cert<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># scp *.pem master03:/etc/kubernetes/cert               </span>
+<span class="token punctuation">[</span>root@master01 cert<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># scp ca.pem root@node01:/etc/kubernetes/cert </span>
+<span class="token punctuation">[</span>root@master01 cert<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># scp ca.pem root@node02:/etc/kubernetes/cert </span></code></pre>
+<p>etcd使用证书组件为：<br>    &gt;    * ca.pem<br>    &gt;    * etcd-key.pem<br>    &gt;    * etcd.pem    </p>
+<h2 id="二-部署etcd三节点集群"><a href="#二-部署etcd三节点集群" class="headerlink" title="二 部署etcd三节点集群"></a>二 部署etcd三节点集群</h2><p>三个etcd节点都要安装etcd软件包(即：master01、master02、master03)</p>
+<h3 id="1-三节点下载软件包"><a href="#1-三节点下载软件包" class="headerlink" title="1 三节点下载软件包"></a>1 三节点下载软件包</h3><pre class=" language-bash"><code class="language-bash"><span class="token function">wget</span> https://github.com/etcd-io/etcd/releases/download/v3.3.10/etcd-v3.3.10-linux-amd64.tar.gz
+<span class="token function">tar</span> zxf etcd-v3.3.10-linux-amd64.tar.gz
+<span class="token function">cp</span>  etcd-v3.3.10-linux-amd64/etcd* /usr/local/bin</code></pre>
+<h3 id="2-三节点都创建etcd数据库工作目录"><a href="#2-三节点都创建etcd数据库工作目录" class="headerlink" title="2 三节点都创建etcd数据库工作目录"></a>2 三节点都创建etcd数据库工作目录</h3><pre class=" language-bash"><code class="language-bash"><span class="token function">mkdir</span> -p /var/lib/etcd</code></pre>
+<h3 id="3-创建三节点的-systemd-unit-文件"><a href="#3-创建三节点的-systemd-unit-文件" class="headerlink" title="3 创建三节点的 systemd unit 文件"></a>3 创建三节点的 systemd unit 文件</h3><p>master01的systemd unit配置文件如下：<br>###############################  172.24.150.85    ################################</p>
+<pre class=" language-bash"><code class="language-bash"><span class="token function">cat</span> <span class="token operator">></span> /etc/systemd/system/etcd.service <span class="token operator">&lt;&lt;</span> <span class="token string">EOF
+[Unit]
+Description=Etcd Server
+After=network.target
+After=network-online.target
+Wants=network-online.target
+Documentation=https://github.com/coreos
+
+[Service]
+Type=notify
+WorkingDirectory=/var/lib/etcd/
+ExecStart=/usr/local/bin/etcd \
+  --name etcd01 \
+  --cert-file=/etc/kubernetes/cert/etcd.pem \
+  --key-file=/etc/kubernetes/cert/etcd-key.pem \
+  --peer-cert-file=/etc/kubernetes/cert/etcd.pem \
+  --peer-key-file=/etc/kubernetes/cert/etcd-key.pem \
+  --trusted-ca-file=/etc/kubernetes/cert/ca.pem \
+  --peer-trusted-ca-file=/etc/kubernetes/cert/ca.pem \
+  --initial-advertise-peer-urls https://172.24.150.85:2380 \
+  --listen-peer-urls https://172.24.150.85:2380 \
+  --listen-client-urls https://172.24.150.85:2379,http://127.0.0.1:2379 \
+  --advertise-client-urls https://172.24.150.85:2379 \
+  --initial-cluster-token etcd-cluster-0 \
+  --initial-cluster etcd01=https://172.24.150.85:2380,etcd02=https://172.24.150.86:2380,etcd03=https://172.24.150.87:2380 \
+  --initial-cluster-state new \
+  --data-dir=/var/lib/etcd
+Restart=on-failure
+RestartSec=5
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target
+EOF</span></code></pre>
+<p>###############################  172.24.150.86    ################################<br>master02的system unit配置文件如下：</p>
+<pre class=" language-bash"><code class="language-bash"><span class="token function">cat</span> <span class="token operator">></span> /etc/systemd/system/etcd.service <span class="token operator">&lt;&lt;</span> <span class="token string">EOF
+[Unit]
+Description=Etcd Server
+After=network.target
+After=network-online.target
+Wants=network-online.target
+Documentation=https://github.com/coreos
+
+[Service]
+Type=notify
+WorkingDirectory=/var/lib/etcd/
+ExecStart=/usr/local/bin/etcd \
+  --name etcd02 \
+  --cert-file=/etc/kubernetes/cert/etcd.pem \
+  --key-file=/etc/kubernetes/cert/etcd-key.pem \
+  --peer-cert-file=/etc/kubernetes/cert/etcd.pem \
+  --peer-key-file=/etc/kubernetes/cert/etcd-key.pem \
+  --trusted-ca-file=/etc/kubernetes/cert/ca.pem \
+  --peer-trusted-ca-file=/etc/kubernetes/cert/ca.pem \
+  --initial-advertise-peer-urls https://172.24.150.86:2380 \
+  --listen-peer-urls https://172.24.150.86:2380 \
+  --listen-client-urls https://172.24.150.86:2379,http://127.0.0.1:2379 \
+  --advertise-client-urls https://172.24.150.86:2379 \
+  --initial-cluster-token etcd-cluster-0 \
+  --initial-cluster etcd01=https://172.24.150.85:2380,etcd02=https://172.24.150.86:2380,etcd03=https://172.24.150.87:2380 \
+  --initial-cluster-state new \
+  --data-dir=/var/lib/etcd
+Restart=on-failure
+RestartSec=5
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target
+EOF</span></code></pre>
+<p>###############################  172.24.150.87    ################################<br>master03的system unit配置文件如下：</p>
+<pre class=" language-bash"><code class="language-bash"><span class="token function">cat</span> <span class="token operator">></span> /etc/systemd/system/etcd.service <span class="token operator">&lt;&lt;</span> <span class="token string">EOF
+[Unit]
+Description=Etcd Server
+After=network.target
+After=network-online.target
+Wants=network-online.target
+Documentation=https://github.com/coreos
+
+[Service]
+Type=notify
+WorkingDirectory=/var/lib/etcd/
+ExecStart=/usr/local/bin/etcd \
+  --name etcd03 \
+  --cert-file=/etc/kubernetes/cert/etcd.pem \
+  --key-file=/etc/kubernetes/cert/etcd-key.pem \
+  --peer-cert-file=/etc/kubernetes/cert/etcd.pem \
+  --peer-key-file=/etc/kubernetes/cert/etcd-key.pem \
+  --trusted-ca-file=/etc/kubernetes/cert/ca.pem \
+  --peer-trusted-ca-file=/etc/kubernetes/cert/ca.pem \
+  --initial-advertise-peer-urls https://172.24.150.87:2380 \
+  --listen-peer-urls https://172.24.150.87:2380 \
+  --listen-client-urls https://172.24.150.87:2379,http://127.0.0.1:2379 \
+  --advertise-client-urls https://172.24.150.87:2379 \
+  --initial-cluster-token etcd-cluster-0 \
+  --initial-cluster etcd01=https://172.24.150.85:2380,etcd02=https://172.24.150.86:2380,etcd03=https://172.24.150.87:2380 \
+  --initial-cluster-state new \
+  --data-dir=/var/lib/etcd
+Restart=on-failure
+RestartSec=5
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target
+EOF</span></code></pre>
+<p>####################################################################################################<br>为了保证通信安全，需要指定 etcd 的公私钥(cert-file和key-file)、Peers 通信的公私钥和 CA 证书(peer-cert-file、peer-key-file、peer-trusted-ca-file)、客户端的CA证书（trusted-ca-file）； </p>
+<p>创建etcd.pem 证书时使用的 etcd-csr.json 文件的 hosts 字段包含所有 etcd 节点的IP，否则证书校验会出错；<br>–initial-cluster-state 值为 new 时，–name 的参数值必须位于 –initial-cluster 列表中.</p>
+<h3 id="4-最好三节点同时启动并且设置开机自启动-xshell工具，一个窗口连接3个主机"><a href="#4-最好三节点同时启动并且设置开机自启动-xshell工具，一个窗口连接3个主机" class="headerlink" title="4 最好三节点同时启动并且设置开机自启动(xshell工具，一个窗口连接3个主机)"></a>4 最好三节点同时启动并且设置开机自启动(xshell工具，一个窗口连接3个主机)</h3><pre class=" language-bash"><code class="language-bash">systemctl daemon-reload
+systemctl start etcd.service
+systemctl <span class="token function">enable</span> etcd.service</code></pre>
+<h3 id="5-查看etcd服务的状态信息"><a href="#5-查看etcd服务的状态信息" class="headerlink" title="5 查看etcd服务的状态信息"></a>5 查看etcd服务的状态信息</h3><pre class=" language-bash"><code class="language-bash">systemctl status etcd.service</code></pre>
+<p>如果不是一起启动的话，最先启动的etcd进程会卡住一段时间，等待其它节点的etcd进程加入集群，为正常现象</p>
+<h3 id="6-验证etcd集群状态，以及查看leader，下面命令可以在任何一个etcd节点执行，同时执行也无所谓"><a href="#6-验证etcd集群状态，以及查看leader，下面命令可以在任何一个etcd节点执行，同时执行也无所谓" class="headerlink" title="6 验证etcd集群状态，以及查看leader，下面命令可以在任何一个etcd节点执行，同时执行也无所谓"></a>6 验证etcd集群状态，以及查看leader，下面命令可以在任何一个etcd节点执行，同时执行也无所谓</h3><pre class=" language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@master01 system<span class="token punctuation">]</span><span class="token comment" spellcheck="true">#  etcdctl --ca-file=/etc/kubernetes/cert/ca.pem --cert-file=/etc/kubernetes/cert/etcd.pem --key-file=/etc/kubernetes/cert/etcd-key.pem cluster-health</span>
+member 2b7694970ad266e9 is healthy: got healthy result from https://172.24.150.86:2379
+member 2de7ad1771e372b4 is healthy: got healthy result from https://172.24.150.87:2379
+member cf6dea03cf608ee3 is healthy: got healthy result from https://172.24.150.85:2379
+cluster is healthy
+<span class="token punctuation">[</span>root@master01 system<span class="token punctuation">]</span><span class="token comment" spellcheck="true">#  etcdctl --ca-file=/etc/kubernetes/cert/ca.pem --cert-file=/etc/kubernetes/cert/etcd.pem --key-file=/etc/kubernetes/cert/etcd-key.pem member list</span>
+2b7694970ad266e9: name<span class="token operator">=</span>etcd02 peerURLs<span class="token operator">=</span>https://172.24.150.86:2380 clientURLs<span class="token operator">=</span>https://172.24.150.86:2379 isLeader<span class="token operator">=</span>false
+2de7ad1771e372b4: name<span class="token operator">=</span>etcd03 peerURLs<span class="token operator">=</span>https://172.24.150.87:2380 clientURLs<span class="token operator">=</span>https://172.24.150.87:2379 isLeader<span class="token operator">=</span>false
+cf6dea03cf608ee3: name<span class="token operator">=</span>etcd01 peerURLs<span class="token operator">=</span>https://172.24.150.85:2380 clientURLs<span class="token operator">=</span>https://172.24.150.85:2379 isLeader<span class="token operator">=</span>true
+</code></pre>
+<pre class=" language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@master02 system<span class="token punctuation">]</span><span class="token comment" spellcheck="true">#  etcdctl --ca-file=/etc/kubernetes/cert/ca.pem --cert-file=/etc/kubernetes/cert/etcd.pem --key-file=/etc/kubernetes/cert/etcd-key.pem cluster-health</span>
+member 2b7694970ad266e9 is healthy: got healthy result from https://172.24.150.86:2379
+member 2de7ad1771e372b4 is healthy: got healthy result from https://172.24.150.87:2379
+member cf6dea03cf608ee3 is healthy: got healthy result from https://172.24.150.85:2379
+cluster is healthy
+<span class="token punctuation">[</span>root@master02 system<span class="token punctuation">]</span><span class="token comment" spellcheck="true">#  etcdctl --ca-file=/etc/kubernetes/cert/ca.pem --cert-file=/etc/kubernetes/cert/etcd.pem --key-file=/etc/kubernetes/cert/etcd-key.pem member list</span>
+2b7694970ad266e9: name<span class="token operator">=</span>etcd02 peerURLs<span class="token operator">=</span>https://172.24.150.86:2380 clientURLs<span class="token operator">=</span>https://172.24.150.86:2379 isLeader<span class="token operator">=</span>false
+2de7ad1771e372b4: name<span class="token operator">=</span>etcd03 peerURLs<span class="token operator">=</span>https://172.24.150.87:2380 clientURLs<span class="token operator">=</span>https://172.24.150.87:2379 isLeader<span class="token operator">=</span>false
+cf6dea03cf608ee3: name<span class="token operator">=</span>etcd01 peerURLs<span class="token operator">=</span>https://172.24.150.85:2380 clientURLs<span class="token operator">=</span>https://172.24.150.85:2379 isLeader<span class="token operator">=</span>true
+<span class="token punctuation">[</span>root@master02 system<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># </span></code></pre>
+<pre class=" language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@master03 system<span class="token punctuation">]</span><span class="token comment" spellcheck="true">#  etcdctl --ca-file=/etc/kubernetes/cert/ca.pem --cert-file=/etc/kubernetes/cert/etcd.pem --key-file=/etc/kubernetes/cert/etcd-key.pem cluster-health</span>
+member 2b7694970ad266e9 is healthy: got healthy result from https://172.24.150.86:2379
+member 2de7ad1771e372b4 is healthy: got healthy result from https://172.24.150.87:2379
+member cf6dea03cf608ee3 is healthy: got healthy result from https://172.24.150.85:2379
+cluster is healthy
+<span class="token punctuation">[</span>root@master03 system<span class="token punctuation">]</span><span class="token comment" spellcheck="true">#  etcdctl --ca-file=/etc/kubernetes/cert/ca.pem --cert-file=/etc/kubernetes/cert/etcd.pem --key-file=/etc/kubernetes/cert/etcd-key.pem member list</span>
+2b7694970ad266e9: name<span class="token operator">=</span>etcd02 peerURLs<span class="token operator">=</span>https://172.24.150.86:2380 clientURLs<span class="token operator">=</span>https://172.24.150.86:2379 isLeader<span class="token operator">=</span>false
+2de7ad1771e372b4: name<span class="token operator">=</span>etcd03 peerURLs<span class="token operator">=</span>https://172.24.150.87:2380 clientURLs<span class="token operator">=</span>https://172.24.150.87:2379 isLeader<span class="token operator">=</span>false
+cf6dea03cf608ee3: name<span class="token operator">=</span>etcd01 peerURLs<span class="token operator">=</span>https://172.24.150.85:2380 clientURLs<span class="token operator">=</span>https://172.24.150.85:2379 isLeader<span class="token operator">=</span>true</code></pre>
+<p>到此ETCD TLS 3节点集群部署完成，下一篇是二进制搭建k8s三节点master高可用集群之第三篇配置flannel网络</p>
+<p>上一篇我们已经搭建etcd高可用集群，这篇我们将搭建Flannel，目的使跨主机的docker能够相互通信，也是保障kubernetes集群的网络基础和保障，下面开始配置。</p>
+<h1 id="生成Flannel网络TLS证书"><a href="#生成Flannel网络TLS证书" class="headerlink" title="生成Flannel网络TLS证书"></a>生成Flannel网络TLS证书</h1><p>在所有集群节点都安装Flannel,下面的操作就只演示master01上，其它节点重复执行即可。(证书就在master01上生成一次就行，然后分发)</p>
+<h2 id="1-创建证书签名请求"><a href="#1-创建证书签名请求" class="headerlink" title="1    创建证书签名请求"></a>1    创建证书签名请求</h2><pre class=" language-bash"><code class="language-bash"><span class="token function">cat</span> <span class="token operator">></span> flanneld-csr.json <span class="token operator">&lt;&lt;</span><span class="token string">EOF
+{
+  "CN": "flanneld",
+  "hosts": [],
+  "key": {
+    "algo": "rsa",
+    "size": 2048
+  },
+  "names": [
+    {
+      "C": "CN",
+      "ST": "BeiJing",
+      "L": "BeiJing",
+      "O": "k8s",
+      "OU": "yunwei"
+    }
+  ]
+}
+EOF</span></code></pre>
+<p>该证书只会被kubectl当做client证书使用，所以hosts字段为空；</p>
+<p>生成证书和私钥:</p>
+<pre class=" language-bash"><code class="language-bash">
+<span class="token punctuation">[</span>root@master01 cert<span class="token punctuation">]</span>cfssl gencert -ca<span class="token operator">=</span>/etc/kubernetes/cert/ca.pem \
+  -ca-key<span class="token operator">=</span>/etc/kubernetes/cert/ca-key.pem \
+  -config<span class="token operator">=</span>/etc/kubernetes/cert/ca-config.json \
+  -profile<span class="token operator">=</span>kubernetes flanneld-csr.json <span class="token operator">|</span> cfssljson -bare flanneld</code></pre>
+<h2 id="2-将证书分发到所有集群节点-etc-kubernetes-cert-目录下"><a href="#2-将证书分发到所有集群节点-etc-kubernetes-cert-目录下" class="headerlink" title="2    将证书分发到所有集群节点/etc/kubernetes/cert/目录下"></a>2    将证书分发到所有集群节点/etc/kubernetes/cert/目录下</h2><pre class=" language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@master01 cert<span class="token punctuation">]</span> <span class="token function">scp</span>  flanneld*.pem   root@master02:/etc/kubernetes/cert/
+<span class="token punctuation">[</span>root@master01 cert<span class="token punctuation">]</span> <span class="token function">scp</span>  flanneld*.pem   root@master03:/etc/kubernetes/cert/
+<span class="token punctuation">[</span>root@master01 cert<span class="token punctuation">]</span> <span class="token function">scp</span>  flanneld*.pem   root@node01:/etc/kubernetes/cert/
+<span class="token punctuation">[</span>root@master01 cert<span class="token punctuation">]</span> <span class="token function">scp</span>  flanneld*.pem   root@node02:/etc/kubernetes/cert/</code></pre>
+<h1 id="二-部署Flannel"><a href="#二-部署Flannel" class="headerlink" title="二    部署Flannel"></a>二    部署Flannel</h1><h2 id="1-下载Flannel-所有节点"><a href="#1-下载Flannel-所有节点" class="headerlink" title="1    下载Flannel(所有节点)"></a>1    下载Flannel(所有节点)</h2><pre class=" language-bash"><code class="language-bash"><span class="token function">wget</span> https://github.com/coreos/flannel/releases/download/v0.10.0/flannel-v0.10.0-linux-amd64.tar.gz
+<span class="token function">tar</span> -xzvf flannel-v0.10.0-linux-amd64.tar.gz
+<span class="token function">cp</span> <span class="token punctuation">{</span>flanneld,mk-docker-opts.sh<span class="token punctuation">}</span> /usr/local/bin</code></pre>
+<h2 id="2-向etcd写入网段信息"><a href="#2-向etcd写入网段信息" class="headerlink" title="2 向etcd写入网段信息"></a>2 向etcd写入网段信息</h2><p>下面两条命令在etcd集群中任意一台上执行一次就行，也就是创建一个flannel网段供docker分配使用</p>
+<pre class=" language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@master01 cert<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># etcdctl --ca-file=/etc/kubernetes/cert/ca.pem --cert-file=/etc/kubernetes/cert/etcd.pem --key-file=/etc/kubernetes/cert/etcd-key.pem mkdir /kubernetes/network</span>
+<span class="token punctuation">[</span>root@master01 cert<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># etcdctl --ca-file=/etc/kubernetes/cert/ca.pem --cert-file=/etc/kubernetes/cert/etcd.pem --key-file=/etc/kubernetes/cert/etcd-key.pem mk /kubernetes/network/config '{"Network":"172.30.0.0/16","SubnetLen":24,"Backend":{"Type":"vxlan"}}'</span></code></pre>
+<p>第二条这么长是一个整命令哦，不要忘记了哦</p>
+<h2 id="3-创建system-unit文件"><a href="#3-创建system-unit文件" class="headerlink" title="3 创建system unit文件"></a>3 创建system unit文件</h2><p>在master01创建好，然后不用做任何修改分发到master02,master03,node01,node02 上。</p>
+<pre class=" language-bash"><code class="language-bash"><span class="token function">cat</span> <span class="token operator">></span>/etc/systemd/system/flannel.service <span class="token operator">&lt;&lt;</span><span class="token string">EOF
+[Unit]
+Description=Flanneld overlay address etcd agent
+After=network.target
+After=network-online.target
+Wants=network-online.target
+After=etcd.service
+Before=docker.service
+
+[Service]
+Type=notify
+ExecStart=/usr/local/bin/flanneld \
+  -etcd-cafile=/etc/kubernetes/cert/ca.pem \
+  -etcd-certfile=/etc/kubernetes/cert/flanneld.pem \
+  -etcd-keyfile=/etc/kubernetes/cert/flanneld-key.pem \
+  -etcd-endpoints=https://172.24.150.85:2379,https://172.24.150.86:2379,https://172.24.150.87:2379 \
+  -etcd-prefix=/kubernetes/network
+ExecStartPost=/usr/local/bin/mk-docker-opts.sh -k DOCKER_NETWORK_OPTIONS -d /run/flannel/docker
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+RequiredBy=docker.service
+EOF</span>
+
+简要介绍：
+    mk-docker-opts.sh 脚本将分配给 flanneld 的 Pod 子网网段信息写入到 /run/flannel/docker 文件中，后续 docker 启动时使用这个文件中参数值设置 docker0 网桥。
+
+    flanneld 使用系统缺省路由所在的接口和其它节点通信，对于有多个网络接口的机器（如，内网和公网），可以用 -iface<span class="token operator">=</span>enpxx 选项值指定通信接口。
+</code></pre>
+<h2 id="4-启动所有节点开始启动flannel并且设置开启自启动"><a href="#4-启动所有节点开始启动flannel并且设置开启自启动" class="headerlink" title="4    启动所有节点开始启动flannel并且设置开启自启动"></a>4    启动所有节点开始启动flannel并且设置开启自启动</h2><pre class=" language-bash"><code class="language-bash">systemctl daemon-reload
+systemctl <span class="token function">enable</span> flanneld
+systemctl start flanneld</code></pre>
+<h2 id="5-查看flannel分配的子网信息"><a href="#5-查看flannel分配的子网信息" class="headerlink" title="5    查看flannel分配的子网信息"></a>5    查看flannel分配的子网信息</h2><pre class=" language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@master01 system<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># cat /run/flannel/docker </span>
+DOCKER_OPT_BIP<span class="token operator">=</span><span class="token string">"--bip=172.30.60.1/24"</span>
+DOCKER_OPT_IPMASQ<span class="token operator">=</span><span class="token string">"--ip-masq=true"</span>
+DOCKER_OPT_MTU<span class="token operator">=</span><span class="token string">"--mtu=1450"</span>
+DOCKER_NETWORK_OPTIONS<span class="token operator">=</span><span class="token string">" --bip=172.30.60.1/24 --ip-masq=true --mtu=1450"</span>
+
+
+<span class="token punctuation">[</span>root@master01 system<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># cat /run/flannel/subnet.env </span>
+FLANNEL_NETWORK<span class="token operator">=</span>172.30.0.0/16
+FLANNEL_SUBNET<span class="token operator">=</span>172.30.60.1/24
+FLANNEL_MTU<span class="token operator">=</span>1450
+FLANNEL_IPMASQ<span class="token operator">=</span>false
+</code></pre>
+<p>/run/flannel/docker是flannel分配给docker的子网信息，/run/flannel/subnet.env包含了flannel整个大网段以及在此节点上的子网段</p>
+<h2 id="6-查看flannel网络是否生效"><a href="#6-查看flannel网络是否生效" class="headerlink" title="6     查看flannel网络是否生效"></a>6     查看flannel网络是否生效</h2><pre class=" language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@master01 system<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># ifconfig</span>
+docker0: flags<span class="token operator">=</span>4099<span class="token operator">&lt;</span>UP,BROADCAST,MULTICAST<span class="token operator">></span>  mtu 1500
+        inet 172.17.0.1  netmask 255.255.0.0  broadcast 172.17.255.255
+        ether 02:42:dc:05:69:5c  txqueuelen 0  <span class="token punctuation">(</span>Ethernet<span class="token punctuation">)</span>
+        RX packets 0  bytes 0 <span class="token punctuation">(</span>0.0 B<span class="token punctuation">)</span>
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 0  bytes 0 <span class="token punctuation">(</span>0.0 B<span class="token punctuation">)</span>
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+eth0: flags<span class="token operator">=</span>4163<span class="token operator">&lt;</span>UP,BROADCAST,RUNNING,MULTICAST<span class="token operator">></span>  mtu 1500
+        inet 172.24.150.85  netmask 255.255.240.0  broadcast 172.24.159.255
+        ether 00:16:3e:01:36:6e  txqueuelen 1000  <span class="token punctuation">(</span>Ethernet<span class="token punctuation">)</span>
+        RX packets 698491  bytes 207475857 <span class="token punctuation">(</span>197.8 MiB<span class="token punctuation">)</span>
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 631869  bytes 77810204 <span class="token punctuation">(</span>74.2 MiB<span class="token punctuation">)</span>
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+flannel.1: flags<span class="token operator">=</span>4163<span class="token operator">&lt;</span>UP,BROADCAST,RUNNING,MULTICAST<span class="token operator">></span>  mtu 1450
+        inet 172.30.60.0  netmask 255.255.255.255  broadcast 0.0.0.0
+        ether 32:1c:4c:05:4a:22  txqueuelen 0  <span class="token punctuation">(</span>Ethernet<span class="token punctuation">)</span>
+        RX packets 0  bytes 0 <span class="token punctuation">(</span>0.0 B<span class="token punctuation">)</span>
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 0  bytes 0 <span class="token punctuation">(</span>0.0 B<span class="token punctuation">)</span>
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+lo: flags<span class="token operator">=</span>73<span class="token operator">&lt;</span>UP,LOOPBACK,RUNNING<span class="token operator">></span>  mtu 65536
+        inet 127.0.0.1  netmask 255.0.0.0
+        loop  txqueuelen 1000  <span class="token punctuation">(</span>Local Loopback<span class="token punctuation">)</span>
+        RX packets 2246  bytes 161117 <span class="token punctuation">(</span>157.3 KiB<span class="token punctuation">)</span>
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 2246  bytes 161117 <span class="token punctuation">(</span>157.3 KiB<span class="token punctuation">)</span>
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0</code></pre>
+<p>可以明显看到flannel1.1的网络信息，说明flannel网络已经正常。</p>
+<h2 id="三-配置docker支持flannel网络"><a href="#三-配置docker支持flannel网络" class="headerlink" title="三     配置docker支持flannel网络"></a>三     配置docker支持flannel网络</h2><h3 id="1-所有节点-master01-03-node01-02-五个节点都安装docker-安装指定版本的docker就不介绍了"><a href="#1-所有节点-master01-03-node01-02-五个节点都安装docker-安装指定版本的docker就不介绍了" class="headerlink" title="1    所有节点(master01-03,node01-02)五个节点都安装docker,安装指定版本的docker就不介绍了"></a>1    所有节点(master01-03,node01-02)五个节点都安装docker,安装指定版本的docker就不介绍了</h3><h3 id="2-配置daocker支持flannel网络"><a href="#2-配置daocker支持flannel网络" class="headerlink" title="2    配置daocker支持flannel网络"></a>2    配置daocker支持flannel网络</h3><p>所有docker节点都操作,对5个节点默认的docker system unit配置文件进行修改</p>
+<pre class=" language-bash"><code class="language-bash"><span class="token function">vi</span>     /usr/lib/systemd/system/docker.service 
+<span class="token punctuation">[</span>Unit<span class="token punctuation">]</span>
+Description<span class="token operator">=</span>Docker Application Container Engine
+Documentation<span class="token operator">=</span>https://docs.docker.com
+After<span class="token operator">=</span>network-online.target firewalld.service
+Wants<span class="token operator">=</span>network-online.target
+
+<span class="token punctuation">[</span>Service<span class="token punctuation">]</span>
+Type<span class="token operator">=</span>notify
+<span class="token comment" spellcheck="true"># the default is not to use systemd for cgroups because the delegate issues still</span>
+<span class="token comment" spellcheck="true"># exists and systemd currently does not support the cgroup feature set required</span>
+<span class="token comment" spellcheck="true"># for containers run by docker</span>
+EnvironmentFile<span class="token operator">=</span>/run/flannel/docker
+ExecStart<span class="token operator">=</span>/usr/bin/dockerd <span class="token variable">$DOCKER_NETWORK_OPTIONS</span>
+ExecReload<span class="token operator">=</span>/bin/kill -s HUP <span class="token variable">$MAINPID</span>
+<span class="token comment" spellcheck="true"># Having non-zero Limit*s causes performance problems due to accounting overhead</span>
+<span class="token comment" spellcheck="true"># in the kernel. We recommend using cgroups to do container-local accounting.</span>
+LimitNOFILE<span class="token operator">=</span>infinity
+LimitNPROC<span class="token operator">=</span>infinity
+LimitCORE<span class="token operator">=</span>infinity
+<span class="token comment" spellcheck="true"># Uncomment TasksMax if your systemd version supports it.</span>
+<span class="token comment" spellcheck="true"># Only systemd 226 and above support this version.</span>
+<span class="token comment" spellcheck="true">#TasksMax=infinity</span>
+TimeoutStartSec<span class="token operator">=</span>0
+<span class="token comment" spellcheck="true"># set delegate yes so that systemd does not reset the cgroups of docker containers</span>
+Delegate<span class="token operator">=</span>yes
+<span class="token comment" spellcheck="true"># kill only the docker process, not all processes in the cgroup</span>
+KillMode<span class="token operator">=</span>process
+<span class="token comment" spellcheck="true"># restart the docker process if it exits prematurely</span>
+Restart<span class="token operator">=</span>on-failure
+StartLimitBurst<span class="token operator">=</span>3
+StartLimitInterval<span class="token operator">=</span>60s
+
+<span class="token punctuation">[</span>Install<span class="token punctuation">]</span>
+WantedBy<span class="token operator">=</span>multi-user.target
+
+<span class="token comment" spellcheck="true">##主要修改配置文件以下两行:</span>
+EnvironmentFile<span class="token operator">=</span>/run/flannel/docker
+ExecStart<span class="token operator">=</span>/usr/bin/dockerd <span class="token variable">$DOCKER_NETWORK_OPTIONS</span>
+这里两行不同而已</code></pre>
+<h2 id="3-重启docker，是配置生效"><a href="#3-重启docker，是配置生效" class="headerlink" title="3    重启docker，是配置生效"></a>3    重启docker，是配置生效</h2><p>先看一下没有修改docker的system unit文件，重启前</p>
+<pre class=" language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@master01 system<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># ifconfig</span>
+docker0: flags<span class="token operator">=</span>4099<span class="token operator">&lt;</span>UP,BROADCAST,MULTICAST<span class="token operator">></span>  mtu 1500
+        inet 172.17.0.1  netmask 255.255.0.0  broadcast 172.17.255.255
+        ether 02:42:dc:05:69:5c  txqueuelen 0  <span class="token punctuation">(</span>Ethernet<span class="token punctuation">)</span>
+        RX packets 0  bytes 0 <span class="token punctuation">(</span>0.0 B<span class="token punctuation">)</span>
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 0  bytes 0 <span class="token punctuation">(</span>0.0 B<span class="token punctuation">)</span>
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+eth0: flags<span class="token operator">=</span>4163<span class="token operator">&lt;</span>UP,BROADCAST,RUNNING,MULTICAST<span class="token operator">></span>  mtu 1500
+        inet 172.24.150.85  netmask 255.255.240.0  broadcast 172.24.159.255
+        ether 00:16:3e:01:36:6e  txqueuelen 1000  <span class="token punctuation">(</span>Ethernet<span class="token punctuation">)</span>
+        RX packets 806758  bytes 292970377 <span class="token punctuation">(</span>279.3 MiB<span class="token punctuation">)</span>
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 729328  bytes 88585438 <span class="token punctuation">(</span>84.4 MiB<span class="token punctuation">)</span>
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+flannel.1: flags<span class="token operator">=</span>4163<span class="token operator">&lt;</span>UP,BROADCAST,RUNNING,MULTICAST<span class="token operator">></span>  mtu 1450
+        inet 172.30.60.0  netmask 255.255.255.255  broadcast 0.0.0.0
+        ether 32:1c:4c:05:4a:22  txqueuelen 0  <span class="token punctuation">(</span>Ethernet<span class="token punctuation">)</span>
+        RX packets 0  bytes 0 <span class="token punctuation">(</span>0.0 B<span class="token punctuation">)</span>
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 0  bytes 0 <span class="token punctuation">(</span>0.0 B<span class="token punctuation">)</span>
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+lo: flags<span class="token operator">=</span>73<span class="token operator">&lt;</span>UP,LOOPBACK,RUNNING<span class="token operator">></span>  mtu 65536
+        inet 127.0.0.1  netmask 255.0.0.0
+        loop  txqueuelen 1000  <span class="token punctuation">(</span>Local Loopback<span class="token punctuation">)</span>
+        RX packets 2914  bytes 195853 <span class="token punctuation">(</span>191.2 KiB<span class="token punctuation">)</span>
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 2914  bytes 195853 <span class="token punctuation">(</span>191.2 KiB<span class="token punctuation">)</span>
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+</code></pre>
+<p>#添加docker的system unit配置文件后，然后重启docker服务,ifconfig命令查看</p>
+<pre class=" language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@master01 system<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># systemctl daemon-reload</span>
+<span class="token punctuation">[</span>root@master01 system<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># systemctl restart docker</span>
+<span class="token punctuation">[</span>root@master01 system<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># ifconfig</span>
+docker0: flags<span class="token operator">=</span>4099<span class="token operator">&lt;</span>UP,BROADCAST,MULTICAST<span class="token operator">></span>  mtu 1500
+        inet 172.30.60.1  netmask 255.255.255.0  broadcast 172.30.60.255
+        ether 02:42:dc:05:69:5c  txqueuelen 0  <span class="token punctuation">(</span>Ethernet<span class="token punctuation">)</span>
+        RX packets 0  bytes 0 <span class="token punctuation">(</span>0.0 B<span class="token punctuation">)</span>
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 0  bytes 0 <span class="token punctuation">(</span>0.0 B<span class="token punctuation">)</span>
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+eth0: flags<span class="token operator">=</span>4163<span class="token operator">&lt;</span>UP,BROADCAST,RUNNING,MULTICAST<span class="token operator">></span>  mtu 1500
+        inet 172.24.150.85  netmask 255.255.240.0  broadcast 172.24.159.255
+        ether 00:16:3e:01:36:6e  txqueuelen 1000  <span class="token punctuation">(</span>Ethernet<span class="token punctuation">)</span>
+        RX packets 814217  bytes 293897650 <span class="token punctuation">(</span>280.2 MiB<span class="token punctuation">)</span>
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 736551  bytes 89555535 <span class="token punctuation">(</span>85.4 MiB<span class="token punctuation">)</span>
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+flannel.1: flags<span class="token operator">=</span>4163<span class="token operator">&lt;</span>UP,BROADCAST,RUNNING,MULTICAST<span class="token operator">></span>  mtu 1450
+        inet 172.30.60.0  netmask 255.255.255.255  broadcast 0.0.0.0
+        ether 32:1c:4c:05:4a:22  txqueuelen 0  <span class="token punctuation">(</span>Ethernet<span class="token punctuation">)</span>
+        RX packets 0  bytes 0 <span class="token punctuation">(</span>0.0 B<span class="token punctuation">)</span>
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 0  bytes 0 <span class="token punctuation">(</span>0.0 B<span class="token punctuation">)</span>
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+lo: flags<span class="token operator">=</span>73<span class="token operator">&lt;</span>UP,LOOPBACK,RUNNING<span class="token operator">></span>  mtu 65536
+        inet 127.0.0.1  netmask 255.0.0.0
+        loop  txqueuelen 1000  <span class="token punctuation">(</span>Local Loopback<span class="token punctuation">)</span>
+        RX packets 2993  bytes 200086 <span class="token punctuation">(</span>195.3 KiB<span class="token punctuation">)</span>
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 2993  bytes 200086 <span class="token punctuation">(</span>195.3 KiB<span class="token punctuation">)</span>
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0</code></pre>
+<h2 id="4-查看dockers网络是否生效"><a href="#4-查看dockers网络是否生效" class="headerlink" title="4    查看dockers网络是否生效"></a>4    查看dockers网络是否生效</h2><pre class=" language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 启动一个容器，查看容器分配的ip是否在flannel网络分配的网段内</span>
+<span class="token punctuation">[</span>root@master01 system<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># docker run -itd --name ceshi centos</span>
+Unable to <span class="token function">find</span> image <span class="token string">'centos:latest'</span> locally
+latest: Pulling from library/centos
+8ba884070f61: Pull complete 
+Digest: sha256:a799dd8a2ded4a83484bbae769d97655392b3f86533ceb7dd96bbac929809f3c
+Status: Downloaded newer image <span class="token keyword">for</span> centos:latest
+efbb88d013137b8014f3ca4c6a1f55b706fed2d4575c838b1a4b307c1d1e2508
+<span class="token punctuation">[</span>root@master01 system<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' efbb88</span>
+172.30.60.2</code></pre>
+<h2 id="5-查看所有集群主机的网络情况"><a href="#5-查看所有集群主机的网络情况" class="headerlink" title="5    查看所有集群主机的网络情况"></a>5    查看所有集群主机的网络情况</h2><pre class=" language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@master01 system<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># etcdctl --ca-file=/etc/kubernetes/cert/ca.pem --cert-file=/etc/kubernetes/cert/etcd.pem --key-file=/etc/kubernetes/cert/etcd-key.pem ls /kubernetes/network/subnets</span>
+/kubernetes/network/subnets/172.30.21.0-24
+/kubernetes/network/subnets/172.30.60.0-24
+/kubernetes/network/subnets/172.30.81.0-24
+/kubernetes/network/subnets/172.30.80.0-24
+/kubernetes/network/subnets/172.30.14.0-24</code></pre>
+<p>从输出可以看出容器使用了172.30.0.0/24网络，属于flannel分配的网络段，到此集群网络配置完成</p>
+<p>下一篇将部署二进制搭建k8s三节点master高可用集群之配置k8s master及高可用</p>
+<p>二进制搭建k8s三节点master高可用集群之配置k8s master及高可用<br>k8s master集群部署如下：<br>master01:172.24.150.85<br>master02:172.24.150.86<br>master03:172.24.150.87<br>haproxyharbor:172.24.150.90 (kube-apiserver的前端SLB)</p>
+<h1 id="一-配置kubernetes-master集群-3master节点"><a href="#一-配置kubernetes-master集群-3master节点" class="headerlink" title="一  配置kubernetes master集群(3master节点)"></a>一  配置kubernetes master集群(3master节点)</h1><p>kubernetes master 节点包含的组件：</p>
+<blockquote>
+<ul>
+<li>kube-apiserver</li>
+<li>kube-scheduler</li>
+<li>kbue-controller-manager<br>目前这三个组件需要部署在同一台机器上(这句话不理解，难道是这三节点要么同时部署在master01,要么同时部署在master02,或master03上吗？难道不能kube-apiserver部署在master01,scheduler部署在master02,controller-manager部署在master03上吗？在或者两个组件部署在一个节点，另一个组件部署在其它两个节点任意节点上不可以吗？三个组件必须捆绑在一起吗？) </li>
+<li>kube-scheduler,kube-controller-manager和kube-apiserver三者的功能紧密相关:</li>
+<li>同时只能有一个kube-sheduler、kube-controller-manager进程处于工作状态，如果运行多个，则需要通过选举产生一个leader;</li>
+</ul>
+</blockquote>
+<h2 id="部署kubectl命令工具"><a href="#部署kubectl命令工具" class="headerlink" title="部署kubectl命令工具"></a>部署kubectl命令工具</h2><p>kubectl 是 kubernetes 集群的命令行管理工具，本文档介绍安装和配置它的步骤。<br>kubectl 默认从 ~/.kube/config 文件读取 kube-apiserver 地址、证书、用户名等信息，如果没有配置，执行 kubectl 命令时可能会出错。<br> ~/.kube/config只需要部署一次，然后拷贝到其他的master。</p>
+<h3 id="1-下载kubectl"><a href="#1-下载kubectl" class="headerlink" title="1    下载kubectl"></a>1    下载kubectl</h3><pre class=" language-bash"><code class="language-bash"><span class="token function">wget</span> https://dl.k8s.io/v1.12.3/kubernetes-server-linux-amd64.tar.gz
+<span class="token function">tar</span> -xzvf kubernetes-server-linux-amd64.tar.gz
+<span class="token function">cd</span> kubernetes/server/bin/
+<span class="token function">cp</span> kube-apiserver kubeadm kube-controller-manager kubectl kube-scheduler /usr/local/bin</code></pre>
+<h3 id="2-创建请求证书"><a href="#2-创建请求证书" class="headerlink" title="2     创建请求证书"></a>2     创建请求证书</h3><pre class=" language-bash"><code class="language-bash"><span class="token function">cat</span> <span class="token operator">></span> admin-csr.json <span class="token operator">&lt;&lt;</span><span class="token string">EOF
+{
+  "CN": "admin",
+  "hosts": [],
+  "key": {
+    "algo": "rsa",
+    "size": 2048
+  },
+  "names": [
+    {
+      "C": "CN",
+      "ST": "BeiJing",
+      "L": "BeiJing",
+      "O": "system:masters",
+      "OU": "yunwei"
+    }
+  ]
+}
+EOF</span>
+
+O 为 system:masters，kube-apiserver 收到该证书后将请求的 Group 设置为 system:masters；
+预定义的 ClusterRoleBinding cluster-admin 将 Group system:masters 与 Role cluster-admin 绑定，该 Role 授予所有 API的权限；
+该证书只会被 kubectl 当做 client 证书使用，所以 hosts 字段为空；</code></pre>
+<p>生成证书和私钥</p>
+<pre class=" language-bash"><code class="language-bash">cfssl gencert -ca<span class="token operator">=</span>/etc/kubernetes/cert/ca.pem \
+  -ca-key<span class="token operator">=</span>/etc/kubernetes/cert/ca-key.pem \
+  -config<span class="token operator">=</span>/etc/kubernetes/cert/ca-config.json \
+  -profile<span class="token operator">=</span>kubernetes admin-csr.json <span class="token operator">|</span> cfssljson -bare admin</code></pre>
+<h3 id="3-创建-kube-config文件"><a href="#3-创建-kube-config文件" class="headerlink" title="3    创建~/.kube/config文件"></a>3    创建~/.kube/config文件</h3><pre class=" language-bash"><code class="language-bash">kubectl config set-cluster kubernetes \
+  --certificate-authority<span class="token operator">=</span>/etc/kubernetes/cert/ca.pem \
+  --embed-certs<span class="token operator">=</span>true \
+  --server<span class="token operator">=</span>https://172.24.150.90:6443 \
+  --kubeconfig<span class="token operator">=</span>kubectl.kubeconfig
+
+<span class="token comment" spellcheck="true"># 设置客户端认证参数</span>
+kubectl config set-credentials admin \
+  --client-certificate<span class="token operator">=</span>admin.pem \
+  --client-key<span class="token operator">=</span>admin-key.pem \
+  --embed-certs<span class="token operator">=</span>true \
+  --kubeconfig<span class="token operator">=</span>kubectl.kubeconfig
+
+<span class="token comment" spellcheck="true"># 设置上下文参数</span>
+kubectl config set-context kubernetes \
+  --cluster<span class="token operator">=</span>kubernetes \
+  --user<span class="token operator">=</span>admin \
+  --kubeconfig<span class="token operator">=</span>kubectl.kubeconfig
+
+<span class="token comment" spellcheck="true"># 设置默认上下文</span>
+kubectl config use-context kubernetes --kubeconfig<span class="token operator">=</span>kubectl.kubeconfig</code></pre>
+<h3 id="4-分发-kube-config文件"><a href="#4-分发-kube-config文件" class="headerlink" title="4    分发~/.kube/config文件"></a>4    分发~/.kube/config文件</h3><pre class=" language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@k8s-master01 cert<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># cp kubectl.kubeconfig   ~/.kube/config</span>
+<span class="token punctuation">[</span>root@k8s-master01 cert<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># cp kubectl.kubeconfig   root@master02:~/.kube/config</span>
+<span class="token punctuation">[</span>root@k8s-master01 cert<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># cp kubectl.kubeconfig   root@master03:~/.kube/config</span></code></pre>
+<h2 id="部署api-server"><a href="#部署api-server" class="headerlink" title="部署api-server"></a>部署api-server</h2><h3 id="1-创建kube-apiserver的证书签名请求"><a href="#1-创建kube-apiserver的证书签名请求" class="headerlink" title="1    创建kube-apiserver的证书签名请求"></a>1    创建kube-apiserver的证书签名请求</h3><pre class=" language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@k8s-master01<span class="token punctuation">]</span>cat <span class="token operator">></span> kubernetes-csr.json <span class="token operator">&lt;&lt;</span><span class="token string">EOF
+{
+  "CN": "kubernetes",
+  "hosts": [
+    "127.0.0.1",
+    "172.24.150.85",
+    "172.24.150.86",
+    "172.24.150.87",
+    "172.24.150.90",
+    "47.108.21.49",
+    "kubernetes",
+    "kubernetes.default",
+    "kubernetes.default.svc",
+    "kubernetes.default.svc.cluster",
+    "kubernetes.default.svc.cluster.local"
+  ],
+  "key": {
+    "algo": "rsa",
+    "size": 2048
+  },
+  "names": [
+    {
+      "C": "CN",
+      "ST": "BeiJing",
+      "L": "BeiJing",
+      "O": "k8s",
+      "OU": "yunwei"
+    }
+  ]
+}
+EOF</span>
+
+hosts 字段指定授权使用该证书的 IP 或域名列表，这里列出了 VIP 、apiserver 节点 IP、kubernetes 服务 IP 和域名；
+域名最后字符不能是 .<span class="token punctuation">(</span>如不能为 kubernetes.default.svc.cluster.local.<span class="token punctuation">)</span>，否则解析时失败，提示： x509: cannot parse dnsName <span class="token string">"kubernetes.default.svc.cluster.local."</span>；
+如果使用非 cluster.local 域名，如 bqding.com，则需要修改域名列表中的最后两个域名为：kubernetes.default.svc.bqding、kubernetes.default.svc.bqding.com</code></pre>
+<p>生成证书和私钥:</p>
+<pre class=" language-bash"><code class="language-bash">cfssl gencert -ca<span class="token operator">=</span>/etc/kubernetes/cert/ca.pem \
+  -ca-key<span class="token operator">=</span>/etc/kubernetes/cert/ca-key.pem \
+  -config<span class="token operator">=</span>/etc/kubernetes/cert/ca-config.json \
+  -profile<span class="token operator">=</span>kubernetes kubernetes-csr.json <span class="token operator">|</span> cfssljson -bare kubernetes</code></pre>
+<h3 id="2-将生成的证书和私钥文件拷贝到master节点："><a href="#2-将生成的证书和私钥文件拷贝到master节点：" class="headerlink" title="2     将生成的证书和私钥文件拷贝到master节点："></a>2     将生成的证书和私钥文件拷贝到master节点：</h3><pre class=" language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@k8s-master1 cert<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># scp kubernetes*.pem root@master02:/etc/kubernetes/cert/</span>
+<span class="token punctuation">[</span>root@k8s-master1 cert<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># scp kubernetes*.pem root@master03:/etc/kubernetes/cert/</span></code></pre>
+<h3 id="3-创建加密配置文件"><a href="#3-创建加密配置文件" class="headerlink" title="3    创建加密配置文件"></a>3    创建加密配置文件</h3><pre class=" language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@master01 cert<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># cat > encryption-config.yaml &lt;&lt;EOF</span>
+kind: EncryptionConfig
+apiVersion: v1
+resources:
+  - resources:
+      - secrets
+    providers:
+      - aescbc:
+          keys:
+            - name: key1
+              secret: <span class="token variable"><span class="token variable">$(</span><span class="token function">head</span> -c 32 /dev/urandom <span class="token operator">|</span> base64<span class="token variable">)</span></span>
+      - identity: <span class="token punctuation">{</span><span class="token punctuation">}</span>
+EOF</code></pre>
+<h3 id="4-分发加密配置文件到master节点"><a href="#4-分发加密配置文件到master节点" class="headerlink" title="4    分发加密配置文件到master节点"></a>4    分发加密配置文件到master节点</h3><pre class=" language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@master01 cert<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># scp encryption-config.yaml  root@master02:/etc/kubernetes/cert/</span>
+<span class="token punctuation">[</span>root@master01 cert<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># scp encryption-config.yaml  root@master03:/etc/kubernetes/cert/</span></code></pre>
+<h3 id="5-创建kube-apiserver-systemd-unit文件"><a href="#5-创建kube-apiserver-systemd-unit文件" class="headerlink" title="5    创建kube-apiserver systemd unit文件"></a>5    创建kube-apiserver systemd unit文件</h3><pre class=" language-bash"><code class="language-bash"><span class="token function">cat</span> <span class="token operator">></span> /etc/systemd/system/kube-apiserver.service <span class="token operator">&lt;&lt;</span> <span class="token string">EOF
+[Unit]
+Description=Kubernetes API Server
+Documentation=https://github.com/GoogleCloudPlatform/kubernetes
+After=network.target
+
+[Service]
+ExecStart=/usr/local/bin/kube-apiserver \
+  --enable-admission-plugins=Initializers,NamespaceLifecycle,NodeRestriction,LimitRanger,ServiceAccount,DefaultStorageClass,ResourceQuota \
+  --anonymous-auth=false \
+  --experimental-encryption-provider-config=/etc/kubernetes/cert/encryption-config.yaml \
+  --advertise-address=172.24.150.85 \
+  --bind-address=172.24.150.85 \
+  --insecure-port=0 \
+  --authorization-mode=Node,RBAC \
+  --runtime-config=api/all \
+  --enable-bootstrap-token-auth \
+  --service-cluster-ip-range=10.254.0.0/16 \
+  --service-node-port-range=30000-38700 \
+  --tls-cert-file=/etc/kubernetes/cert/kubernetes.pem \
+  --tls-private-key-file=/etc/kubernetes/cert/kubernetes-key.pem \
+  --client-ca-file=/etc/kubernetes/cert/ca.pem \
+  --kubelet-client-certificate=/etc/kubernetes/cert/kubernetes.pem \
+  --kubelet-client-key=/etc/kubernetes/cert/kubernetes-key.pem \
+  --service-account-key-file=/etc/kubernetes/cert/ca-key.pem \
+  --etcd-cafile=/etc/kubernetes/cert/ca.pem \
+  --etcd-certfile=/etc/kubernetes/cert/kubernetes.pem \
+  --etcd-keyfile=/etc/kubernetes/cert/kubernetes-key.pem \
+  --etcd-servers=https://172.24.150.85:2379,https://172.24.150.86:2379,https://172.24.150.87:2379 \
+  --enable-swagger-ui=true \
+  --allow-privileged=true \
+  --apiserver-count=3 \
+  --audit-log-maxage=30 \
+  --audit-log-maxbackup=3 \
+  --audit-log-maxsize=100 \
+  --audit-log-path=/var/log/kube-apiserver-audit.log \
+  --event-ttl=1h \
+  --alsologtostderr=true \
+  --logtostderr=false \
+  --log-dir=/var/log/kubernetes \
+  --v=2
+Restart=on-failure
+RestartSec=5
+Type=notify
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.targe
+EOF</span>
+
+--experimental-encryption-provider-config：启用加密特性；
+--authorization-mode<span class="token operator">=</span>Node,RBAC： 开启 Node 和 RBAC 授权模式，拒绝未授权的请求；
+--enable-admission-plugins：启用 ServiceAccount 和 NodeRestriction；
+--service-account-key-file：签名 ServiceAccount Token 的公钥文件，kube-controller-manager 的 --service-account-private-key-file 指定私钥文件，两者配对使用；
+--tls-*-file：指定 apiserver 使用的证书、私钥和 CA 文件。--client-ca-file 用于验证 client <span class="token punctuation">(</span>kue-controller-manager、kube-scheduler、kubelet、kube-proxy 等<span class="token punctuation">)</span>请求所带的证书；
+--kubelet-client-certificate、--kubelet-client-key：如果指定，则使用 https 访问 kubelet APIs；需要为证书对应的用户<span class="token punctuation">(</span>上面 kubernetes*.pem 证书的用户为 kubernetes<span class="token punctuation">)</span> 用户定义 RBAC 规则，否则访问 kubelet API 时提示未授权；
+--bind-address： 不能为 127.0.0.1，否则外界不能访问它的安全端口 6443；
+--insecure-port<span class="token operator">=</span>0：关闭监听非安全端口<span class="token punctuation">(</span>8080<span class="token punctuation">)</span>；
+--service-cluster-ip-range： 指定 Service Cluster IP 地址段；
+--service-node-port-range： 指定 NodePort 的端口范围；
+--runtime-config<span class="token operator">=</span>api/all<span class="token operator">=</span>true： 启用所有版本的 APIs，如 autoscaling/v2alpha1；
+--enable-bootstrap-token-auth：启用 kubelet bootstrap 的 token 认证；
+--apiserver-count<span class="token operator">=</span>3：指定集群运行模式，多台 kube-apiserver 会通过 leader 选举产生一个工作节点，其它节点处于阻塞状态；</code></pre>
+<h3 id="6-分发kube-apiserver-service文件到其它master"><a href="#6-分发kube-apiserver-service文件到其它master" class="headerlink" title="6 分发kube-apiserver.service文件到其它master"></a>6 分发kube-apiserver.service文件到其它master</h3><pre class=" language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@master01 cert<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># scp /etc/systemd/system/kube-apiserver.service root@master02:/etc/systemd/system/kube-apiserver.service</span>
+<span class="token punctuation">[</span>root@master01 cert<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># scp /etc/systemd/system/kube-apiserver.service root@master03:/etc/systemd/system/kube-apiserver.service</span></code></pre>
+<h3 id="7-创建日志目录"><a href="#7-创建日志目录" class="headerlink" title="7 创建日志目录"></a>7 创建日志目录</h3><pre class=" language-bash"><code class="language-bash"><span class="token function">mkdir</span> -p /var/log/kubernetes/</code></pre>
+<h3 id="8-启动api-server服务"><a href="#8-启动api-server服务" class="headerlink" title="8 启动api-server服务"></a>8 启动api-server服务</h3><pre class=" language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@master01 cert<span class="token punctuation">]</span> systemctl daemon-reload
+<span class="token punctuation">[</span>root@master01 cert<span class="token punctuation">]</span> systemctl <span class="token function">enable</span> kube-apiserver
+<span class="token punctuation">[</span>root@master01 cert<span class="token punctuation">]</span> systemctl start kube-apiserver</code></pre>
+<h3 id="9-检查api-server和集群状态"><a href="#9-检查api-server和集群状态" class="headerlink" title="9    检查api-server和集群状态"></a>9    检查api-server和集群状态</h3><pre class=" language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@master01 cert<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># netstat -ptln | grep kube-apiserve</span>
+tcp        0      0 192.168.80.9:6443       0.0.0.0:*               LISTEN      22348/kube-apiserve
+
+<span class="token punctuation">[</span>root@master01 cert<span class="token punctuation">]</span><span class="token comment" spellcheck="true">#kubectl cluster-info</span>
+Kubernetes master is running at https://172.24.150.90:6443
+
+To further debug and diagnose cluster problems, use <span class="token string">'kubectl cluster-info dump'</span><span class="token keyword">.</span></code></pre>
+<h3 id="10-授予kubernetes证书访问kubelet-api权限"><a href="#10-授予kubernetes证书访问kubelet-api权限" class="headerlink" title="10    授予kubernetes证书访问kubelet api权限"></a>10    授予kubernetes证书访问kubelet api权限</h3><pre class=" language-bash"><code class="language-bash">kubectl create clusterrolebinding kube-apiserver:kubelet-apis --clusterrole<span class="token operator">=</span>system:kubelet-api-admin --user kubernetes</code></pre>
+<h2 id="三-部署kube-controller-manager"><a href="#三-部署kube-controller-manager" class="headerlink" title="三  部署kube-controller-manager"></a>三  部署kube-controller-manager</h2><p>该集群包含 3 个节点，启动后将通过竞争选举机制产生一个 leader 节点，其它节点为阻塞状态。当 leader 节点不可用后，剩余节点将再次进行选举产生新的 leader 节点，从而保证服务的可用性。<br>为保证通信安全，本文档先生成 x509 证书和私钥，kube-controller-manager 在如下两种情况下使用该证书：<br>与 kube-apiserver 的安全端口通信时;<br>在安全端口(https，10252) 输出 prometheus 格式的 metrics；</p>
+<h3 id="1-创建kube-controller-manager证书请求"><a href="#1-创建kube-controller-manager证书请求" class="headerlink" title="1    创建kube-controller-manager证书请求"></a>1    创建kube-controller-manager证书请求</h3><pre class=" language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@master01 cert<span class="token punctuation">]</span>cat <span class="token operator">></span> kube-controller-manager-csr.json <span class="token operator">&lt;&lt;</span> <span class="token string">EOF
+{
+    "CN": "system:kube-controller-manager",
+    "key": {
+        "algo": "rsa",
+        "size": 2048
+    },
+    "hosts": [
+      "127.0.0.1",
+      "172.24.150.85",
+      "172.24.150.86",
+      "172.24.150.87"
+    ],
+    "names": [
+      {
+        "C": "CN",
+        "ST": "BeiJing",
+        "L": "BeiJing",
+        "O": "system:kube-controller-manager",
+        "OU": "yunwei"
+      }
+    ]
+}
+EOF</span>
+hosts 列表包含所有 kube-controller-manager 节点 IP；
+CN 为 system:kube-controller-manager、O 为 system:kube-controller-manager，kubernetes 内置的 ClusterRoleBindings system:kube-controller-manager 赋予 kube-controller-manager 工作所需的权限。</code></pre>
+<p>生成证书和私钥：</p>
+<pre class=" language-bash"><code class="language-bash">cfssl gencert -ca<span class="token operator">=</span>/etc/kubernetes/cert/ca.pem \
+  -ca-key<span class="token operator">=</span>/etc/kubernetes/cert/ca-key.pem \
+  -config<span class="token operator">=</span>/etc/kubernetes/cert/ca-config.json \
+  -profile<span class="token operator">=</span>kubernetes kube-controller-manager-csr.json <span class="token operator">|</span> cfssljson -bare kube-controller-manager</code></pre>
+<h3 id="2-将生成的证书和私钥分发到所有master节点"><a href="#2-将生成的证书和私钥分发到所有master节点" class="headerlink" title="2 将生成的证书和私钥分发到所有master节点"></a>2 将生成的证书和私钥分发到所有master节点</h3><pre class=" language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@master01 cert<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># scp kube-controller-manager*.pem root@master02:/etc/kubernetes/cert/</span>
+<span class="token punctuation">[</span>root@master01 cert<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># scp kube-controller-manager*.pem root@master03:/etc/kubernetes/cert/</span></code></pre>
+<h3 id="3-创建和分发kubeconfig文件"><a href="#3-创建和分发kubeconfig文件" class="headerlink" title="3 创建和分发kubeconfig文件"></a>3 创建和分发kubeconfig文件</h3><pre class=" language-bash"><code class="language-bash">kubectl config set-cluster kubernetes \
+  --certificate-authority<span class="token operator">=</span>/etc/kubernetes/cert/ca.pem \
+  --embed-certs<span class="token operator">=</span>true \
+  --server<span class="token operator">=</span>https://172.24.150.90:6443 \
+  --kubeconfig<span class="token operator">=</span>kube-controller-manager.kubeconfig
+
+
+kubectl config set-credentials system:kube-controller-manager \
+  --client-certificate<span class="token operator">=</span>kube-controller-manager.pem \
+  --client-key<span class="token operator">=</span>kube-controller-manager-key.pem \
+  --embed-certs<span class="token operator">=</span>true \
+  --kubeconfig<span class="token operator">=</span>kube-controller-manager.kubeconfig
+
+kubectl config set-context system:kube-controller-manager \
+  --cluster<span class="token operator">=</span>kubernetes \
+  --user<span class="token operator">=</span>system:kube-controller-manager \
+  --kubeconfig<span class="token operator">=</span>kube-controller-manager.kubeconfig
+
+kubectl config use-context system:kube-controller-manager --kubeconfig<span class="token operator">=</span>kube-controller-manager.kubeconfig
+</code></pre>
+<p>分发kube-controller-manager.kubeconfig到master02、master03节点</p>
+<pre class=" language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@master01 cert<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># scp kube-controller-manager.kubeconfig root@master02:/etc/kubernetes/cert/</span>
+<span class="token punctuation">[</span>root@master01 cert<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># scp kube-controller-manager.kubeconfig root@master03:/etc/kubernetes/cert/</span></code></pre>
+<h3 id="4-创建和分发kube-controller-manager-systemd-unit文件"><a href="#4-创建和分发kube-controller-manager-systemd-unit文件" class="headerlink" title="4    创建和分发kube-controller-manager systemd unit文件"></a>4    创建和分发kube-controller-manager systemd unit文件</h3><pre class=" language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@master01<span class="token punctuation">]</span>cat <span class="token operator">></span> /etc/systemd/system/kube-controller-manager.service  <span class="token operator">&lt;&lt;</span> <span class="token string">EOF
+[Unit]
+Description=Kubernetes Controller Manager
+Documentation=https://github.com/GoogleCloudPlatform/kubernetes
+
+[Service]
+ExecStart=/usr/local/bin/kube-controller-manager \
+  --address=127.0.0.1 \
+  --kubeconfig=/etc/kubernetes/cert/kube-controller-manager.kubeconfig \
+  --authentication-kubeconfig=/etc/kubernetes/cert/kube-controller-manager.kubeconfig \
+  --service-cluster-ip-range=10.254.0.0/16 \
+  --cluster-name=kubernetes \
+  --cluster-signing-cert-file=/etc/kubernetes/cert/ca.pem \
+  --cluster-signing-key-file=/etc/kubernetes/cert/ca-key.pem \
+  --experimental-cluster-signing-duration=8760h \
+  --root-ca-file=/etc/kubernetes/cert/ca.pem \
+  --service-account-private-key-file=/etc/kubernetes/cert/ca-key.pem \
+  --leader-elect=true \
+  --feature-gates=RotateKubeletServerCertificate=true \
+  --controllers=*,bootstrapsigner,tokencleaner \
+  --horizontal-pod-autoscaler-use-rest-clients=true \
+  --horizontal-pod-autoscaler-sync-period=10s \
+  --tls-cert-file=/etc/kubernetes/cert/kube-controller-manager.pem \
+  --tls-private-key-file=/etc/kubernetes/cert/kube-controller-manager-key.pem \
+  --use-service-account-credentials=true \
+  --alsologtostderr=true \
+  --logtostderr=false \
+  --log-dir=/var/log/kubernetes \
+  --v=2
+Restart=on
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+EOF</span>
+
+
+--address：指定监听的地址为127.0.0.1
+--kubeconfig：指定 kubeconfig 文件路径，kube-controller-manager 使用它连接和验证 kube-apiserver；
+--cluster-signing-*-file：签名 TLS Bootstrap 创建的证书；
+--experimental-cluster-signing-duration：指定 TLS Bootstrap 证书的有效期；
+--root-ca-file：放置到容器 ServiceAccount 中的 CA 证书，用来对 kube-apiserver 的证书进行校验；
+--service-account-private-key-file：签名 ServiceAccount 中 Token 的私钥文件，必须和 kube-apiserver 的 --service-account-key-file 指定的公钥文件配对使用；
+--service-cluster-ip-range ：指定 Service Cluster IP 网段，必须和 kube-apiserver 中的同名参数一致；
+--leader-elect<span class="token operator">=</span>true：集群运行模式，启用选举功能；被选为 leader 的节点负责处理工作，其它节点为阻塞状态；
+--feature-gates<span class="token operator">=</span>RotateKubeletServerCertificate<span class="token operator">=</span>true：开启 kublet server 证书的自动更新特性；
+--controllers<span class="token operator">=</span>*,bootstrapsigner,tokencleaner：启用的控制器列表，tokencleaner 用于自动清理过期的 Bootstrap token；
+--horizontal-pod-autoscaler-*：custom metrics 相关参数，支持 autoscaling/v2alpha1；
+--tls-cert-file、--tls-private-key-file：使用 https 输出 metrics 时使用的 Server 证书和秘钥；
+--use-service-account-credentials<span class="token operator">=</span>true:</code></pre>
+<p>分发kube-controller-manager systemd unit文件</p>
+<pre class=" language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@master01 cert<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># scp /etc/systemd/system/kube-controller-manager.service root@master02:/etc/systemd/system/kube-controller-manager.service</span>
+<span class="token punctuation">[</span>root@master01 cert<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># scp /etc/systemd/system/kube-controller-manager.service root@master03:/etc/systemd/system/kube-controller-manager.service</span></code></pre>
+<h3 id="5-启动kube-controller-manager服务"><a href="#5-启动kube-controller-manager服务" class="headerlink" title="5    启动kube-controller-manager服务"></a>5    启动kube-controller-manager服务</h3><pre class=" language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@master01 cert<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># systemctl daemon-reload</span>
+<span class="token punctuation">[</span>root@master01 cert<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># systemctl enable kube-controller-manager &amp;&amp; systemctl start kube-controller-manager</span></code></pre>
+<h3 id="6-检查kube-controller-manager服务"><a href="#6-检查kube-controller-manager服务" class="headerlink" title="6    检查kube-controller-manager服务"></a>6    检查kube-controller-manager服务</h3><pre class=" language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@master01 cert<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># netstat -lnpt|grep kube-controll</span>
+tcp        0      0 127.0.0.1:10252         0.0.0.0:*               LISTEN      17906/kube-controll 
+tcp6       0      0 :::10257                :::*                    LISTEN      17906/kube-controll</code></pre>
+<h3 id="7-查看当前kube-controller-manager的leader"><a href="#7-查看当前kube-controller-manager的leader" class="headerlink" title="7 查看当前kube-controller-manager的leader"></a>7 查看当前kube-controller-manager的leader</h3><pre class=" language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@master01 ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true">#  kubectl get endpoints kube-controller-manager --namespace=kube-system  -o yaml</span>
+apiVersion: v1
+kind: Endpoints
+metadata:
+  annotations:
+    control-plane.alpha.kubernetes.io/leader: <span class="token string">'{"holderIdentity":"master03_318c0152-a096-11e9-a701-00163e0134cf","leaseDurationSeconds":15,"acquireTime":"2019-07-08T02:25:14Z","renewTime":"2019-07-09T14:40:23Z","leaderTransitions":1}'</span>
+  creationTimestamp: 2019-07-07T09:04:06Z
+  name: kube-controller-manager
+  namespace: kube-system
+  resourceVersion: <span class="token string">"248855"</span>
+  selfLink: /api/v1/namespaces/kube-system/endpoints/kube-controller-manager
+  uid: 2caad7f6-a096-11e9-9fca-00163e0132fb
+</code></pre>
+<p>当前leader为master03节点</p>
+<h2 id="四-部署kube-scheduler"><a href="#四-部署kube-scheduler" class="headerlink" title="四    部署kube-scheduler"></a>四    部署kube-scheduler</h2><p>该集群包含 3 个节点，启动后将通过竞争选举机制产生一个 leader 节点，其它节点为阻塞状态。当 leader 节点不可用后，剩余节点将再次进行选举产生新的 leader 节点，从而保证服务的可用性。<br>为保证通信安全，本文档先生成 x509 证书和私钥，kube-scheduler 在如下两种情况下使用该证书：<br>1 与 kube-apiserver 的安全端口通信;<br>2 在安全端口(https，10251) 输出 prometheus 格式的 metrics；</p>
+<h3 id="1-创建kube-scheduler证书请求"><a href="#1-创建kube-scheduler证书请求" class="headerlink" title="1 创建kube-scheduler证书请求"></a>1 创建kube-scheduler证书请求</h3><pre class=" language-bash"><code class="language-bash">
+<span class="token punctuation">[</span>root@master01<span class="token punctuation">]</span>cat <span class="token operator">></span> kube-scheduler-csr.json <span class="token operator">&lt;&lt;</span> <span class="token string">EOF
+{
+    "CN": "system:kube-scheduler",
+    "hosts": [
+      "127.0.0.1",
+      "172.24.150.85",
+      "172.24.150.86",
+      "172.24.150.87"
+    ],
+    "key": {
+        "algo": "rsa",
+        "size": 2048
+    },
+    "names": [
+      {
+        "C": "CN",
+        "ST": "BeiJing",
+        "L": "BeiJing",
+        "O": "system:kube-scheduler",
+        "OU": "yunwei"
+      }
+    ]
+}
+EOF</span>
+hosts 列表包含所有 kube-scheduler 节点 IP；
+CN 为 system:kube-scheduler、O 为 system:kube-scheduler，kubernetes 内置的 ClusterRoleBindings system:kube-scheduler 将赋予 kube-scheduler 工作所需的权限。</code></pre>
+<p>生成证书和私钥：<br>cfssl gencert -ca=/etc/kubernetes/cert/ca.pem <br>  -ca-key=/etc/kubernetes/cert/ca-key.pem <br>  -config=/etc/kubernetes/cert/ca-config.json <br>  -profile=kubernetes kube-scheduler-csr.json | cfssljson -bare kube-scheduler</p>
+<h3 id="2-创建和分发kube-scheduler-kubeconfig文件"><a href="#2-创建和分发kube-scheduler-kubeconfig文件" class="headerlink" title="2    创建和分发kube-scheduler.kubeconfig文件"></a>2    创建和分发kube-scheduler.kubeconfig文件</h3><pre class=" language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@master01<span class="token punctuation">]</span> kubectl config set-cluster kubernetes \
+      --certificate-authority<span class="token operator">=</span>/etc/kubernetes/cert/ca.pem \
+      --embed-certs<span class="token operator">=</span>true \
+      --server<span class="token operator">=</span>https://172.24.150.90:6443 \
+      --kubeconfig<span class="token operator">=</span>kube-scheduler.kubeconfig
+
+<span class="token punctuation">[</span>root@master01<span class="token punctuation">]</span> kubectl config set-credentials system:kube-scheduler \
+  --client-certificate<span class="token operator">=</span>kube-scheduler.pem \
+  --client-key<span class="token operator">=</span>kube-scheduler-key.pem \
+  --embed-certs<span class="token operator">=</span>true \
+  --kubeconfig<span class="token operator">=</span>kube-scheduler.kubeconfig
+
+<span class="token punctuation">[</span>root@master01<span class="token punctuation">]</span> kubectl config set-context system:kube-scheduler \
+  --cluster<span class="token operator">=</span>kubernetes \
+  --user<span class="token operator">=</span>system:kube-scheduler \
+  --kubeconfig<span class="token operator">=</span>kube-scheduler.kubeconfig
+
+<span class="token punctuation">[</span>root@master01<span class="token punctuation">]</span> kubectl config use-context system:kube-scheduler --kubeconfig<span class="token operator">=</span>kube-scheduler.kubeconfig
+
+上一步创建的证书、私钥以及 kube-apiserver 地址被写入到 kubeconfig 文件中；</code></pre>
+<p>分发kubeconfig到master02、master03节点</p>
+<pre class=" language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@master01 cert<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># scp kube-scheduler.kubeconfig root@master02:/etc/kubernetes/cert/</span>
+<span class="token punctuation">[</span>root@master01 cert<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># scp kube-scheduler.kubeconfig root@master03:/etc/kubernetes/cert/</span></code></pre>
+<h3 id="3-创建和分发kube-scheduler-systemd-unit文件"><a href="#3-创建和分发kube-scheduler-systemd-unit文件" class="headerlink" title="3    创建和分发kube-scheduler systemd unit文件"></a>3    创建和分发kube-scheduler systemd unit文件</h3><pre class=" language-bash"><code class="language-bash"><span class="token function">cat</span> <span class="token operator">></span> /etc/systemd/system/kube-scheduler.service <span class="token operator">&lt;&lt;</span> <span class="token string">EOF
+[Unit]
+Description=Kubernetes Scheduler
+Documentation=https://github.com/GoogleCloudPlatform/kubernetes
+
+[Service]
+ExecStart=/usr/local/bin/kube-scheduler \
+  --address=127.0.0.1 \
+  --kubeconfig=/etc/kubernetes/cert/kube-scheduler.kubeconfig \
+  --leader-elect=true \
+  --alsologtostderr=true \
+  --logtostderr=false \
+  --log-dir=/var/log/kubernetes \
+  --v=2
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+EOF</span>
+
+
+--address：在 127.0.0.1:10251 端口接收 http /metrics 请求；kube-scheduler 目前还不支持接收 https 请求；
+--kubeconfig：指定 kubeconfig 文件路径，kube-scheduler 使用它连接和验证 kube-apiserver；
+--leader-elect<span class="token operator">=</span>true：集群运行模式，启用选举功能；被选为 leader 的节点负责处理工作，其它节点为阻塞状态；</code></pre>
+<p>分发 systemd unit 文件到所有 master 节点：</p>
+<pre class=" language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@master01 cert<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># scp /etc/systemd/system/kube-scheduler.service master02:/etc/systemd/system/kube-scheduler.service</span>
+<span class="token punctuation">[</span>root@master01 cert<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># scp /etc/systemd/system/kube-scheduler.service master03:/etc/systemd/system/kube-scheduler.service</span></code></pre>
+<h3 id="4-启动kube-scheduler服务"><a href="#4-启动kube-scheduler服务" class="headerlink" title="4    启动kube-scheduler服务"></a>4    启动kube-scheduler服务</h3><pre class=" language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@master01 cert<span class="token punctuation">]</span> systemctl daemon-reload 
+<span class="token punctuation">[</span>root@master01 cert<span class="token punctuation">]</span> systemctl <span class="token function">enable</span> kube-scheduler <span class="token operator">&amp;&amp;</span> systemctl start kube-scheduler</code></pre>
+<h3 id="5-查看kube-scheduler运行监听端口"><a href="#5-查看kube-scheduler运行监听端口" class="headerlink" title="5    查看kube-scheduler运行监听端口"></a>5    查看kube-scheduler运行监听端口</h3><pre class=" language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@master1 cert<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># netstat -lnpt|grep kube-scheduler</span>
+tcp        0      0 127.0.0.1:10251         0.0.0.0:*               LISTEN      17921/kube-schedule</code></pre>
+<h3 id="6-查看当前kube-scheduler的leader"><a href="#6-查看当前kube-scheduler的leader" class="headerlink" title="6    查看当前kube-scheduler的leader"></a>6    查看当前kube-scheduler的leader</h3><pre class=" language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@master01 ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># kubectl get endpoints kube-scheduler --namespace=kube-system  -o yaml</span>
+apiVersion: v1
+kind: Endpoints
+metadata:
+  annotations:
+    control-plane.alpha.kubernetes.io/leader: <span class="token string">'{"holderIdentity":"master03_3e7bc3fc-a097-11e9-ba09-00163e0134cf","leaseDurationSeconds":15,"acquireTime":"2019-07-08T02:24:52Z","renewTime":"2019-07-09T14:51:37Z","leaderTransitions":1}'</span>
+  creationTimestamp: 2019-07-07T09:11:31Z
+  name: kube-scheduler
+  namespace: kube-system
+  resourceVersion: <span class="token string">"249869"</span>
+  selfLink: /api/v1/namespaces/kube-system/endpoints/kube-scheduler
+  uid: 35b657c6-a097-11e9-8e39-00163e01366e
+</code></pre>
+<p>可见当前的leader为master03节点</p>
+<h2 id="七-在master01、master02、master03节点上验证功能是否正常"><a href="#七-在master01、master02、master03节点上验证功能是否正常" class="headerlink" title="七    在master01、master02、master03节点上验证功能是否正常"></a>七    在master01、master02、master03节点上验证功能是否正常</h2><pre class=" language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@master01 ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># kubectl get cs</span>
+NAME                 STATUS    MESSAGE             ERROR
+controller-manager   Healthy   ok                  
+scheduler            Healthy   ok                  
+etcd-0               Healthy   <span class="token punctuation">{</span><span class="token string">"health"</span><span class="token keyword">:</span><span class="token string">"true"</span><span class="token punctuation">}</span>   
+etcd-2               Healthy   <span class="token punctuation">{</span><span class="token string">"health"</span><span class="token keyword">:</span><span class="token string">"true"</span><span class="token punctuation">}</span>   
+etcd-1               Healthy   <span class="token punctuation">{</span><span class="token string">"health"</span><span class="token keyword">:</span><span class="token string">"true"</span><span class="token punctuation">}</span>   
+
+
+<span class="token punctuation">[</span>root@master02 ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># kubectl get componentstatuses</span>
+NAME                 STATUS    MESSAGE             ERROR
+controller-manager   Healthy   ok                  
+scheduler            Healthy   ok                  
+etcd-1               Healthy   <span class="token punctuation">{</span><span class="token string">"health"</span><span class="token keyword">:</span><span class="token string">"true"</span><span class="token punctuation">}</span>   
+etcd-0               Healthy   <span class="token punctuation">{</span><span class="token string">"health"</span><span class="token keyword">:</span><span class="token string">"true"</span><span class="token punctuation">}</span>   
+etcd-2               Healthy   <span class="token punctuation">{</span><span class="token string">"health"</span><span class="token keyword">:</span><span class="token string">"true"</span><span class="token punctuation">}</span>   
+
+
+<span class="token punctuation">[</span>root@master03 ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># kubectl get cs</span>
+NAME                 STATUS    MESSAGE             ERROR
+scheduler            Healthy   ok                  
+controller-manager   Healthy   ok                  
+etcd-0               Healthy   <span class="token punctuation">{</span><span class="token string">"health"</span><span class="token keyword">:</span><span class="token string">"true"</span><span class="token punctuation">}</span>   
+etcd-2               Healthy   <span class="token punctuation">{</span><span class="token string">"health"</span><span class="token keyword">:</span><span class="token string">"true"</span><span class="token punctuation">}</span>   
+etcd-1               Healthy   <span class="token punctuation">{</span><span class="token string">"health"</span><span class="token keyword">:</span><span class="token string">"true"</span><span class="token punctuation">}</span>   
+</code></pre>
+<h2 id="八-haproxy做3master节点的高可用-未做keepalived的心跳检测"><a href="#八-haproxy做3master节点的高可用-未做keepalived的心跳检测" class="headerlink" title="八 haproxy做3master节点的高可用(未做keepalived的心跳检测)"></a>八 haproxy做3master节点的高可用(未做keepalived的心跳检测)</h2><p>haproxy 监听 haproxyharbor主机的6443端口，后端连接所有 kube-apiserver 实例，提供健康检查和负载均衡功能</p>
+<h3 id="1-haproxyharbor主机安装haproxy"><a href="#1-haproxyharbor主机安装haproxy" class="headerlink" title="1     haproxyharbor主机安装haproxy"></a>1     haproxyharbor主机安装haproxy</h3><pre class=" language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@haproxyharbor ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># cd /etc/haproxy/ &amp;&amp; mv haproxy.cfg haproxy.cfg.bak &amp;&amp; cat >/etc/haproxy/haproxy.cfg &lt;&lt;EOF</span>
+global
+    log /dev/log    local0
+    log /dev/log    local1 notice
+    <span class="token function">chroot</span> /var/lib/haproxy
+    stats socket /var/run/haproxy-admin.sock mode 660 level admin
+    stats <span class="token function">timeout</span> 30s
+    user haproxy
+    group haproxy
+    daemon
+    nbproc 1
+
+defaults
+    log     global
+    <span class="token function">timeout</span> connect 5000
+    <span class="token function">timeout</span> client  10m
+    <span class="token function">timeout</span> server  10m
+
+listen  admin_stats
+    bind 0.0.0.0:10080
+    mode http
+    log 127.0.0.1 local0 err
+    stats refresh 30s
+    stats uri /status
+    stats realm welcome login\ Haproxy
+    stats auth admin:123456
+    stats hide-version
+    stats admin <span class="token keyword">if</span> TRUE
+
+listen kube-master
+    bind 0.0.0.0:6443
+    mode tcp
+    option tcplog
+    balance roundrobin
+    server master01 172.24.150.85:6443 check inter 2000 fall 2 rise 2 weight 1
+    server master02 172.24.150.86:6443 check inter 2000 fall 2 rise 2 weight 1
+    server master03 172.24.150.87:6443 check inter 2000 fall 2 rise 2 weight 1
+EOF
+
+haproxy 在 10080 端口输出 status 信息；
+haproxy 监听该主机上所有接口的 6443 端口，该端口与环境变量 <span class="token variable">${KUBE_APISERVER}</span> 指定的端口必须一致；
+server 字段列出所有 kube-apiserver 监听的 IP 和端口；</code></pre>
+<h3 id="2-启动haproxy服务"><a href="#2-启动haproxy服务" class="headerlink" title="2    启动haproxy服务"></a>2    启动haproxy服务</h3><pre class=" language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@haproxyharbor ~<span class="token punctuation">]</span> systemctl <span class="token function">enable</span> haproxy <span class="token operator">&amp;&amp;</span> systemctl start haproxy</code></pre>
+<h3 id="3-查看haproxy的服务状态："><a href="#3-查看haproxy的服务状态：" class="headerlink" title="3    查看haproxy的服务状态："></a>3    查看haproxy的服务状态：</h3><pre class=" language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@haproxyharbor ~<span class="token punctuation">]</span> systemctl status haproxy<span class="token operator">|</span><span class="token function">grep</span> Active</code></pre>
+<p>###################################################################</p>
+<h1 id="对node01、node02节点部署k8s-node服务"><a href="#对node01、node02节点部署k8s-node服务" class="headerlink" title="对node01、node02节点部署k8s node服务"></a>对node01、node02节点部署k8s node服务</h1><p>kubernetes work节点运行如下组件：docker、kubelet、kube-proxy、flannel</p>
+<h2 id="一-安装依赖包-node01和node02都安装"><a href="#一-安装依赖包-node01和node02都安装" class="headerlink" title="一    安装依赖包(node01和node02都安装)"></a>一    安装依赖包(node01和node02都安装)</h2><pre class=" language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@node01 ~<span class="token punctuation">]</span>yum <span class="token function">install</span> -y epel-release <span class="token function">wget</span> conntrack ipvsadm ipset jq iptables curl sysstat libseccomp <span class="token operator">&amp;&amp;</span> /usr/sbin/modprobe ip_vs
+<span class="token punctuation">[</span>root@node02 ~<span class="token punctuation">]</span>yum <span class="token function">install</span> -y epel-release <span class="token function">wget</span> conntrack ipvsadm ipset jq iptables curl sysstat libseccomp <span class="token operator">&amp;&amp;</span> /usr/sbin/modprobe ip_vs</code></pre>
+<h2 id="二-部署kubelet组件"><a href="#二-部署kubelet组件" class="headerlink" title="二     部署kubelet组件"></a>二     部署kubelet组件</h2><p>kublet 运行在每个 worker 节点上，接收 kube-apiserver 发送的请求，管理 Pod 容器，执行交互式命令，如 exec、run、logs 等。<br>kublet 启动时自动向 kube-apiserver 注册节点信息，内置的 cadvisor 统计和监控节点的资源使用情况。<br>为确保安全，本文档只开启接收 https 请求的安全端口，对请求进行认证和授权，拒绝未授权的访问(如 apiserver、heapster)。</p>
+<h3 id="1-下载和分发kubelet二进制文件"><a href="#1-下载和分发kubelet二进制文件" class="headerlink" title="1    下载和分发kubelet二进制文件"></a>1    下载和分发kubelet二进制文件</h3><pre class=" language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@master01 src<span class="token punctuation">]</span> <span class="token function">wget</span> https://dl.k8s.io/v1.12.3/kubernetes-server-linux-amd64.tar.gz
+<span class="token punctuation">[</span>root@master01 src<span class="token punctuation">]</span> <span class="token function">tar</span> -xzvf kubernetes-server-linux-amd64.tar.gz
+<span class="token punctuation">[</span>root@master01 src<span class="token punctuation">]</span> <span class="token function">cp</span> kubernetes/server/bin/
+<span class="token punctuation">[</span>root@master01 src<span class="token punctuation">]</span> <span class="token function">cp</span> kubelet kube-proxy /usr/local/bin
+<span class="token punctuation">[</span>root@master01 src<span class="token punctuation">]</span> <span class="token function">scp</span>  kubelet kube-proxy root@node01:/usr/local/bin
+<span class="token punctuation">[</span>root@master01 src<span class="token punctuation">]</span> <span class="token function">scp</span>  kubelet kube-proxy root@node02:/usr/local/bin</code></pre>
+<h3 id="2-创建kubelet-bootstrap-kubeconfig文件-master01执行"><a href="#2-创建kubelet-bootstrap-kubeconfig文件-master01执行" class="headerlink" title="2    创建kubelet bootstrap kubeconfig文件(master01执行)"></a>2    创建kubelet bootstrap kubeconfig文件(master01执行)</h3><p>###################由于我是两个node(node01,node02)节点只需创建两个token就可以了##################################</p>
+<pre class=" language-bash"><code class="language-bash"><span class="token comment" spellcheck="true">#创建 token</span>
+<span class="token function">export</span> BOOTSTRAP_TOKEN<span class="token operator">=</span><span class="token variable"><span class="token variable">$(</span>kubeadm token create \
+  --description kubelet-bootstrap-token \
+  --groups system:bootstrappers:master01 \
+  --kubeconfig ~/.kube/config<span class="token variable">)</span></span>
+
+kubectl config use-context default --kubeconfig<span class="token operator">=</span>kubelet-bootstrap-master01.kubeconfig
+<span class="token punctuation">[</span>root@master01 cert<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># export BOOTSTRAP_TOKEN=$(kubeadm token create \</span>
+<span class="token operator">></span>   --description kubelet-bootstrap-token \
+<span class="token operator">></span>   --groups system:bootstrappers:master01 \
+<span class="token operator">></span>   --kubeconfig ~/.kube/config<span class="token punctuation">)</span>
+I0709 20:02:07.166974   29695 version.go:93<span class="token punctuation">]</span> could not fetch a Kubernetes version from the internet: unable to get URL <span class="token string">"https://dl.k8s.io/release/stable-1.txt"</span><span class="token keyword">:</span> Get https://dl.k8s.io/release/stable-1.txt: net/http: request canceled <span class="token keyword">while</span> waiting <span class="token keyword">for</span> connection <span class="token punctuation">(</span>Client.Timeout exceeded <span class="token keyword">while</span> awaiting headers<span class="token punctuation">)</span>
+I0709 20:02:07.167046   29695 version.go:94<span class="token punctuation">]</span> falling back to the local client version: v1.12.3
+<span class="token comment" spellcheck="true">##暂时不用理会这继续往下执行  </span>
+
+<span class="token comment" spellcheck="true"># 设置集群参数</span>
+kubectl config set-cluster kubernetes \
+  --certificate-authority<span class="token operator">=</span>/etc/kubernetes/cert/ca.pem \
+  --embed-certs<span class="token operator">=</span>true \
+  --server<span class="token operator">=</span>https://172.24.150.90:6443 \
+  --kubeconfig<span class="token operator">=</span>kubelet-bootstrap-master01.kubeconfig
+
+<span class="token comment" spellcheck="true"># 设置客户端认证参数</span>
+kubectl config set-credentials kubelet-bootstrap \
+  --token<span class="token operator">=</span><span class="token variable">${BOOTSTRAP_TOKEN}</span> \
+  --kubeconfig<span class="token operator">=</span>kubelet-bootstrap-master01.kubeconfig
+
+<span class="token comment" spellcheck="true"># 设置上下文参数</span>
+kubectl config set-context default \
+  --cluster<span class="token operator">=</span>kubernetes \
+  --user<span class="token operator">=</span>kubelet-bootstrap \
+  --kubeconfig<span class="token operator">=</span>kubelet-bootstrap-master01.kubeconfig
+<span class="token comment" spellcheck="true"># 设置默认上下文</span>
+kubectl config use-context default --kubeconfig<span class="token operator">=</span>kubelet-bootstrap-master02.kubeconfig
+<span class="token comment" spellcheck="true">##########################################################################</span>
+
+<span class="token comment" spellcheck="true">#创建 token</span>
+<span class="token function">export</span> BOOTSTRAP_TOKEN<span class="token operator">=</span><span class="token variable"><span class="token variable">$(</span>kubeadm token create \
+  --description kubelet-bootstrap-token \
+  --groups system:bootstrappers:master02 \
+  --kubeconfig ~/.kube/config<span class="token variable">)</span></span>
+
+<span class="token comment" spellcheck="true"># 设置集群参数</span>
+kubectl config set-cluster kubernetes \
+  --certificate-authority<span class="token operator">=</span>/etc/kubernetes/cert/ca.pem \
+  --embed-certs<span class="token operator">=</span>true \
+  --server<span class="token operator">=</span>https://172.24.150.90:6443 \
+  --kubeconfig<span class="token operator">=</span>kubelet-bootstrap-master02.kubeconfig
+<span class="token comment" spellcheck="true"># 设置客户端认证参数</span>
+kubectl config set-credentials kubelet-bootstrap \
+  --token<span class="token operator">=</span><span class="token variable">${BOOTSTRAP_TOKEN}</span> \
+  --kubeconfig<span class="token operator">=</span>kubelet-bootstrap-master02.kubeconfig
+<span class="token comment" spellcheck="true"># 设置上下文参数</span>
+kubectl config set-context default \
+  --cluster<span class="token operator">=</span>kubernetes \
+  --user<span class="token operator">=</span>kubelet-bootstrap \
+  --kubeconfig<span class="token operator">=</span>kubelet-bootstrap-master02.kubeconfig
+<span class="token comment" spellcheck="true"># 设置默认上下文</span>
+kubectl config use-context default --kubeconfig<span class="token operator">=</span>kubelet-bootstrap-master02.kubeconfig
+
+
+kubelet-bootstrap-master0x.kubeconfig文件创建两次，分别为改成kubelet-bootstrap-master01.kubeconfig,kubelet-bootstrap-master02.kubeconfig
+证书中写入 Token 而非证书，证书后续由 controller-manager 创建。</code></pre>
+<p>##########################################################################################<br>#创建 token</p>
+<p>注意补充：</p>
+<pre class=" language-bash"><code class="language-bash">使用kubeadm安装需要下载相关的镜像，可以使用以下命令查看
+<span class="token punctuation">[</span>root@master01 bin<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># kubeadm config images list</span>
+I0707 19:23:47.877237   13023 version.go:93<span class="token punctuation">]</span> could not fetch a Kubernetes version from the internet: unable to get URL <span class="token string">"https://dl.k8s.io/release/stable-1.txt"</span><span class="token keyword">:</span> Get https://dl.k8s.io/release/stable-1.txt: net/http: request canceled <span class="token keyword">while</span> waiting <span class="token keyword">for</span> connection <span class="token punctuation">(</span>Client.Timeout exceeded <span class="token keyword">while</span> awaiting headers<span class="token punctuation">)</span>
+I0707 19:23:47.877324   13023 version.go:94<span class="token punctuation">]</span> falling back to the local client version: v1.12.3
+k8s.gcr.io/kube-apiserver:v1.12.3
+k8s.gcr.io/kube-controller-manager:v1.12.3
+k8s.gcr.io/kube-scheduler:v1.12.3
+k8s.gcr.io/kube-proxy:v1.12.3
+k8s.gcr.io/pause:3.1
+k8s.gcr.io/etcd:3.2.24
+k8s.gcr.io/coredns:1.2.2
+
+<span class="token comment" spellcheck="true"># 先在墙外的一台服务器上下载好需要的镜像，然后打tag标签，上传到自己的dockerhub上，再在墙内机器上下载，然后在反打回标签就可以了</span>
+<span class="token punctuation">[</span>root@li1891-184 ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># docker images</span>
+REPOSITORY                           TAG                 IMAGE ID            CREATED             SIZE
+cntsp/kube-proxy                     v1.12.3             ab97fa69b926        7 months ago        96.5MB
+k8s.gcr.io/kube-proxy                v1.12.3             ab97fa69b926        7 months ago        96.5MB
+cntsp/kube-apiserver                 v1.12.3             6b54f7bebd72        7 months ago        194MB
+k8s.gcr.io/kube-apiserver            v1.12.3             6b54f7bebd72        7 months ago        194MB
+cntsp/kube-controller-manager        v1.12.3             c79022eb8bc9        7 months ago        164MB
+k8s.gcr.io/kube-controller-manager   v1.12.3             c79022eb8bc9        7 months ago        164MB
+cntsp/kube-scheduler                 v1.12.3             5e75513787b1        7 months ago        58.3MB
+k8s.gcr.io/kube-scheduler            v1.12.3             5e75513787b1        7 months ago        58.3MB
+cntsp/etcd                           3.2.24              3cab8e1b9802        9 months ago        220MB
+k8s.gcr.io/etcd                      3.2.24              3cab8e1b9802        9 months ago        220MB
+cntsp/coredns                        1.2.2               367cdc8433a4        10 months ago       39.2MB
+k8s.gcr.io/coredns                   1.2.2               367cdc8433a4        10 months ago       39.2MB
+cntsp/pause                          3.1                 da86e6ba6ca1        18 months ago       742kB
+k8s.gcr.io/pause                     3.1                 da86e6ba6ca1        18 months ago       742kB
+
+docker tag cntsp/kube-proxy:v1.12.3  k8s.gcr.io/kube-proxy:v1.12.3
+docker tag cntsp/kube-apiserver:v1.12.3 k8s.gcr.io/kube-apiserver:v1.12.3
+docker tag cntsp/kube-controller-manager:v1.12.3 k8s.gcr.io/kube-controller-manager:v1.12.3
+docker tag cntsp/kube-scheduler:v1.12.3  k8s.gcr.io/kube-scheduler:v1.12.3
+docker tag cntsp/etcd:3.2.24  k8s.gcr.io/etcd:3.2.24
+docker tag cntsp/coredns:1.2.2  k8s.gcr.io/coredns:1.2.3
+docker tag cntsp/pause:3.1  k8s.gcr.io/pause:3.1</code></pre>
+<h3 id="3-查看kubeadm为各个节点创建的token"><a href="#3-查看kubeadm为各个节点创建的token" class="headerlink" title="3    查看kubeadm为各个节点创建的token:"></a>3    查看kubeadm为各个节点创建的token:</h3><pre class=" language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@master01 ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># kubeadm token list --kubeconfig ~/.kube/config</span>
+TOKEN                     TTL         EXPIRES                     USAGES                   DESCRIPTION               EXTRA GROUPS
+5hdpcv.oov1vb6p2pdsk9cj   19h         2019-07-10T20:02:07+08:00   authentication,signing   kubelet-bootstrap-token   system:bootstrappers:master01    
+5la9kt.rg86oqup9lmh8mc3   20h         2019-07-10T20:54:04+08:00   authentication,signing   kubelet-bootstrap-token   system:bootstrappers:master03        <span class="token comment" spellcheck="true">##</span>
+7pmf04.7exbjzt4e0mqb1k6   <span class="token operator">&lt;</span>invalid<span class="token operator">></span>   2019-07-08T19:14:17+08:00   authentication,signing   kubelet-bootstrap-token   system:bootstrappers:master01
+8thsbu.kczv9cg4p18qc1uh   <span class="token operator">&lt;</span>invalid<span class="token operator">></span>   2019-07-08T23:53:33+08:00   authentication,signing   kubelet-bootstrap-token   system:bootstrappers:master01
+a2480e.fcpm6md4y3auhlbj   <span class="token operator">&lt;</span>invalid<span class="token operator">></span>   2019-07-08T18:01:24+08:00   authentication,signing   kubelet-bootstrap-token   system:bootstrappers:master01
+broru2.ntzhoupwbokulsgy   20h         2019-07-10T20:50:56+08:00   authentication,signing   kubelet-bootstrap-token   system:bootstrappers:master01        <span class="token comment" spellcheck="true">##</span>
+ovf435.wx9o306i9sof1ztm   20h         2019-07-10T20:53:12+08:00   authentication,signing   kubelet-bootstrap-token   system:bootstrappers:master02        <span class="token comment" spellcheck="true">##</span>
+创建的 token 有效期为 1 天，超期后将不能再被使用，且会被 kube-controller-manager 的 tokencleaner 清理<span class="token punctuation">(</span>如果启用该 controller 的话<span class="token punctuation">)</span>；
+kube-apiserver 接收 kubelet 的 bootstrap token 后，将请求的 user 设置为 system:bootstrap:，group 设置为 system:bootstrappers</code></pre>
+<p>查看各token关联的Secret</p>
+<pre class=" language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@master01 ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># kubectl get secrets  -n kube-system</span>
+NAME                                             TYPE                                  DATA   AGE
+attachdetach-controller-token-pmwks              kubernetes.io/service-account-token   3      2d7h
+bootstrap-signer-token-fz6jp                     kubernetes.io/service-account-token   3      2d7h
+bootstrap-token-0a7w0g                           bootstrap.kubernetes.io/token         7      2d4h
+bootstrap-token-2w1i45                           bootstrap.kubernetes.io/token         7      2d6h
+bootstrap-token-2xbl5i                           bootstrap.kubernetes.io/token         7      6h28m
+bootstrap-token-5hdpcv                           bootstrap.kubernetes.io/token         7      4h36m
+bootstrap-token-5la9kt                           bootstrap.kubernetes.io/token         7      3h44m
+bootstrap-token-7pmf04                           bootstrap.kubernetes.io/token         7      2d5h
+bootstrap-token-8thsbu                           bootstrap.kubernetes.io/token         7      2d
+bootstrap-token-a2480e                           bootstrap.kubernetes.io/token         7      2d6h
+bootstrap-token-broru2                           bootstrap.kubernetes.io/token         7      3h47m
+bootstrap-token-bz7en0                           bootstrap.kubernetes.io/token         7      2d4h
+bootstrap-token-cssc84                           bootstrap.kubernetes.io/token         7      2d7h
+bootstrap-token-iau28s                           bootstrap.kubernetes.io/token         7      2d7h
+bootstrap-token-iufp5a                           bootstrap.kubernetes.io/token         7      2d4h
+bootstrap-token-ovf435                           bootstrap.kubernetes.io/token         7      3h45m
+bootstrap-token-tv8p15                           bootstrap.kubernetes.io/token         7      37h
+bootstrap-token-wj6vmg                           bootstrap.kubernetes.io/token         7      2d4h
+certificate-controller-token-gh8qq               kubernetes.io/service-account-token   3      2d7h
+clusterrole-aggregation-controller-token-4nsb7   kubernetes.io/service-account-token   3      2d7h
+cronjob-controller-token-l95gw                   kubernetes.io/service-account-token   3      2d7h
+daemon-set-controller-token-4d5wk                kubernetes.io/service-account-token   3      2d7h
+default-token-p5gvt                              kubernetes.io/service-account-token   3      2d7h
+deployment-controller-token-jlnhh                kubernetes.io/service-account-token   3      2d7h
+disruption-controller-token-xgt7n                kubernetes.io/service-account-token   3      2d7h
+endpoint-controller-token-jgr6r                  kubernetes.io/service-account-token   3      2d7h
+expand-controller-token-lhbpc                    kubernetes.io/service-account-token   3      2d7h
+generic-garbage-collector-token-6t9mt            kubernetes.io/service-account-token   3      2d7h
+horizontal-pod-autoscaler-token-f7zvp            kubernetes.io/service-account-token   3      2d7h
+job-controller-token-5bq5b                       kubernetes.io/service-account-token   3      2d7h
+namespace-controller-token-vcp7v                 kubernetes.io/service-account-token   3      2d7h
+node-controller-token-kzjgc                      kubernetes.io/service-account-token   3      2d7h
+persistent-volume-binder-token-2sz49             kubernetes.io/service-account-token   3      2d7h
+pod-garbage-collector-token-nw6ck                kubernetes.io/service-account-token   3      2d7h
+pv-protection-controller-token-jg9rq             kubernetes.io/service-account-token   3      2d7h
+pvc-protection-controller-token-bj5c7            kubernetes.io/service-account-token   3      2d7h
+replicaset-controller-token-jv5r5                kubernetes.io/service-account-token   3      2d7h
+replication-controller-token-5nfzh               kubernetes.io/service-account-token   3      2d7h
+resourcequota-controller-token-dpzk9             kubernetes.io/service-account-token   3      2d7h
+service-account-controller-token-qxflv           kubernetes.io/service-account-token   3      2d7h
+service-controller-token-8bhkb                   kubernetes.io/service-account-token   3      2d7h
+statefulset-controller-token-sms2q               kubernetes.io/service-account-token   3      2d7h
+token-cleaner-token-85hbw                        kubernetes.io/service-account-token   3      2d7h
+ttl-controller-token-zdwb4                       kubernetes.io/service-account-token   3      2d7h</code></pre>
+<h3 id="4-分发bootstrap-kubeconfig文件"><a href="#4-分发bootstrap-kubeconfig文件" class="headerlink" title="4    分发bootstrap kubeconfig文件"></a>4    分发bootstrap kubeconfig文件</h3><pre class=" language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@master1 ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># scp kubelet-bootstrap-master01.kubeconfig root@node01:/etc/kubernetes/cert/kubelet-bootstrap.kubeconfig</span>
+<span class="token punctuation">[</span>root@master1 ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># scp kubelet-bootstrap-master02.kubeconfig root@node02:/etc/kubernetes/cert/kubelet-bootstrap.kubeconfig</span></code></pre>
+<h3 id="5-创建和分发kubelet参数配置文件"><a href="#5-创建和分发kubelet参数配置文件" class="headerlink" title="5    创建和分发kubelet参数配置文件"></a>5    创建和分发kubelet参数配置文件</h3><p>创建 kubelet 参数配置模板文件：</p>
+<pre class=" language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@master01 cert<span class="token punctuation">]</span>cat <span class="token operator">></span> kubelet.config.json <span class="token operator">&lt;&lt;</span><span class="token string">EOF
+{
+  "kind": "KubeletConfiguration",
+  "apiVersion": "kubelet.config.k8s.io/v1beta1",
+  "authentication": {
+    "x509": {
+      "clientCAFile": "/etc/kubernetes/cert/ca.pem"
+    },
+    "webhook": {
+      "enabled": true,
+      "cacheTTL": "2m0s"
+    },
+    "anonymous": {
+      "enabled": false
+    }
+  },
+  "authorization": {
+    "mode": "Webhook",
+    "webhook": {
+      "cacheAuthorizedTTL": "5m0s",
+      "cacheUnauthorizedTTL": "30s"
+    }
+  },
+  "address": "172.24.150.88",
+  "port": 10250,
+  "readOnlyPort": 0,
+  "cgroupDriver": "cgroupfs",
+  "hairpinMode": "promiscuous-bridge",
+  "serializeImagePulls": false,
+  "featureGates": {
+    "RotateKubeletClientCertificate": true,
+    "RotateKubeletServerCertificate": true
+  },
+  "clusterDomain": "cluster.local.",
+  "clusterDNS": ["10.254.0.2"]
+}
+EOF</span>
+
+address：API 监听地址，不能为 127.0.0.1，否则 kube-apiserver、heapster 等不能调用 kubelet 的 API；
+readOnlyPort<span class="token operator">=</span>0：关闭只读端口<span class="token punctuation">(</span>默认 10255<span class="token punctuation">)</span>，等效为未指定；
+authentication.anonymous.enabled：设置为 false，不允许匿名?访问 10250 端口；
+authentication.x509.clientCAFile：指定签名客户端证书的 CA 证书，开启 HTTP 证书认证；
+authentication.webhook.enabled<span class="token operator">=</span>true：开启 HTTPs bearer token 认证；
+对于未通过 x509 证书和 webhook 认证的请求<span class="token punctuation">(</span>kube-apiserver 或其他客户端<span class="token punctuation">)</span>，将被拒绝，提示 Unauthorized；
+authroization.mode<span class="token operator">=</span>Webhook：kubelet 使用 SubjectAccessReview API 查询 kube-apiserver 某 user、group 是否具有操作资源的权限<span class="token punctuation">(</span>RBAC<span class="token punctuation">)</span>；
+featureGates.RotateKubeletClientCertificate、featureGates.RotateKubeletServerCertificate：自动 rotate 证书，证书的有效期取决于 kube-controller-manager 的 --experimental-cluster-signing-duration 参数；
+需要 root 账户运行；</code></pre>
+<p>为node01、node02分发kubelet配置文件</p>
+<pre class=" language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@master01 cert<span class="token punctuation">]</span>scp kubelet.config.json root@node01:/etc/kubernetes/cert/kubelet.config.json
+<span class="token punctuation">[</span>root@master01 cert<span class="token punctuation">]</span>scp kubelet.config.json root@node02:/etc/kubernetes/cert/kubelet.config.json</code></pre>
+<h3 id="6-创建和分发kubelet-systemd-unit文件"><a href="#6-创建和分发kubelet-systemd-unit文件" class="headerlink" title="6     创建和分发kubelet systemd unit文件"></a>6     创建和分发kubelet systemd unit文件</h3><pre class=" language-bash"><code class="language-bash">
+<span class="token function">cat</span> <span class="token operator">></span>/etc/systemd/system/kubelet.service <span class="token operator">&lt;&lt;</span><span class="token string">EOF
+[Unit]
+Description=Kubernetes Kubelet
+Documentation=https://github.com/GoogleCloudPlatform/kubernetes
+After=docker.service
+Requires=docker.service
+
+[Service]
+WorkingDirectory=/var/lib/kubelet
+ExecStart=/usr/local/bin/kubelet \
+  --bootstrap-kubeconfig=/etc/kubernetes/cert/kubelet-bootstrap.kubeconfig \
+  --cert-dir=/etc/kubernetes/cert \
+  --kubeconfig=/etc/kubernetes/cert/kubelet.kubeconfig \
+  --config=/etc/kubernetes/cert/kubelet.config.json \
+  --hostname-override=172.24.150.89 \
+  --pod-infra-container-image=registry.cn-hangzhou.aliyuncs.com/google_containers/pause-amd64:3.1 \
+  --allow-privileged=true \
+  --alsologtostderr=true \
+  --logtostderr=false \
+  --log-dir=/var/log/kubernetes \
+  --v=2
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+EOF</span>
+如果设置了 --hostname-override 选项，则 kube-proxy 也需要设置该选项，否则会出现找不到 Node 的情况；
+--bootstrap-kubeconfig：指向 bootstrap kubeconfig 文件，kubelet 使用该文件中的用户名和 token 向 kube-apiserver 发送 TLS Bootstrapping 请求；
+K8S approve kubelet 的 csr 请求后，在 --cert-dir 目录创建证书和私钥文件，然后写入 --kubeconfig 文件；</code></pre>
+<h3 id="7-Bootstrap-Token-Auth和授予权限"><a href="#7-Bootstrap-Token-Auth和授予权限" class="headerlink" title="7    Bootstrap Token Auth和授予权限"></a>7    Bootstrap Token Auth和授予权限</h3><p>kublet 启动时查找配置的 –kubeletconfig 文件是否存在，如果不存在则使用 –bootstrap-kubeconfig 向 kube-apiserver 发送证书签名请求 (CSR)。<br>kube-apiserver 收到 CSR 请求后，对其中的 Token 进行认证（事先使用 kubeadm 创建的 token），认证通过后将请求的 user 设置为 system:bootstrap:，group 设置为 system:bootstrappers，这一过程称为 Bootstrap Token Auth。<br>默认情况下，这个 user 和 group 没有创建 CSR 的权限，kubelet 启动失败，错误日志如下：</p>
+<pre class=" language-bash"><code class="language-bash"><span class="token function">sudo</span> journalctl -u kubelet -a <span class="token operator">|</span><span class="token function">grep</span> -A 2 <span class="token string">'certificatesigningrequests'</span>
+july 06 06:42:36 kube-node1 kubelet<span class="token punctuation">[</span>26986<span class="token punctuation">]</span>: F0506 06:42:36.314378   26986 server.go:233<span class="token punctuation">]</span> failed to run Kubelet: cannot create certificate signing request: certificatesigningrequests.certificates.k8s.io is forbidden: User <span class="token string">"system:bootstrap:lemy40"</span> cannot create certificatesigningrequests.certificates.k8s.io at the cluster scope
+july 06 06:42:36 node01 systemd<span class="token punctuation">[</span>1<span class="token punctuation">]</span>: kubelet.service: Main process exited, code<span class="token operator">=</span>exited, status<span class="token operator">=</span>255/n/a
+july 06 06:42:36 node01 systemd<span class="token punctuation">[</span>1<span class="token punctuation">]</span>: kubelet.service: Failed with result <span class="token string">'exit-code'</span><span class="token keyword">.</span></code></pre>
+<p>解决办法是：创建一个 clusterrolebinding，将 group system:bootstrappers 和 clusterrole system:node-bootstrapper 绑定：</p>
+<pre class=" language-bash"><code class="language-bash">root@master01 ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true">#  kubectl create clusterrolebinding kubelet-bootstrap --clusterrole=system:node-bootstrapper --group=system:bootstrappers</span></code></pre>
+<h3 id="8-启动kubelet服务"><a href="#8-启动kubelet服务" class="headerlink" title="8    启动kubelet服务"></a>8    启动kubelet服务</h3><pre class=" language-bash"><code class="language-bash"><span class="token function">mkdir</span> -p /var/log/kubernetes <span class="token operator">&amp;&amp;</span> <span class="token function">mkdir</span> -p /var/lib/kubelet
+systemctl daemon-reload 
+systemctl <span class="token function">enable</span> kubelet 
+systemctl restart kubelet</code></pre>
+<p>关闭 swap 分区，否则 kubelet 会启动失败；<br>必须先创建工作和日志目录；<br>kubelet 启动后使用 –bootstrap-kubeconfig 向 kube-apiserver 发送 CSR 请求，当这个 CSR 被 approve 后，kube-controller-manager 为 kubelet 创建 TLS 客户端证书、私钥和 –kubeletconfig 文件。<br>注意：kube-controller-manager 需要配置 –cluster-signing-cert-file 和 –cluster-signing-key-file 参数，才会为 TLS Bootstrap 创建证书和私钥。<br>两个 node 节点的 csr 均处于 pending 状态；<br>** 此时kubelet的进程有，但是监听端口还未启动，需要进行下面步骤！**</p>
+<h3 id="9-approve-kubelet-csr请求"><a href="#9-approve-kubelet-csr请求" class="headerlink" title="9    approve kubelet csr请求"></a>9    approve kubelet csr请求</h3><p>可以手动或自动 approve CSR 请求,** 推荐使用自动的方式**，因为从 v1.8 版本开始，可以自动轮转approve csr 后生成的证书。<br>i、手动approve csr请求<br>查看 CSR 列表:</p>
+<pre class=" language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@master01 ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># kubectl get csr</span>
+NAME                                                   AGE   REQUESTOR                 CONDITION
+node-csr-P7XcQAc2yNlXn1pUmQFxXNCdGyyt8ccVuW3bmoUZiK4   30m   system:bootstrap:e7n0o5   Pending
+node-csr-gD18nmcyPUNWNyDQvCo2BMYiiA4K59BNkclFRWv1SAM   79m   system:bootstrap:ydbwyk   Pending
+node-csr-u2sVzVkFYnMxPIYWjXHbqRJROtTZBYzA1s2vATPLzyo   30m   system:bootstrap:8w6j3n   Pending
+approve CSR 
+<span class="token punctuation">[</span>root@master01 ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># kubectl certificate approve node-csr-gD18nmcyPUNWNyDQvCo2BMYiiA4K59BNkclFRWv1SAM</span>
+certificatesigningrequest.certificates.k8s.io <span class="token string">"node-csr gD18nmcyPUNWNyDQvCo2BMYiiA4K59BNkclFRWv1SAM"</span> approved</code></pre>
+<p>查看 Approve 结果：</p>
+<pre class=" language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@master01 ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># kubectl describe csr node-csr-gD18nmcyPUNWNyDQvCo2BMYiiA4K59BNkclFRWv1SAM</span>
+Name:               node-csr-gD18nmcyPUNWNyDQvCo2BMYiiA4K59BNkclFRWv1SAM
+Labels:             <span class="token operator">&lt;</span>none<span class="token operator">></span>
+Annotations:        <span class="token operator">&lt;</span>none<span class="token operator">></span>
+CreationTimestamp:  Thu, 20 Dec 2018 19:55:39 +0800
+Requesting User:    system:bootstrap:ydbwyk
+Status:             Approved,Issued
+Subject:
+         Common Name:    system:node: 172.24.150.88
+         Serial Number:  
+         Organization:   system:nodes
+Events:  <span class="token operator">&lt;</span>none<span class="token operator">></span>
+Requesting User：请求 CSR 的用户，kube-apiserver 对它进行认证和授权；
+Subject：请求签名的证书信息；
+证书的 CN 是 system:node:192.168.80.10， Organization 是 system:nodes，kube-apiserver 的 Node 授权模式会授予该证书的相关权限；</code></pre>
+<p>ii、自动approve csr请求<br>创建三个 ClusterRoleBinding，分别用于自动 approve client、renew client、renew server 证书：</p>
+<pre class=" language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@master01 ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># cat > csr-crb.yaml &lt;&lt;EOF</span>
+ <span class="token comment" spellcheck="true"># Approve all CSRs for the group "system:bootstrappers"</span>
+ kind: ClusterRoleBinding
+ apiVersion: rbac.authorization.k8s.io/v1
+ metadata:
+   name: auto-approve-csrs-for-group
+ subjects:
+ - kind: Group
+   name: system:bootstrappers
+   apiGroup: rbac.authorization.k8s.io
+ roleRef:
+   kind: ClusterRole
+   name: system:certificates.k8s.io:certificatesigningrequests:nodeclient
+   apiGroup: rbac.authorization.k8s.io
+---
+ <span class="token comment" spellcheck="true"># To let a node of the group "system:nodes" renew its own credentials</span>
+ kind: ClusterRoleBinding
+ apiVersion: rbac.authorization.k8s.io/v1
+ metadata:
+   name: node-client-cert-renewal
+ subjects:
+ - kind: Group
+   name: system:nodes
+   apiGroup: rbac.authorization.k8s.io
+ roleRef:
+   kind: ClusterRole
+   name: system:certificates.k8s.io:certificatesigningrequests:selfnodeclient
+   apiGroup: rbac.authorization.k8s.io
+---
+<span class="token comment" spellcheck="true"># A ClusterRole which instructs the CSR approver to approve a node requesting a</span>
+<span class="token comment" spellcheck="true"># serving cert matching its client cert.</span>
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: approve-node-server-renewal-csr
+rules:
+- apiGroups: <span class="token punctuation">[</span><span class="token string">"certificates.k8s.io"</span><span class="token punctuation">]</span>
+  resources: <span class="token punctuation">[</span><span class="token string">"certificatesigningrequests/selfnodeserver"</span><span class="token punctuation">]</span>
+  verbs: <span class="token punctuation">[</span><span class="token string">"create"</span><span class="token punctuation">]</span>
+---
+ <span class="token comment" spellcheck="true"># To let a node of the group "system:nodes" renew its own server credentials</span>
+ kind: ClusterRoleBinding
+ apiVersion: rbac.authorization.k8s.io/v1
+ metadata:
+   name: node-server-cert-renewal
+ subjects:
+ - kind: Group
+   name: system:nodes
+   apiGroup: rbac.authorization.k8s.io
+ roleRef:
+   kind: ClusterRole
+   name: approve-node-server-renewal-csr
+   apiGroup: rbac.authorization.k8s.io
+EOF
+auto-approve-csrs-for-group：自动 approve node 的第一次 CSR； 注意第一次 CSR 时，请求的 Group 为 system:bootstrappers；
+node-client-cert-renewal：自动 approve node 后续过期的 client 证书，自动生成的证书 Group 为 system:nodes<span class="token punctuation">;</span>
+node-server-cert-renewal：自动 approve node 后续过期的 server 证书，自动生成的证书 Group 为 system:nodes<span class="token punctuation">;</span></code></pre>
+<p>生效配置：</p>
+<pre class=" language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@master01<span class="token punctuation">]</span>kubectl apply -f csr-crb.yaml</code></pre>
+<h3 id="10-查看kubelet情况"><a href="#10-查看kubelet情况" class="headerlink" title="10    查看kubelet情况"></a>10    查看kubelet情况</h3><p>等待一段时间(1-10 分钟)，两个节点的 CSR 都被自动 approve</p>
+<pre class=" language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@master01 ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># kubectl get csr</span>
+NAME                                                   AGE   REQUESTOR                 CONDITION
+node-csr-P7XcQAc2yNlXn1pUmQFxXNCdGyyt8ccVuW3bmoUZiK4   35m   system:bootstrap:e7n0o5   Approved,Issued
+node-csr-gD18nmcyPUNWNyDQvCo2BMYiiA4K59BNkclFRWv1SAM   84m   system:bootstrap:ydbwyk   Approved,Issued</code></pre>
+<p>节点ready:</p>
+<pre class=" language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@master01 ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># kubectl get nodes</span>
+NAME            STATUS   ROLES    AGE     VERSION
+172.24.150.88   Ready    <span class="token operator">&lt;</span>none<span class="token operator">></span>   3h40m   v1.12.3
+172.24.150.89   Ready    <span class="token operator">&lt;</span>none<span class="token operator">></span>   3h39m   v1.12.3</code></pre>
+<p>kube-controller-manager 为各 node 生成了 kubeconfig 文件和公私钥：</p>
+<pre class=" language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@node01 cert<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># ll</span>
+total 52
+-rw------- 1 root root 1679 Jul  7 14:18 ca-key.pem
+-rw-r--r-- 1 root root 1359 Jul  7 14:18 ca.pem
+-rw------- 1 root root 1675 Jul  7 13:30 flanneld-key.pem
+-rw-r--r-- 1 root root 1391 Jul  7 13:30 flanneld.pem
+-rw------- 1 root root 2158 Jul  9 20:57 kubelet-bootstrap.kubeconfig
+-rw------- 1 root root 1273 Jul  9 21:17 kubelet-client-2019-07-09-21-17-43.pem
+lrwxrwxrwx 1 root root   59 Jul  9 21:17 kubelet-client-current.pem -<span class="token operator">></span> /etc/kubernetes/cert/kubelet-client-2019-07-09-21-17-43.pem
+-rw-r--r-- 1 root root  800 Jul  9 21:01 kubelet.config.json
+-rw-r--r-- 1 root root 2185 Jul  9 21:07 kubelet.crt
+-rw------- 1 root root 1679 Jul  9 21:07 kubelet.key
+-rw------- 1 root root 2298 Jul  9 21:17 kubelet.kubeconfig
+-rw-r--r-- 1 root root  321 Jul  9 21:36 kube-proxy.config.yaml
+-rw------- 1 root root 6273 Jul  9 21:28 kube-proxy.kubeconfig
+kubelet-server 证书会周期轮转；</code></pre>
+<h2 id="三-部署kube-proxy组件"><a href="#三-部署kube-proxy组件" class="headerlink" title="三    部署kube-proxy组件"></a>三    部署kube-proxy组件</h2><p>kube-proxy 运行在所有 worker 节点上，，它监听 apiserver 中 service 和 Endpoint 的变化情况，创建路由规则来进行服务负载均衡。<br>本文档讲解部署 kube-proxy 的部署，使用 ipvs 模式。</p>
+<h3 id="1-创建证书"><a href="#1-创建证书" class="headerlink" title="1    创建证书"></a>1    创建证书</h3><pre class=" language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@master01 cert<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># cat > kube-proxy-csr.json &lt;&lt;EOF</span>
+<span class="token punctuation">{</span>
+  <span class="token string">"CN"</span><span class="token keyword">:</span> <span class="token string">"system:kube-proxy"</span>,
+  <span class="token string">"key"</span><span class="token keyword">:</span> <span class="token punctuation">{</span>
+    <span class="token string">"algo"</span><span class="token keyword">:</span> <span class="token string">"rsa"</span>,
+    <span class="token string">"size"</span><span class="token keyword">:</span> 2048
+  <span class="token punctuation">}</span>,
+  <span class="token string">"names"</span><span class="token keyword">:</span> <span class="token punctuation">[</span>
+    <span class="token punctuation">{</span>
+      <span class="token string">"C"</span><span class="token keyword">:</span> <span class="token string">"CN"</span>,
+      <span class="token string">"ST"</span><span class="token keyword">:</span> <span class="token string">"BeiJing"</span>,
+      <span class="token string">"L"</span><span class="token keyword">:</span> <span class="token string">"BeiJing"</span>,
+      <span class="token string">"O"</span><span class="token keyword">:</span> <span class="token string">"k8s"</span>,
+      <span class="token string">"OU"</span><span class="token keyword">:</span> <span class="token string">"yunwei"</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">]</span>
+<span class="token punctuation">}</span>
+EOF
+CN：指定该证书的 User 为 system:kube-proxy；
+预定义的 RoleBinding system:node-proxier 将User system:kube-proxy 与 Role system:node-proxier 绑定，该 Role 授予了调用 kube-apiserver Proxy 相关 API 的权限；
+该证书只会被 kube-proxy 当做 client 证书使用，所以 hosts 字段为空；</code></pre>
+<h3 id="2-创建和分发kubeconfig文件"><a href="#2-创建和分发kubeconfig文件" class="headerlink" title="2    创建和分发kubeconfig文件"></a>2    创建和分发kubeconfig文件</h3><pre class=" language-bash"><code class="language-bash">root@master01 cert<span class="token punctuation">]</span><span class="token comment" spellcheck="true">#kubectl config set-cluster kubernetes \</span>
+  --certificate-authority<span class="token operator">=</span>/etc/kubernetes/cert/ca.pem \
+  --embed-certs<span class="token operator">=</span>true \
+  --server<span class="token operator">=</span>https://172.24.150.90:6443 \
+  --kubeconfig<span class="token operator">=</span>kube-proxy.kubeconfig
+
+<span class="token punctuation">[</span>root@master01 cert<span class="token punctuation">]</span><span class="token comment" spellcheck="true">#kubectl config set-credentials kube-proxy \</span>
+  --client-certificate<span class="token operator">=</span>kube-proxy.pem \
+  --client-key<span class="token operator">=</span>kube-proxy-key.pem \
+  --embed-certs<span class="token operator">=</span>true \
+  --kubeconfig<span class="token operator">=</span>kube-proxy.kubeconfig
+
+<span class="token punctuation">[</span>root@master01 cert<span class="token punctuation">]</span><span class="token comment" spellcheck="true">#kubectl config set-context default \</span>
+  --cluster<span class="token operator">=</span>kubernetes \
+  --user<span class="token operator">=</span>kube-proxy \
+  --kubeconfig<span class="token operator">=</span>kube-proxy.kubeconfig
+
+<span class="token punctuation">[</span>root@master01 cert<span class="token punctuation">]</span><span class="token comment" spellcheck="true">#kubectl config use-context default --kubeconfig=kube-proxy.kubeconfig</span>
+
+--embed-certs<span class="token operator">=</span>true：将 ca.pem 和 admin.pem 证书内容嵌入到生成的 kubectl-proxy.kubeconfig 文件中<span class="token punctuation">(</span>不加时，写入的是证书文件路径<span class="token punctuation">)</span>；
+</code></pre>
+<p>分发kubeconfig文件</p>
+<pre class=" language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@master01 cert<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># scp kube-proxy.kubeconfig root@node01:/etc/kubernetes/cert/</span>
+<span class="token punctuation">[</span>root@master01 cert<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># scp kube-proxy.kubeconfig root@node02:/etc/kubernetes/cert/</span></code></pre>
+<h3 id="3-创建kube-proxy配置文件"><a href="#3-创建kube-proxy配置文件" class="headerlink" title="3    创建kube-proxy配置文件"></a>3    创建kube-proxy配置文件</h3><p>从 v1.10 开始，kube-proxy 部分参数可以配置文件中配置。可以使用 –write-config-to 选项生成该配置文件，或者参考 kubeproxyconfig 的类型定义源文件 ：<a href="https://github.com/kubernetes/kubernetes/blob/master/pkg/proxy/apis/kubeproxyconfig/types.go" target="_blank" rel="noopener">https://github.com/kubernetes/kubernetes/blob/master/pkg/proxy/apis/kubeproxyconfig/types.go</a><br>创建 kube-proxy config 文件模板：</p>
+<p>[root@master01 cert]# cat &gt;kube-proxy.config.yaml &lt;&lt;EOF<br>apiVersion: kubeproxy.config.k8s.io/v1alpha1<br>bindAddress: 172.24.150.88<br>clientConnection:<br>  kubeconfig: /etc/kubernetes/cert/kube-proxy.kubeconfig<br>clusterCIDR: 172.30.0.0/16<br>healthzBindAddress: 172.24.150.88:10256<br>hostnameOverride: k8s-node1<br>kind: KubeProxyConfiguration<br>metricsBindAddress: 172.24.150.88:10249<br>mode: “ipvs”<br>EOF<br>bindAddress: 监听地址；<br>clientConnection.kubeconfig: 连接 apiserver 的 kubeconfig 文件；<br>clusterCIDR: kube-proxy 根据 –cluster-cidr 判断集群内部和外部流量，指定 –cluster-cidr 或 –masquerade-all选项后 kube-proxy 才会对访问 Service IP 的请求做 SNAT；<br>hostnameOverride: 参数值必须与 kubelet 的值一致，否则 kube-proxy 启动后会找不到该 Node，从而不会创建任何 ipvs 规则；<br>mode: 使用 ipvs 模式；<br>其中clusterc idr为flannel网络地址。</p>
+<p>文件格式问题，注意参考格式见下<br>[root@kmaster01 kubernetes]# cat /etc/kubernetes/kube-proxy.config.yaml<br>apiVersion: kubeproxy.config.k8s.io/v1alpha1<br>bindAddress: 172.24.150.88<br>clientConnection:<br>  kubeconfig: /etc/kubernetes/kube-proxy.kubeconfig<br>clusterCIDR: 172.30.0.0/16<br>healthzBindAddress: 172.24.150.88:10256<br>hostnameOverride: k8s-master1<br>kind: KubeProxyConfiguration<br>metricsBindAddress: 172.24.150.88:10249<br>mode: “ipvs”<br>[root@k8s-master1 kubernetes]#<br>kubeconfig: /etc/kubernetes/kube-proxy.kubeconfig     ## 注意这个前面的空格，没有就会报下面的错误：</p>
+<p>Jul 06 00:35:13 node01 kube-proxy[25540]: I0706 00:35:13.307740   25540 server.go:412] Neither kubeconfig file nor master URL was specified. Falling back to in-cluster config.<br>Jul 06 00:35:13 node01 kube-proxy[25540]: F0706 00:35:13.307780   25540 server.go:360] unable to load in-cluster configuration, KUBERNETES_SERVICE_HOST and KUBERNETES_SERVICE_PORT must be defined</p>
+<pre><code>为各节点创建和分发 kube-proxy 配置文件：
+```bash
+[root@master01 cert]# scp kube-proxy.config.yaml root@node01:/etc/kubernetes/cert/
+[root@master01 cert]# scp kube-proxy.config.yaml root@node02:/etc/kubernetes/cert/</code></pre><h3 id="4-在node01和node02上分别创建-kube-proxy-systemd-unit文件"><a href="#4-在node01和node02上分别创建-kube-proxy-systemd-unit文件" class="headerlink" title="4    在node01和node02上分别创建 kube-proxy systemd unit文件"></a>4    在node01和node02上分别创建 kube-proxy systemd unit文件</h3><pre class=" language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@node01 cert<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># cat >/etc/systemd/system/kube-proxy.service &lt;&lt;EOF</span>
+<span class="token punctuation">[</span>Unit<span class="token punctuation">]</span>
+Description<span class="token operator">=</span>Kubernetes Kube-Proxy Server
+Documentation<span class="token operator">=</span>https://github.com/GoogleCloudPlatform/kubernetes
+After<span class="token operator">=</span>network.target
+
+<span class="token punctuation">[</span>Service<span class="token punctuation">]</span>
+WorkingDirectory<span class="token operator">=</span>/var/lib/kube-proxy
+ExecStart<span class="token operator">=</span>/usr/local/bin/kube-proxy \
+  --config<span class="token operator">=</span>/etc/kubernetes/cert/kube-proxy.config.yaml \
+  --alsologtostderr<span class="token operator">=</span>true \
+  --logtostderr<span class="token operator">=</span>false \
+  --log-dir<span class="token operator">=</span>/var/lib/kube-proxy/log \
+  --v<span class="token operator">=</span>2
+Restart<span class="token operator">=</span>on-failure
+RestartSec<span class="token operator">=</span>5
+LimitNOFILE<span class="token operator">=</span>65536
+
+<span class="token punctuation">[</span>Install<span class="token punctuation">]</span>
+WantedBy<span class="token operator">=</span>multi-user.target
+EOF
+
+<span class="token punctuation">[</span>root@node02 cert<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># cat >/etc/systemd/system/kube-proxy.service &lt;&lt;EOF</span>
+<span class="token punctuation">[</span>Unit<span class="token punctuation">]</span>
+Description<span class="token operator">=</span>Kubernetes Kube-Proxy Server
+Documentation<span class="token operator">=</span>https://github.com/GoogleCloudPlatform/kubernetes
+After<span class="token operator">=</span>network.target
+
+<span class="token punctuation">[</span>Service<span class="token punctuation">]</span>
+WorkingDirectory<span class="token operator">=</span>/var/lib/kube-proxy
+ExecStart<span class="token operator">=</span>/usr/local/bin/kube-proxy \
+  --config<span class="token operator">=</span>/etc/kubernetes/cert/kube-proxy.config.yaml \
+  --alsologtostderr<span class="token operator">=</span>true \
+  --logtostderr<span class="token operator">=</span>false \
+  --log-dir<span class="token operator">=</span>/var/lib/kube-proxy/log \
+  --v<span class="token operator">=</span>2
+Restart<span class="token operator">=</span>on-failure
+RestartSec<span class="token operator">=</span>5
+LimitNOFILE<span class="token operator">=</span>65536
+
+<span class="token punctuation">[</span>Install<span class="token punctuation">]</span>
+WantedBy<span class="token operator">=</span>multi-user.target
+EOF
+</code></pre>
+<h3 id="5-启动kube-proxy服务"><a href="#5-启动kube-proxy服务" class="headerlink" title="5    启动kube-proxy服务"></a>5    启动kube-proxy服务</h3><pre class=" language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@node01 cert<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># mkdir -p /var/lib/kube-proxy/log</span>
+<span class="token punctuation">[</span>root@node01 cert<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># systemctl daemon-reload</span>
+<span class="token punctuation">[</span>root@node01 cert<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># systemctl enable kube-proxy</span>
+<span class="token punctuation">[</span>root@node01 cert<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># systemctl restart kube-proxy</span>
+
+<span class="token punctuation">[</span>root@node02 cert<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># mkdir -p /var/lib/kube-proxy/log</span>
+<span class="token punctuation">[</span>root@node02 cert<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># systemctl daemon-reload</span>
+<span class="token punctuation">[</span>root@node02 cert<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># systemctl enable kube-proxy</span>
+<span class="token punctuation">[</span>root@node02 cert<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># systemctl restart kube-proxy</span></code></pre>
+<p>必须先创建工作和日志目录；</p>
+<h3 id="6-检查启动结果-node01和node02上"><a href="#6-检查启动结果-node01和node02上" class="headerlink" title="6    检查启动结果(node01和node02上)"></a>6    检查启动结果(node01和node02上)</h3><pre class=" language-bash"><code class="language-bash">systemctl status kube-proxy<span class="token operator">|</span><span class="token function">grep</span> Active
+
+确保状态为 active <span class="token punctuation">(</span>running<span class="token punctuation">)</span>，否则查看日志，确认原因：
+
+journalctl -u kube-proxy</code></pre>
+<p>查看监听端口状态</p>
+<pre class=" language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@node1 cert<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># netstat -lnpt|grep kube-proxy</span>
+tcp        0      0  172.24.150.88:10256     0.0.0.0:*               LISTEN      9617/kube-proxy     
+tcp        0      0  172.24.150.88:10249     0.0.0.0:*               LISTEN      9617/kube-proxy
+10249：http prometheus metrics port<span class="token punctuation">;</span>
+10256：http healthz port<span class="token punctuation">;</span></code></pre>
+<h3 id="7-查看ipvs路由规则"><a href="#7-查看ipvs路由规则" class="headerlink" title="7 查看ipvs路由规则"></a>7 查看ipvs路由规则</h3><pre class=" language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@node01 cert<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># yum install ipvsadm</span>
+<span class="token punctuation">[</span>root@node01 cert<span class="token punctuation">]</span><span class="token comment" spellcheck="true">#ipvsadm -ln</span>
+IP Virtual Server version 1.2.1 <span class="token punctuation">(</span>size<span class="token operator">=</span>4096<span class="token punctuation">)</span>
+Prot LocalAddress:Port Scheduler Flags
+  -<span class="token operator">></span> RemoteAddress:Port           Forward Weight ActiveConn InActConn
+TCP  10.254.0.1:443 rr
+  -<span class="token operator">></span>  172.24.150.85:6443            Masq    1      0          0         
+  -<span class="token operator">></span>  172.24.150.86:6443            Masq    1      0          0         
+  -<span class="token operator">></span>  172.24.150.87:6443            Masq    1      0          0 
+
+可见将所有到 kubernetes cluster ip 443 端口的请求都转发到 kube-apiserver 的 6443 端口。
+至此node节点部署完成。</code></pre>
+<h2 id="四-验证集群功能"><a href="#四-验证集群功能" class="headerlink" title="四 验证集群功能"></a>四 验证集群功能</h2><h3 id="1-查看节点状况"><a href="#1-查看节点状况" class="headerlink" title="1    查看节点状况"></a>1    查看节点状况</h3><pre class=" language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@master01 ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># kubectl get nodes</span>
+NAME            STATUS   ROLES    AGE   VERSION
+172.24.150.88   Ready    <span class="token operator">&lt;</span>none<span class="token operator">></span>   13h   v1.12.3
+172.24.150.89   Ready    <span class="token operator">&lt;</span>none<span class="token operator">></span>   13h   v1.12.3</code></pre>
+<h3 id="2-创建nginx-web测试文件"><a href="#2-创建nginx-web测试文件" class="headerlink" title="2    创建nginx web测试文件"></a>2    创建nginx web测试文件</h3><pre class=" language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@master01 ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># cat >nginx-web.yml&lt;&lt;EOF </span>
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-web
+  labels:
+    tier: frontend
+spec:
+  type: NodePort
+  selector:
+    tier: frontend
+  ports:
+  - name: http
+    port: 80
+    targetPort: 80
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: nginx-con
+  labels:
+    tier: frontend
+spec:
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        tier: frontend
+    spec:
+      containers:
+      - name: nginx-pod
+        image: nginx
+        ports:
+        - containerPort: 80
+EOF
+</code></pre>
+<p>执行nginx-web.yaml文件:</p>
+<pre class=" language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@master01 ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># kubectl create -f nginx-web.yml</span>
+</code></pre>
+<h3 id="3-查看各个Node上Pod-IP的连通性"><a href="#3-查看各个Node上Pod-IP的连通性" class="headerlink" title="3    查看各个Node上Pod IP的连通性"></a>3    查看各个Node上Pod IP的连通性</h3><pre class=" language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@master01 ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true">#  kubectl get pod -o wide</span>
+NAME                         READY   STATUS    RESTARTS   AGE   IP            NODE            NOMINATED NODE
+nginx-con-594b8d6b48-46gf7   1/1     Running   0          12h   172.30.21.2   172.24.150.88   <span class="token operator">&lt;</span>none<span class="token operator">></span>
+nginx-con-594b8d6b48-9t2xt   1/1     Running   0          12h   172.30.14.2   172.24.150.89   <span class="token operator">&lt;</span>none<span class="token operator">></span>
+nginx-con-594b8d6b48-vt589   1/1     Running   1          12h   172.30.21.3   172.24.150.88   <span class="token operator">&lt;</span>none<span class="token operator">></span>
+可见，nginx 的 Pod IP 分别是 172.30.21.2、172.30.14.2、172.30.21.2，在node01、node02 上分别 <span class="token function">ping</span> 这三个 IP，看是否连通：
+<span class="token punctuation">[</span>root@node01 ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># ping  172.30.21.3</span>
+PING 172.30.21.3 <span class="token punctuation">(</span>172.30.21.3<span class="token punctuation">)</span> 56<span class="token punctuation">(</span>84<span class="token punctuation">)</span> bytes of data.
+64 bytes from 172.30.21.3: icmp_seq<span class="token operator">=</span>1 ttl<span class="token operator">=</span>64 time<span class="token operator">=</span>0.074 ms
+64 bytes from 172.30.21.3: icmp_seq<span class="token operator">=</span>2 ttl<span class="token operator">=</span>64 time<span class="token operator">=</span>0.034 ms
+64 bytes from 172.30.21.3: icmp_seq<span class="token operator">=</span>3 ttl<span class="token operator">=</span>64 time<span class="token operator">=</span>0.026 ms
+64 bytes from 172.30.21.3: icmp_seq<span class="token operator">=</span>4 ttl<span class="token operator">=</span>64 time<span class="token operator">=</span>0.022 ms
+64 bytes from 172.30.21.3: icmp_seq<span class="token operator">=</span>5 ttl<span class="token operator">=</span>64 time<span class="token operator">=</span>0.022 ms
+64 bytes from 172.30.21.3: icmp_seq<span class="token operator">=</span>6 ttl<span class="token operator">=</span>64 time<span class="token operator">=</span>0.024 ms
+64 bytes from 172.30.21.3: icmp_seq<span class="token operator">=</span>7 ttl<span class="token operator">=</span>64 time<span class="token operator">=</span>0.021 ms
+64 bytes from 172.30.21.3: icmp_seq<span class="token operator">=</span>8 ttl<span class="token operator">=</span>64 time<span class="token operator">=</span>0.020 ms
+64 bytes from 172.30.21.3: icmp_seq<span class="token operator">=</span>9 ttl<span class="token operator">=</span>64 time<span class="token operator">=</span>0.022 ms
+^C
+--- 172.30.21.3 <span class="token function">ping</span> statistics ---
+9 packets transmitted, 9 received, 0% packet loss, <span class="token function">time</span> 7999ms
+rtt min/avg/max/mdev <span class="token operator">=</span> 0.020/0.029/0.074/0.017 ms
+<span class="token punctuation">[</span>root@node02 ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># ping  172.30.21.3</span>
+PING 172.30.21.3 <span class="token punctuation">(</span>172.30.21.3<span class="token punctuation">)</span> 56<span class="token punctuation">(</span>84<span class="token punctuation">)</span> bytes of data.
+64 bytes from 172.30.21.3: icmp_seq<span class="token operator">=</span>1 ttl<span class="token operator">=</span>63 time<span class="token operator">=</span>0.415 ms
+64 bytes from 172.30.21.3: icmp_seq<span class="token operator">=</span>2 ttl<span class="token operator">=</span>63 time<span class="token operator">=</span>0.268 ms
+64 bytes from 172.30.21.3: icmp_seq<span class="token operator">=</span>3 ttl<span class="token operator">=</span>63 time<span class="token operator">=</span>0.215 ms
+64 bytes from 172.30.21.3: icmp_seq<span class="token operator">=</span>4 ttl<span class="token operator">=</span>63 time<span class="token operator">=</span>0.205 ms
+64 bytes from 172.30.21.3: icmp_seq<span class="token operator">=</span>5 ttl<span class="token operator">=</span>63 time<span class="token operator">=</span>0.208 ms
+64 bytes from 172.30.21.3: icmp_seq<span class="token operator">=</span>6 ttl<span class="token operator">=</span>63 time<span class="token operator">=</span>0.211 ms
+64 bytes from 172.30.21.3: icmp_seq<span class="token operator">=</span>7 ttl<span class="token operator">=</span>63 time<span class="token operator">=</span>0.216 ms
+64 bytes from 172.30.21.3: icmp_seq<span class="token operator">=</span>8 ttl<span class="token operator">=</span>63 time<span class="token operator">=</span>0.216 ms
+64 bytes from 172.30.21.3: icmp_seq<span class="token operator">=</span>9 ttl<span class="token operator">=</span>63 time<span class="token operator">=</span>0.203 ms
+64 bytes from 172.30.21.3: icmp_seq<span class="token operator">=</span>10 ttl<span class="token operator">=</span>63 time<span class="token operator">=</span>0.216 ms
+64 bytes from 172.30.21.3: icmp_seq<span class="token operator">=</span>11 ttl<span class="token operator">=</span>63 time<span class="token operator">=</span>0.216 ms
+64 bytes from 172.30.21.3: icmp_seq<span class="token operator">=</span>12 ttl<span class="token operator">=</span>63 time<span class="token operator">=</span>0.224 ms
+64 bytes from 172.30.21.3: icmp_seq<span class="token operator">=</span>13 ttl<span class="token operator">=</span>63 time<span class="token operator">=</span>0.217 ms
+</code></pre>
+<h3 id="4-查看server的集群ip"><a href="#4-查看server的集群ip" class="headerlink" title="4    查看server的集群ip"></a>4    查看server的集群ip</h3><pre class=" language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@master01 ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># kubectl get svc</span>
+NAME         TYPE        CLUSTER-IP       EXTERNAL-IP   PORT<span class="token punctuation">(</span>S<span class="token punctuation">)</span>        AGE
+kubernetes   ClusterIP   10.254.0.1       <span class="token operator">&lt;</span>none<span class="token operator">></span>        443/TCP        2d17h
+nginx-web    NodePort    10.254.189.106   <span class="token operator">&lt;</span>none<span class="token operator">></span>        80:36545/TCP   12h
+
+10.254.189.106为nginx service的集群ip，代理的是前面的三个pod容器应用。
+PORT 80是集群IP的端口，36545是node节点上的端口，可以用nodeip:nodeport方式访问服务
+node01对应的公网IP为：47.108.67.44 ，在一台和这个k8s集群好不相干的主机上访问
+<span class="token punctuation">[</span>root@harbor1 ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true">#  curl http://47.108.67.44:36545/</span>
+<span class="token operator">&lt;</span><span class="token operator">!</span>DOCTYPE html<span class="token operator">></span>
+<span class="token operator">&lt;</span>html<span class="token operator">></span>
+<span class="token operator">&lt;</span>head<span class="token operator">></span>
+<span class="token operator">&lt;</span>title<span class="token operator">></span>Welcome to nginx<span class="token operator">!</span><span class="token operator">&lt;</span>/title<span class="token operator">></span>
+<span class="token operator">&lt;</span>style<span class="token operator">></span>
+    body <span class="token punctuation">{</span>
+        width: 35em<span class="token punctuation">;</span>
+        margin: 0 auto<span class="token punctuation">;</span>
+        font-family: Tahoma, Verdana, Arial, sans-serif<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token operator">&lt;</span>/style<span class="token operator">></span>
+<span class="token operator">&lt;</span>/head<span class="token operator">></span>
+<span class="token operator">&lt;</span>body<span class="token operator">></span>
+<span class="token operator">&lt;</span>h1<span class="token operator">></span>Welcome to nginx<span class="token operator">!</span><span class="token operator">&lt;</span>/h1<span class="token operator">></span>
+<span class="token operator">&lt;</span>p<span class="token operator">></span>If you see this page, the nginx web server is successfully installed and
+working. Further configuration is required.<span class="token operator">&lt;</span>/p<span class="token operator">></span>
+
+<span class="token operator">&lt;</span>p<span class="token operator">></span>For online documentation and support please refer to
+<span class="token operator">&lt;</span>a href<span class="token operator">=</span><span class="token string">"http://nginx.org/"</span><span class="token operator">></span>nginx.org<span class="token operator">&lt;</span>/a<span class="token operator">></span>.<span class="token operator">&lt;</span>br/<span class="token operator">></span>
+Commercial support is available at
+<span class="token operator">&lt;</span>a href<span class="token operator">=</span><span class="token string">"http://nginx.com/"</span><span class="token operator">></span>nginx.com<span class="token operator">&lt;</span>/a<span class="token operator">></span>.<span class="token operator">&lt;</span>/p<span class="token operator">></span>
+
+<span class="token operator">&lt;</span>p<span class="token operator">></span><span class="token operator">&lt;</span>em<span class="token operator">></span>Thank you <span class="token keyword">for</span> using nginx.<span class="token operator">&lt;</span>/em<span class="token operator">></span><span class="token operator">&lt;</span>/p<span class="token operator">></span>
+<span class="token operator">&lt;</span>/body<span class="token operator">></span>
+<span class="token operator">&lt;</span>/html<span class="token operator">></span></code></pre>
+
+            </div>
+            <hr/>
+
+            
+
+    <div class="reprint" id="reprint-statement">
+        
+            <div class="reprint__author">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-user">
+                        文章作者:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="https://cntsp.github.io" rel="external nofollow noreferrer">阿培</a>
+                </span>
+            </div>
+            <div class="reprint__type">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-link">
+                        文章链接:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="https://cntsp.github.io/2019/07/10/kubernetes%E4%B9%8B%E9%98%BF%E9%87%8C%E4%BA%91%E9%83%A8%E7%BD%B2/">https://cntsp.github.io/2019/07/10/kubernetes%E4%B9%8B%E9%98%BF%E9%87%8C%E4%BA%91%E9%83%A8%E7%BD%B2/</a>
+                </span>
+            </div>
+            <div class="reprint__notice">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-copyright">
+                        版权声明:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    本博客所有文章除特別声明外，均采用
+                    <a href="https://creativecommons.org/licenses/by/4.0/deed.zh" rel="external nofollow noreferrer" target="_blank">CC BY 4.0</a>
+                    许可协议。转载请注明来源
+                    <a href="https://cntsp.github.io" target="_blank">阿培</a>
+                    !
+                </span>
+            </div>
+        
+    </div>
+
+    <script async defer>
+      document.addEventListener("copy", function (e) {
+        let toastHTML = '<span>复制成功，请遵循本文的转载规则</span><button class="btn-flat toast-action" onclick="navToReprintStatement()" style="font-size: smaller">查看</a>';
+        M.toast({html: toastHTML})
+      });
+
+      function navToReprintStatement() {
+        $("html, body").animate({scrollTop: $("#reprint-statement").offset().top - 80}, 800);
+      }
+    </script>
+
+
+
+            <div class="tag_share" style="display: block;">
+                <div class="post-meta__tag-list" style="display: inline-block;">
+                    
+                        <div class="article-tag">
+                            
+                                <a href="/tags/kubernetes/">
+                                    <span class="chip bg-color">kubernetes</span>
+                                </a>
+                            
+                                <a href="/tags/%E9%98%BF%E9%87%8C%E4%BA%91/">
+                                    <span class="chip bg-color">阿里云</span>
+                                </a>
+                            
+                        </div>
+                    
+                </div>
+                <div class="post_share" style="zoom: 80%; width: fit-content; display: inline-block; float: right; margin: -0.15rem 0;">
+                    <link rel="stylesheet" type="text/css" href="/libs/share/css/share.min.css">
+
+<div id="article-share">
+    
+    
+    <div class="social-share" data-sites="twitter,facebook,google,qq,qzone,wechat,weibo,douban,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
+    <script src="/libs/share/js/social-share.min.js"></script>
+    
+
+    
+
+</div>
+
+                </div>
+            </div>
+            
+                <style>
+    #reward {
+        margin: 40px 0;
+        text-align: center;
+    }
+
+    #reward .reward-link {
+        font-size: 1.4rem;
+        line-height: 38px;
+    }
+
+    #reward .btn-floating:hover {
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2), 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    #rewardModal {
+        width: 320px;
+        height: 350px;
+    }
+
+    #rewardModal .reward-title {
+        margin: 15px auto;
+        padding-bottom: 5px;
+    }
+
+    #rewardModal .modal-content {
+        padding: 10px;
+    }
+
+    #rewardModal .close {
+        position: absolute;
+        right: 15px;
+        top: 15px;
+        color: rgba(0, 0, 0, 0.5);
+        font-size: 1.3rem;
+        line-height: 20px;
+        cursor: pointer;
+    }
+
+    #rewardModal .close:hover {
+        color: #ef5350;
+        transform: scale(1.3);
+        -moz-transform:scale(1.3);
+        -webkit-transform:scale(1.3);
+        -o-transform:scale(1.3);
+    }
+
+    #rewardModal .reward-tabs {
+        margin: 0 auto;
+        width: 210px;
+    }
+
+    .reward-tabs .tabs {
+        height: 38px;
+        margin: 10px auto;
+        padding-left: 0;
+    }
+
+    .reward-content ul {
+        padding-left: 0 !important;
+    }
+
+    .reward-tabs .tabs .tab {
+        height: 38px;
+        line-height: 38px;
+    }
+
+    .reward-tabs .tab a {
+        color: #fff;
+        background-color: #ccc;
+    }
+
+    .reward-tabs .tab a:hover {
+        background-color: #ccc;
+        color: #fff;
+    }
+
+    .reward-tabs .wechat-tab .active {
+        color: #fff !important;
+        background-color: #22AB38 !important;
+    }
+
+    .reward-tabs .alipay-tab .active {
+        color: #fff !important;
+        background-color: #019FE8 !important;
+    }
+
+    .reward-tabs .reward-img {
+        width: 210px;
+        height: 210px;
+    }
+</style>
+
+<div id="reward">
+    <a href="#rewardModal" class="reward-link modal-trigger btn-floating btn-medium waves-effect waves-light red">赏</a>
+
+    <!-- Modal Structure -->
+    <div id="rewardModal" class="modal">
+        <div class="modal-content">
+            <a class="close modal-close"><i class="fas fa-times"></i></a>
+            <h4 class="reward-title">你的赏识是我前进的动力</h4>
+            <div class="reward-content">
+                <div class="reward-tabs">
+                    <ul class="tabs row">
+                        <li class="tab col s6 alipay-tab waves-effect waves-light"><a href="#alipay">支付宝</a></li>
+                        <li class="tab col s6 wechat-tab waves-effect waves-light"><a href="#wechat">微 信</a></li>
+                    </ul>
+                    <div id="alipay">
+                        <img src="/medias/reward/alipay.jpg" class="reward-img" alt="支付宝打赏二维码">
+                    </div>
+                    <div id="wechat">
+                        <img src="/medias/reward/wechat.png" class="reward-img" alt="微信打赏二维码">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $('.tabs').tabs();
+    });
+</script>
+            
+        </div>
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+<article id="prenext-posts" class="prev-next articles">
+    <div class="row article-row">
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge left-badge text-color">
+                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
+            <div class="card">
+                <a href="/2019/11/14/yum%E5%AE%89%E8%A3%85lnmp%E7%8E%AF%E5%A2%83/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/4.jpg" class="responsive-img" alt="Centos7-yum安装lnmp环境">
+                        
+                        <span class="card-title">Centos7-yum安装lnmp环境</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            yum安装nginx\php\mysql，搭建lnmp环境yum升级
+yum update
+yum安装nginx最新源
+yum localinstall http://nginx.org/packages/centos/7/noarch/R
+                        
+                    </div>
+                    <div class="publish-info">
+                        <span class="publish-date">
+                            <i class="far fa-clock fa-fw icon-date"></i>2019-11-14
+                        </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/lnmp/" class="post-category">
+                                    lnmp
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/linux/">
+                        <span class="chip bg-color">linux</span>
+                    </a>
+                    
+                    <a href="/tags/lnmp/">
+                        <span class="chip bg-color">lnmp</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
+            </div>
+            <div class="card">
+                <a href="/2019/07/10/kubernetes%E4%B9%8Bpause/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/14.jpg" class="responsive-img" alt="kubernetes集群中的pause容器">
+                        
+                        <span class="card-title">kubernetes集群中的pause容器</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            昨天晚上搭建好了k8s多主集群，启动了一个nginx的pod，然而每启动一个pod就伴随这一个pause容器，考虑到之前在做kubelet的systemd unit文件时有见到：
+[root@node01 ~]# docker ps
+CON
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2019-07-10
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/%E5%AE%B9%E5%99%A8%E6%8A%80%E6%9C%AF/" class="post-category">
+                                    容器技术
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/kubernetes/">
+                        <span class="chip bg-color">kubernetes</span>
+                    </a>
+                    
+                    <a href="/tags/pause/">
+                        <span class="chip bg-color">pause</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+    </div>
+</article>
+
+</div>
+
+
+
+<!-- 代码块功能依赖 -->
+<script type="text/javascript" src="/libs/codeBlock/codeBlockFuction.js"></script>
+
+<!-- 代码语言 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeLang.js"></script>
+
+    
+<!-- 代码块复制 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeCopy.js"></script>
+
+
+<!-- 代码块收缩 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeShrink.js"></script>
+
+
+<!-- 代码块折行 -->
+
+<style type="text/css">
+code[class*="language-"], pre[class*="language-"] { white-space: pre !important; }
+</style>
+
+    </div>
+    <div id="toc-aside" class="expanded col l3 hide-on-med-and-down">
+        <div class="toc-widget">
+            <div class="toc-title"><i class="far fa-list-alt"></i>&nbsp;&nbsp;目录</div>
+            <div id="toc-content"></div>
+        </div>
+    </div>
+</div>
+
+<!-- TOC 悬浮按钮. -->
+
+<div id="floating-toc-btn" class="hide-on-med-and-down">
+    <a class="btn-floating btn-large bg-color">
+        <i class="fas fa-list-ul"></i>
+    </a>
+</div>
+
+
+<script src="/libs/tocbot/tocbot.min.js"></script>
+<script>
+    $(function () {
+        tocbot.init({
+            tocSelector: '#toc-content',
+            contentSelector: '#articleContent',
+            headingsOffset: -($(window).height() * 0.4 - 45),
+            collapseDepth: Number('0'),
+            headingSelector: 'h2, h3, h4'
+        });
+
+        // modify the toc link href to support Chinese.
+        let i = 0;
+        let tocHeading = 'toc-heading-';
+        $('#toc-content a').each(function () {
+            $(this).attr('href', '#' + tocHeading + (++i));
+        });
+
+        // modify the heading title id to support Chinese.
+        i = 0;
+        $('#articleContent').children('h2, h3, h4').each(function () {
+            $(this).attr('id', tocHeading + (++i));
+        });
+
+        // Set scroll toc fixed.
+        let tocHeight = parseInt($(window).height() * 0.4 - 64);
+        let $tocWidget = $('.toc-widget');
+        $(window).scroll(function () {
+            let scroll = $(window).scrollTop();
+            /* add post toc fixed. */
+            if (scroll > tocHeight) {
+                $tocWidget.addClass('toc-fixed');
+            } else {
+                $tocWidget.removeClass('toc-fixed');
+            }
+        });
+
+        
+        /* 修复文章卡片 div 的宽度. */
+        let fixPostCardWidth = function (srcId, targetId) {
+            let srcDiv = $('#' + srcId);
+            if (srcDiv.length === 0) {
+                return;
+            }
+
+            let w = srcDiv.width();
+            if (w >= 450) {
+                w = w + 21;
+            } else if (w >= 350 && w < 450) {
+                w = w + 18;
+            } else if (w >= 300 && w < 350) {
+                w = w + 16;
+            } else {
+                w = w + 14;
+            }
+            $('#' + targetId).width(w);
+        };
+
+        // 切换TOC目录展开收缩的相关操作.
+        const expandedClass = 'expanded';
+        let $tocAside = $('#toc-aside');
+        let $mainContent = $('#main-content');
+        $('#floating-toc-btn .btn-floating').click(function () {
+            if ($tocAside.hasClass(expandedClass)) {
+                $tocAside.removeClass(expandedClass).hide();
+                $mainContent.removeClass('l9');
+            } else {
+                $tocAside.addClass(expandedClass).show();
+                $mainContent.addClass('l9');
+            }
+            fixPostCardWidth('artDetail', 'prenext-posts');
+        });
+        
+    });
+</script>
+
+    
+
+</main>
+
+
+
+    <footer class="page-footer bg-color">
+    <div class="container row center-align">
+        <div class="col s12 m8 l8 copy-right">
+            Copyright&nbsp;&copy;
+            <span id="year">年份</span>
+            <a href="https://cntsp.github.io" target="_blank">阿培</a>
+            |&nbsp;Powered by&nbsp;<a href="https://hexo.io/" target="_blank">Hexo</a>
+            |&nbsp;Theme&nbsp;<a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
+            <br>
+            
+            
+            
+            
+            
+            
+            <span id="busuanzi_container_site_pv">
+                |&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;<span id="busuanzi_value_site_pv"
+                    class="white-color"></span>&nbsp;次
+            </span>
+            
+            
+            <span id="busuanzi_container_site_uv">
+                |&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;<span id="busuanzi_value_site_uv"
+                    class="white-color"></span>&nbsp;人
+            </span>
+            
+            <br>
+            
+            <span id="sitetime">载入运行时间...</span>
+            <script>
+                function siteTime() {
+                    window.setTimeout("siteTime()", 1000);
+                    var seconds = 1000;
+                    var minutes = seconds * 60;
+                    var hours = minutes * 60;
+                    var days = hours * 24;
+                    var years = days * 365;
+                    var today = new Date();
+                    var startYear = "2019";
+                    var startMonth = "6";
+                    var startDate = "28";
+                    var startHour = "0";
+                    var startMinute = "0";
+                    var startSecond = "0";
+                    var todayYear = today.getFullYear();
+                    var todayMonth = today.getMonth() + 1;
+                    var todayDate = today.getDate();
+                    var todayHour = today.getHours();
+                    var todayMinute = today.getMinutes();
+                    var todaySecond = today.getSeconds();
+                    var t1 = Date.UTC(startYear, startMonth, startDate, startHour, startMinute, startSecond);
+                    var t2 = Date.UTC(todayYear, todayMonth, todayDate, todayHour, todayMinute, todaySecond);
+                    var diff = t2 - t1;
+                    var diffYears = Math.floor(diff / years);
+                    var diffDays = Math.floor((diff / days) - diffYears * 365);
+                    var diffHours = Math.floor((diff - (diffYears * 365 + diffDays) * days) / hours);
+                    var diffMinutes = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours) /
+                        minutes);
+                    var diffSeconds = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours -
+                        diffMinutes * minutes) / seconds);
+                    if (startYear == todayYear) {
+                        document.getElementById("year").innerHTML = todayYear;
+                        document.getElementById("sitetime").innerHTML = "本站已安全运行 " + diffDays + " 天 " + diffHours +
+                            " 小时 " + diffMinutes + " 分钟 " + diffSeconds + " 秒";
+                    } else {
+                        document.getElementById("year").innerHTML = startYear + " - " + todayYear;
+                        document.getElementById("sitetime").innerHTML = "本站已安全运行 " + diffYears + " 年 " + diffDays +
+                            " 天 " + diffHours + " 小时 " + diffMinutes + " 分钟 " + diffSeconds + " 秒";
+                    }
+                }
+                setInterval(siteTime, 1000);
+            </script>
+            
+            <br>
+            
+        </div>
+        <div class="col s12 m4 l4 social-link social-statis">
+    <a href="https://github.com/cntsp" class="tooltipped" target="_blank" data-tooltip="访问我的GitHub" data-position="top" data-delay="50">
+        <i class="fab fa-github"></i>
+    </a>
+
+
+
+    <a href="mailto:1909873483@qq.com" class="tooltipped" target="_blank" data-tooltip="邮件联系我" data-position="top" data-delay="50">
+        <i class="fas fa-envelope-open"></i>
+    </a>
+
+
+
+
+
+
+
+    <a href="tencent://AddContact/?fromId=50&fromSubId=1&subcmd=all&uin=1909873483" class="tooltipped" target="_blank" data-tooltip="QQ联系我: 1909873483" data-position="top" data-delay="50">
+        <i class="fab fa-qq"></i>
+    </a>
+
+
+
+
+
+
+
+    <a href="/atom.xml" class="tooltipped" target="_blank" data-tooltip="RSS 订阅" data-position="top" data-delay="50">
+        <i class="fas fa-rss"></i>
+    </a>
+
+</div>
+    </div>
+</footer>
+
+<div class="progress-bar"></div>
+
+
+    <!-- 搜索遮罩框 -->
+<div id="searchModal" class="modal">
+    <div class="modal-content">
+        <div class="search-header">
+            <span class="title"><i class="fas fa-search"></i>&nbsp;&nbsp;搜索</span>
+            <input type="search" id="searchInput" name="s" placeholder="请输入搜索的关键字"
+                   class="search-input">
+        </div>
+        <div id="searchResult"></div>
+    </div>
+</div>
+
+<script src="/js/search.js"></script>
+<script type="text/javascript">
+$(function () {
+    searchFunc("/" + "search.xml", 'searchInput', 'searchResult');
+});
+</script>
+    <!-- 回到顶部按钮 -->
+<div id="backTop" class="top-scroll">
+    <a class="btn-floating btn-large waves-effect waves-light" href="#!">
+        <i class="fas fa-arrow-up"></i>
+    </a>
+</div>
+
+
+    <script src="/libs/materialize/materialize.min.js"></script>
+    <script src="/libs/masonry/masonry.pkgd.min.js"></script>
+    <script src="/libs/aos/aos.js"></script>
+    <script src="/libs/scrollprogress/scrollProgress.min.js"></script>
+    <script src="/libs/lightGallery/js/lightgallery-all.min.js"></script>
+    <script src="/js/matery.js"></script>
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    <script src="/libs/others/clicklove.js" async="async"></script>
+    
+    
+    <script async src="/libs/others/busuanzi.pure.mini.js"></script>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    
+    
+    <script src="/libs/instantpage/instantpage.js" type="module"></script>
+    
+
+</body>
+
+</html>
