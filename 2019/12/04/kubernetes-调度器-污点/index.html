@@ -27,7 +27,7 @@ Taint 和 toleration 相互配合，可以用来避">
     
     <script src="/libs/jquery/jquery.min.js"></script>
     
-</head>
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
 
 
 <body>
@@ -483,8 +483,7 @@ Taint 和 toleration 相互配合，可以用来避">
 <h2 id="污点-Taint"><a href="#污点-Taint" class="headerlink" title="污点(Taint)"></a>污点(Taint)</h2><p><strong>I、污点（Taint）的组成</strong></p>
 <p><strong>使用 <code>kubectl taint</code> 命令可以给某个Node节点设置污点，Node 被设置上污点之后就和Pod 之间存在了一种相斥的关系，可以让Node拒绝Pod的调度执行，甚至将Node已经存在的Pod驱逐出去</strong></p>
 <p><strong>每个污点的组成如下：</strong></p>
-<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="string">key=value:effect</span></span></pre></td></tr></table></figure>
-
+<pre class=" language-yaml"><code class="language-yaml">key=value<span class="token punctuation">:</span>effect</code></pre>
 <p><strong>每个污点有一个Key和value作为污点的标签，其中value可以为空，effect描述污点的作用。当前taint effect 支持如下三个选项：</strong></p>
 <ul>
 <li><code>NoSchedule</code>: <strong>表示K8S将不会将Pod调度到具有该污点的Node上</strong></li>
@@ -492,26 +491,43 @@ Taint 和 toleration 相互配合，可以用来避">
 <li><code>NoExecute</code>:<strong>表示k8s将不会将Pod调度到具有该污点的Node上，同时会将Node上已经存在的Pod驱逐出去</strong></li>
 </ul>
 <p><strong>II、污点的设置、查看和去除</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="comment"># 设置污点</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">kubectl taint nodes node1 key1=value1:NoSchedule</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line"><span class="comment"># 节点说明中，查找 Taints 字段</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">kubectl describe pod pod-name</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line"><span class="comment"># 去除污点</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line">kubectl taint nodes node1 key1:NoSchedule-</span></pre></td></tr></table></figure>
+<pre class=" language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 设置污点</span>
+kubectl taint nodes node1 key1<span class="token operator">=</span>value1:NoSchedule
 
+<span class="token comment" spellcheck="true"># 节点说明中，查找 Taints 字段</span>
+kubectl describe pod pod-name
+
+<span class="token comment" spellcheck="true"># 去除污点</span>
+kubectl taint nodes node1 key1:NoSchedule-</code></pre>
 <h2 id="容忍（Tolerations）"><a href="#容忍（Tolerations）" class="headerlink" title="容忍（Tolerations）"></a>容忍（Tolerations）</h2><p><strong>设置了污点的Node将根据 taint 的effect: NoSchedule、PreferNoSchedule、NoExecute和Pod之间产生互斥的关系，Pod将在一定程度上不会被调度到Node上。但我们可以在Pod上设置容忍(Toleration)，意思是设置了容忍的Pod将可以容忍污点的存在，可以被调度到存在污点的Node上</strong></p>
 <p><strong>pod.spec.tolerations</strong></p>
-<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="attr">tolerations:</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line"><span class="bullet">-</span> <span class="attr">key:</span> <span class="string">"key1"</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">  <span class="attr">operator:</span> <span class="string">"Equal"</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">  <span class="attr">value:</span> <span class="string">"value1"</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">  <span class="attr">effect:</span> <span class="string">"NoSchedule"</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">  <span class="attr">tolerationSeconds:</span> <span class="number">3600</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line"><span class="bullet">-</span> <span class="attr">key:</span> <span class="string">"key1"</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line">  <span class="attr">operator:</span> <span class="string">"Equal"</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line">  <span class="attr">value:</span> <span class="string">"value1"</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line">  <span class="attr">effect:</span> <span class="string">"NoExecute"</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">11</span></pre></td><td class="code"><pre><span class="line"><span class="bullet">-</span> <span class="attr">key:</span> <span class="string">"key2"</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">12</span></pre></td><td class="code"><pre><span class="line">  <span class="attr">operator:</span> <span class="string">"Exists"</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">13</span></pre></td><td class="code"><pre><span class="line">  <span class="attr">effect:</span> <span class="string">"NoSchedule"</span></span></pre></td></tr></table></figure>
-
+<pre class=" language-yaml"><code class="language-yaml"><span class="token key atrule">tolerations</span><span class="token punctuation">:</span>
+<span class="token punctuation">-</span> <span class="token key atrule">key</span><span class="token punctuation">:</span> <span class="token string">"key1"</span>
+  <span class="token key atrule">operator</span><span class="token punctuation">:</span> <span class="token string">"Equal"</span>
+  <span class="token key atrule">value</span><span class="token punctuation">:</span> <span class="token string">"value1"</span>
+  <span class="token key atrule">effect</span><span class="token punctuation">:</span> <span class="token string">"NoSchedule"</span>
+  <span class="token key atrule">tolerationSeconds</span><span class="token punctuation">:</span> <span class="token number">3600</span>
+<span class="token punctuation">-</span> <span class="token key atrule">key</span><span class="token punctuation">:</span> <span class="token string">"key1"</span>
+  <span class="token key atrule">operator</span><span class="token punctuation">:</span> <span class="token string">"Equal"</span>
+  <span class="token key atrule">value</span><span class="token punctuation">:</span> <span class="token string">"value1"</span>
+  <span class="token key atrule">effect</span><span class="token punctuation">:</span> <span class="token string">"NoExecute"</span>
+<span class="token punctuation">-</span> <span class="token key atrule">key</span><span class="token punctuation">:</span> <span class="token string">"key2"</span>
+  <span class="token key atrule">operator</span><span class="token punctuation">:</span> <span class="token string">"Exists"</span>
+  <span class="token key atrule">effect</span><span class="token punctuation">:</span> <span class="token string">"NoSchedule"</span></code></pre>
 <ul>
 <li><strong>其中 key,value,effect 要与 Node上设置的 taint 保持一致</strong></li>
 <li><strong>operator 的值为Exists将会忽略 value 值</strong></li>
 <li><strong>tolerationsSeconds</strong>：<strong>用于描述当Pod需要被驱逐时可以在Pod上继续保留运行的时间</strong></li>
 </ul>
 <p><strong>I、当不指定 key 值时，表示容忍所有的污点key:</strong></p>
-<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="attr">tolerations:</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line"><span class="bullet">-</span> <span class="attr">operator:</span> <span class="string">"Exists"</span></span></pre></td></tr></table></figure>
-
+<pre class=" language-yaml"><code class="language-yaml"><span class="token key atrule">tolerations</span><span class="token punctuation">:</span>
+<span class="token punctuation">-</span> <span class="token key atrule">operator</span><span class="token punctuation">:</span> <span class="token string">"Exists"</span></code></pre>
 <p><strong>II、当不指定effect值时，表示容忍所有的污点作用</strong></p>
-<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="attr">tolerations:</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line"><span class="bullet">-</span> <span class="attr">key:</span> <span class="string">"key"</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">  <span class="attr">operator:</span> <span class="string">"Exists"</span></span></pre></td></tr></table></figure>
-
+<pre class=" language-yaml"><code class="language-yaml"><span class="token key atrule">tolerations</span><span class="token punctuation">:</span>
+<span class="token punctuation">-</span> <span class="token key atrule">key</span><span class="token punctuation">:</span> <span class="token string">"key"</span>
+  <span class="token key atrule">operator</span><span class="token punctuation">:</span> <span class="token string">"Exists"</span></code></pre>
 <p><strong>III、有多个Master存在时，防止资源浪费，可以如下设置</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">kubectl taint nodes Node-Name node-role.kubernetes.io/master=:PreferNoSchedule</span></pre></td></tr></table></figure>
-
+<pre class=" language-bash"><code class="language-bash">kubectl taint nodes Node-Name node-role.kubernetes.io/master<span class="token operator">=</span>:PreferNoSchedule</code></pre>
 
             </div>
             <hr/>
@@ -767,7 +783,8 @@ Taint 和 toleration 相互配合，可以用来避">
                     <div class="summary block-with-text">
                         
                             指定调度节点I、Pod.spec.nodeName 将 Pod 直接调度到指定的Node节点上，会跳过 Scheduler 的调度策略，该匹配规则是强制匹配
-1apiVersion: extensions/v1beta12kind: Dep
+apiVersion: extensions/v1beta1
+kind: Depl
                         
                     </div>
                     <div class="publish-info">

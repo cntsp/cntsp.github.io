@@ -7,8 +7,8 @@
     <meta name="keywords" content="docker部署rancher1.6, 阿培">
     <meta name="description" content="Centos7系统部署rancher1.6.28版本首先安装docker如果想要安装指定版本的docker，请移步安装指定版本docker
 本次操作安装默认版本的docker(1.13.1):
-1yum -y install docker
-">
+yum -y install docker
+方">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -29,7 +29,7 @@
     
     <script src="/libs/jquery/jquery.min.js"></script>
     
-</head>
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
 
 
 <body>
@@ -469,24 +469,42 @@
             <div id="articleContent">
                 <h2 id="Centos7系统部署rancher1-6-28版本"><a href="#Centos7系统部署rancher1-6-28版本" class="headerlink" title="Centos7系统部署rancher1.6.28版本"></a>Centos7系统部署rancher1.6.28版本</h2><h3 id="首先安装docker"><a href="#首先安装docker" class="headerlink" title="首先安装docker"></a>首先安装docker</h3><p>如果想要安装指定版本的docker，请移步<a href="https://cntsp.github.io/2019/11/14/centos7%E7%94%9F%E6%88%90%E7%8E%AF%E5%A2%83%E9%83%A8%E7%BD%B2docker-ce/">安装指定版本docker</a></p>
 <p>本次操作安装默认版本的docker(1.13.1):</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">yum -y install docker</span></pre></td></tr></table></figure>
+<pre class=" language-bash"><code class="language-bash">yum -y <span class="token function">install</span> docker</code></pre>
 <h3 id="方案一："><a href="#方案一：" class="headerlink" title="方案一："></a>方案一：</h3><p><strong>单机部署，不使用外置的数据库</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">systemctl stop firewalld.service</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">docker pull rancher/server:v1.6.26</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">docker run --name rancher --restart=unless-stopped  -d -p 8080:8080 rancher/server:v1.6.26</span></pre></td></tr></table></figure>
-
+<pre class=" language-bash"><code class="language-bash">systemctl stop firewalld.service
+docker pull rancher/server:v1.6.26
+docker run --name rancher --restart<span class="token operator">=</span>unless-stopped  -d -p 8080:8080 rancher/server:v1.6.26</code></pre>
 <p>访问rancher UI界面：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">http://IP:8080</span></pre></td></tr></table></figure>
-
+<pre class=" language-bash"><code class="language-bash">http://IP:8080</code></pre>
 <h3 id="方案二"><a href="#方案二" class="headerlink" title="方案二"></a>方案二</h3><p><strong>单机部署，使用外置的数据库</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="comment"># 关闭防火墙</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">systemctl stop firewalld.service</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line"><span class="comment"># 下载mariadb镜像tag为10.1</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">docker pull mariadb:10.1</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line"><span class="comment"># 下载rancher/server的镜像tag为v1.6.28</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line">docker pull rancher/server:v1.6.28</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line"><span class="comment"># 启动数据库容器，名字为mariadb2,root密码为nihaoma</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">11</span></pre></td><td class="code"><pre><span class="line">docker run -d --name maridb2 -p 3306:3306 -e MYSQL_ROOT_PASSWORD=nihaoma  mariadb:10.1 </span></pre></td></tr><tr><td class="gutter"><pre><span class="line">12</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">13</span></pre></td><td class="code"><pre><span class="line"><span class="comment"># 进入mariadb2数据库容器</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">14</span></pre></td><td class="code"><pre><span class="line">docker <span class="built_in">exec</span> -it mariadb2 /bin/bash</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">15</span></pre></td><td class="code"><pre><span class="line"><span class="comment"># 进入数据库</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">16</span></pre></td><td class="code"><pre><span class="line">mysql -uroot -pnihaoma</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">17</span></pre></td><td class="code"><pre><span class="line">&gt; CREATE DATABASE IF NOT EXISTS cattle COLLATE = <span class="string">'utf8_general_ci'</span> CHARACTER SET = <span class="string">'utf8'</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">18</span></pre></td><td class="code"><pre><span class="line">&gt; GRANT ALL ON cattle.* TO <span class="string">'cattle'</span>@<span class="string">'%'</span> IDENTIFIED BY <span class="string">'cattle'</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">19</span></pre></td><td class="code"><pre><span class="line">&gt; FLUSH PRIVILEGES;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">20</span></pre></td><td class="code"><pre><span class="line">&gt; EXIT;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">21</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">22</span></pre></td><td class="code"><pre><span class="line"><span class="comment"># 启动rancher/server容器连接外置的数据库容器</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">23</span></pre></td><td class="code"><pre><span class="line">docker run --name rancher2 --restart=unless-stopped -d -p 18080:8080 rancher/server:v1.6.28 \</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">24</span></pre></td><td class="code"><pre><span class="line">--db-host xxx.xxx.xxx.xxx --db-port 3306 --db-user cattle --db-pass cattle --db-name cattle</span></pre></td></tr></table></figure>
+<pre class=" language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 关闭防火墙</span>
+systemctl stop firewalld.service
+
+<span class="token comment" spellcheck="true"># 下载mariadb镜像tag为10.1</span>
+docker pull mariadb:10.1
+
+<span class="token comment" spellcheck="true"># 下载rancher/server的镜像tag为v1.6.28</span>
+docker pull rancher/server:v1.6.28
+
+<span class="token comment" spellcheck="true"># 启动数据库容器，名字为mariadb2,root密码为nihaoma</span>
+docker run -d --name maridb2 -p 3306:3306 -e MYSQL_ROOT_PASSWORD<span class="token operator">=</span>nihaoma  mariadb:10.1 
+
+<span class="token comment" spellcheck="true"># 进入mariadb2数据库容器</span>
+docker <span class="token function">exec</span> -it mariadb2 /bin/bash
+<span class="token comment" spellcheck="true"># 进入数据库</span>
+mysql -uroot -pnihaoma
+<span class="token operator">></span> CREATE DATABASE IF NOT EXISTS cattle COLLATE <span class="token operator">=</span> <span class="token string">'utf8_general_ci'</span> CHARACTER SET <span class="token operator">=</span> <span class="token string">'utf8'</span><span class="token punctuation">;</span>
+<span class="token operator">></span> GRANT ALL ON cattle.* TO <span class="token string">'cattle'</span>@<span class="token string">'%'</span> IDENTIFIED BY <span class="token string">'cattle'</span><span class="token punctuation">;</span>
+<span class="token operator">></span> FLUSH PRIVILEGES<span class="token punctuation">;</span>
+<span class="token operator">></span> EXIT<span class="token punctuation">;</span>
+
+<span class="token comment" spellcheck="true"># 启动rancher/server容器连接外置的数据库容器</span>
+docker run --name rancher2 --restart<span class="token operator">=</span>unless-stopped -d -p 18080:8080 rancher/server:v1.6.28 \
+--db-host xxx.xxx.xxx.xxx --db-port 3306 --db-user cattle --db-pass cattle --db-name cattle
+</code></pre>
 <p>如果出现链接不到数据库的情况，请重启一下docker服务</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">systemctl restart docker.service</span></pre></td></tr></table></figure>
-
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">http://IP:8080</span></pre></td></tr></table></figure>
-
-
-
-
-
+<pre class=" language-bash"><code class="language-bash">systemctl restart docker.service</code></pre>
+<pre class=" language-bash"><code class="language-bash">http://IP:8080</code></pre>
 
             </div>
             <hr/>
@@ -740,8 +758,8 @@
                         
                             Centos7系统部署rancher1.6.28版本首先安装docker如果想要安装指定版本的docker，请移步安装指定版本docker
 本次操作安装默认版本的docker(1.13.1):
-1yum -y install docker
-
+yum -y install docker
+方
                         
                     </div>
                     <div class="publish-info">

@@ -26,7 +26,7 @@
     
     <script src="/libs/jquery/jquery.min.js"></script>
     
-</head>
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
 
 
 <body>
@@ -542,8 +542,8 @@
                             
                                 Centos7系统部署rancher1.6.28版本首先安装docker如果想要安装指定版本的docker，请移步安装指定版本docker
 本次操作安装默认版本的docker(1.13.1):
-1yum -y install docker
-
+yum -y install docker
+方
                             
                         </div>
                         <div class="publish-info">
@@ -626,7 +626,8 @@
                         <div class="summary block-with-text">
                             
                                 指定调度节点I、Pod.spec.nodeName 将 Pod 直接调度到指定的Node节点上，会跳过 Scheduler 的调度策略，该匹配规则是强制匹配
-1apiVersion: extensions/v1beta12kind: Dep
+apiVersion: extensions/v1beta1
+kind: Depl
                             
                         </div>
                         <div class="publish-info">
