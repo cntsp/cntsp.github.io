@@ -4,8 +4,12 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="keywords" content="Hello World, 阿培">
-    <meta name="description" content="Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hex">
+    <meta name="keywords" content="kubernetes-调度器-调度说明, 阿培">
+    <meta name="description" content="简介Scheduler 是kubernetes的调度器，主要的任务是把定义的Pod分配到集群的节点上。听起来非常简单，单有很多要考虑的问题
+
+公平：如何保证每个节点都能被分配资源
+资源高效利用：集群所有资源最大化被使用
+效率：调度的性能要好">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -13,7 +17,7 @@
     <meta name="format-detection" content="telephone=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Hello World | 阿培</title>
+    <title>kubernetes-调度器-调度说明 | 阿培</title>
     <link rel="icon" type="image/png" href="/favicon.png">
 
     <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
@@ -309,7 +313,7 @@
             <div class="col s12 m12 l12">
                 <div class="brand">
                     <div class="description center-align post-title">
-                        Hello World
+                        kubernetes-调度器-调度说明
                     </div>
                 </div>
             </div>
@@ -425,12 +429,29 @@
             <div class="row tag-cate">
                 <div class="col s7">
                     
-                          <div class="article-tag">
-                            <span class="chip bg-color">无标签</span>
-                          </div>
+                    <div class="article-tag">
+                        
+                            <a href="/tags/kubernetes/">
+                                <span class="chip bg-color">kubernetes</span>
+                            </a>
+                        
+                            <a href="/tags/%E8%B0%83%E5%BA%A6%E5%99%A8/">
+                                <span class="chip bg-color">调度器</span>
+                            </a>
+                        
+                    </div>
                     
                 </div>
                 <div class="col s5 right-align">
+                    
+                    <div class="post-cate">
+                        <i class="fas fa-bookmark fa-fw icon-category"></i>
+                        
+                            <a href="/categories/%E5%AE%B9%E5%99%A8%E6%8A%80%E6%9C%AF/" class="post-category">
+                                容器技术
+                            </a>
+                        
+                    </div>
                     
                 </div>
             </div>
@@ -439,7 +460,7 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
-                    2019-12-05
+                    2019-12-04
                 </div>
                 
 
@@ -456,19 +477,34 @@
         <hr class="clearfix">
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <p>Welcome to <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="noopener">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="noopener">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="noopener">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">"My New Post"</span></span></pre></td></tr></table></figure>
+                <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p><strong>Scheduler 是kubernetes的调度器，主要的任务是把定义的Pod分配到集群的节点上。听起来非常简单，单有很多要考虑的问题</strong></p>
+<ul>
+<li><strong>公平：如何保证每个节点都能被分配资源</strong></li>
+<li><strong>资源高效利用：集群所有资源最大化被使用</strong></li>
+<li><strong>效率：调度的性能要好，能够尽快地对大批量的Pod 完成调度工作</strong></li>
+<li><strong>灵活：允许用户根据自己的需求控制调度的逻辑</strong></li>
+</ul>
+<p><strong>Scheduler 是作为单独的程序运行的，启动之后会一直监听API Server，获取 <code>PodSpec.Nodename</code>为空的pod,对每个pod都会创建一个binding,表明该Pod应该放到哪个节点上</strong></p>
+<h2 id="调度过程"><a href="#调度过程" class="headerlink" title="调度过程"></a>调度过程</h2><p><strong>调度分为几个部分：首先是过滤掉不满足条件的节点，这个过程为<code>predicate</code>；然后对通过的几点按照优先级排序，这个是<code>priority</code>;最后从中选择优先级最高的节点。如果中间任何一步骤有错误，就直接返回错误</strong></p>
+<p><strong>Predicate 有一系列的算法可以使用：</strong></p>
+<ul>
+<li><code>PodFitsResources</code>:<strong>节点上剩余的资源是否大于pod请求的资源</strong></li>
+<li><code>PodFitHost</code>:<strong>如果pod指定了NodeName,检查节点名称是否和NodeName匹配</strong></li>
+<li><code>PodFitsHostPorts</code>:<strong>节点上已经使用的port是否和pod申请的port冲突</strong></li>
+<li><code>PodSelectorMatches</code>: <strong>过滤掉和pod指定的label不匹配的节点</strong></li>
+<li><code>NoDiskConflict</code>:<strong>已经mount的volume和pod指定的volume不冲突，除非它们都是只读</strong></li>
+</ul>
+<p><strong>如果在predicate过程中没有合适的节点，pod会一直在<code>pending</code>状态，不断重试调度，直到有节点满足条件。经过这个步骤，如果有多个节点满足条件，就继续priorities过程：安装优先级大小对节点排序</strong></p>
+<ul>
+<li><code>LeastRequestedPriority</code>：<strong>通过计算CPU和Memory使用率越接近，权重越高。这个应该和上面的一起使用，不应该单独使用</strong></li>
+<li><code>ImageLocalityPriority</code>:<strong>倾向于已经有要使用镜像的节点，镜像总大小值越大，权重越高</strong></li>
+</ul>
+<p><strong>通过算法对所有的优先级项目和权重进行计算，得出最终的结果</strong></p>
+<h2 id="自定义调度器"><a href="#自定义调度器" class="headerlink" title="自定义调度器"></a>自定义调度器</h2><p><strong>除了kubernetes自带的调度器，你也可以编写自己的调度器。通过<code>spec:schedulername</code>参数指定调度器的名字，可以为pod选择某个调度器进行调度。比如下面的pod选择<code>my.scheduler</code>进行调度，而不是默认的<code>default.scheduler</code>;</strong></p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line"><span class="attr">kind:</span> <span class="string">Pod</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line"><span class="attr">metadata:</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">  <span class="attr">name:</span> <span class="string">annotation-second-scheduler</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">  <span class="attr">labels:</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">    <span class="attr">name:</span> <span class="string">multischeduler-example</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line"><span class="attr">spec:</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line">  <span class="attr">schedulername:</span> <span class="string">my-scheduler</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line">  <span class="attr">containers:</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line">  <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">pod-with-second-annotation-container</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">11</span></pre></td><td class="code"><pre><span class="line">    <span class="attr">image:</span> <span class="string">gcr.io/google_containers/pause:2.0</span></span></pre></td></tr></table></figure>
 
-<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="noopener">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">$ hexo server</span></pre></td></tr></table></figure>
 
-<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="noopener">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">$ hexo generate</span></pre></td></tr></table></figure>
 
-<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="noopener">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html" target="_blank" rel="noopener">Deployment</a></p>
 
             </div>
             <hr/>
@@ -494,7 +530,7 @@
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="https://cntsp.github.io/2019/12/05/hello-world/">https://cntsp.github.io/2019/12/05/hello-world/</a>
+                    <a href="https://cntsp.github.io/2019/12/04/kubernetes-%E8%B0%83%E5%BA%A6%E5%99%A8-%E8%B0%83%E5%BA%A6%E8%AF%B4%E6%98%8E/">https://cntsp.github.io/2019/12/04/kubernetes-%E8%B0%83%E5%BA%A6%E5%99%A8-%E8%B0%83%E5%BA%A6%E8%AF%B4%E6%98%8E/</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -531,7 +567,15 @@
                 <div class="post-meta__tag-list" style="display: inline-block;">
                     
                         <div class="article-tag">
-                            <span class="chip bg-color">无标签</span>
+                            
+                                <a href="/tags/kubernetes/">
+                                    <span class="chip bg-color">kubernetes</span>
+                                </a>
+                            
+                                <a href="/tags/%E8%B0%83%E5%BA%A6%E5%99%A8/">
+                                    <span class="chip bg-color">调度器</span>
+                                </a>
+                            
                         </div>
                     
                 </div>
@@ -699,78 +743,28 @@
             <div class="article-badge left-badge text-color">
                 <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
             <div class="card">
-                <a href="/2019/12/06/docker%E9%83%A8%E7%BD%B2rancher1-6/">
+                <a href="/2019/12/04/kubernetes-%E8%B0%83%E5%BA%A6%E5%99%A8-%E8%B0%83%E5%BA%A6%E4%BA%B2%E5%92%8C%E6%80%A7/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/10.jpg" class="responsive-img" alt="docker部署rancher1.6">
+                        <img src="/medias/featureimages/3.jpg" class="responsive-img" alt="kubernetes-调度器-调度亲和性">
                         
-                        <span class="card-title">docker部署rancher1.6</span>
+                        <span class="card-title">kubernetes-调度器-调度亲和性</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            Centos7系统部署rancher1.6.28版本首先安装docker如果想要安装指定版本的docker，请移步安装指定版本docker
-本次操作安装默认版本的docker(1.13.1):
-1yum -y install docker
+                            节点的亲和性pod.spec.nodeAffinity
 
+preferredDuringSchedulinglgnoredDuringExecution:软策略
+requireDuringSchedulinglgnoredDuringExe
                         
                     </div>
                     <div class="publish-info">
                         <span class="publish-date">
-                            <i class="far fa-clock fa-fw icon-date"></i>2019-12-06
+                            <i class="far fa-clock fa-fw icon-date"></i>2019-12-04
                         </span>
-                        <span class="publish-author">
-                            
-                            <i class="fas fa-user fa-fw"></i>
-                            阿培
-                            
-                        </span>
-                    </div>
-                </div>
-                
-                <div class="card-action article-tags">
-                    
-                    <a href="/tags/docker/">
-                        <span class="chip bg-color">docker</span>
-                    </a>
-                    
-                    <a href="/tags/rancher1-6/">
-                        <span class="chip bg-color">rancher1.6</span>
-                    </a>
-                    
-                </div>
-                
-            </div>
-        </div>
-        
-        
-        <div class="article col s12 m6" data-aos="fade-up">
-            <div class="article-badge right-badge text-color">
-                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
-            </div>
-            <div class="card">
-                <a href="/2019/12/04/kubernetes-%E8%B0%83%E5%BA%A6%E5%99%A8-%E5%9B%BA%E5%AE%9A%E8%8A%82%E7%82%B9/">
-                    <div class="card-image">
-                        
-                        
-                        <img src="/medias/featureimages/10.jpg" class="responsive-img" alt="kubernetes-调度器-固定节点">
-                        
-                        <span class="card-title">kubernetes-调度器-固定节点</span>
-                    </div>
-                </a>
-                <div class="card-content article-content">
-                    <div class="summary block-with-text">
-                        
-                            指定调度节点I、Pod.spec.nodeName 将 Pod 直接调度到指定的Node节点上，会跳过 Scheduler 的调度策略，该匹配规则是强制匹配
-1apiVersion: extensions/v1beta12kind: Dep
-                        
-                    </div>
-                    <div class="publish-info">
-                            <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2019-12-04
-                            </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
@@ -790,8 +784,66 @@
                         <span class="chip bg-color">kubernetes</span>
                     </a>
                     
-                    <a href="/tags/%E5%9B%BA%E5%AE%9A%E8%8A%82%E7%82%B9/">
-                        <span class="chip bg-color">固定节点</span>
+                    <a href="/tags/%E4%BA%B2%E5%92%8C%E6%80%A7/">
+                        <span class="chip bg-color">亲和性</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                本篇&nbsp;<i class="far fa-dot-circle"></i>
+            </div>
+            <div class="card">
+                <a href="/2019/12/04/kubernetes-%E8%B0%83%E5%BA%A6%E5%99%A8-%E8%B0%83%E5%BA%A6%E8%AF%B4%E6%98%8E/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/12.jpg" class="responsive-img" alt="kubernetes-调度器-调度说明">
+                        
+                        <span class="card-title">kubernetes-调度器-调度说明</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            简介Scheduler 是kubernetes的调度器，主要的任务是把定义的Pod分配到集群的节点上。听起来非常简单，单有很多要考虑的问题
+
+公平：如何保证每个节点都能被分配资源
+资源高效利用：集群所有资源最大化被使用
+效率：调度的性能要好
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2019-12-04
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/%E5%AE%B9%E5%99%A8%E6%8A%80%E6%9C%AF/" class="post-category">
+                                    容器技术
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/kubernetes/">
+                        <span class="chip bg-color">kubernetes</span>
+                    </a>
+                    
+                    <a href="/tags/%E8%B0%83%E5%BA%A6%E5%99%A8/">
+                        <span class="chip bg-color">调度器</span>
                     </a>
                     
                 </div>
