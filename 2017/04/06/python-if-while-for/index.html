@@ -1,0 +1,1374 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+
+
+<head>
+    <meta charset="utf-8">
+    <meta name="keywords" content="python循环语句, 阿培">
+    <meta name="description" content="if 测试的语法结构if boolean_expression1:    suite1elif boolean_expression2:    suite2…else:    else_suiteelif语句是可选的仅用于占位，而后再填充相">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="renderer" content="webkit|ie-stand|ie-comp">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>python循环语句 | 阿培</title>
+    <link rel="icon" type="image/x-icon, image/vnd.microsoft.icon" href="/favicon.ico">
+
+    <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
+    <link rel="stylesheet" type="text/css" href="/libs/materialize/materialize.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/aos/aos.css">
+    <link rel="stylesheet" type="text/css" href="/libs/animate/animate.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/lightGallery/css/lightgallery.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/matery.css">
+    <link rel="stylesheet" type="text/css" href="/css/my.css">
+    
+    <script src="/libs/jquery/jquery.min.js"></script>
+    
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+
+<body>
+    <header class="navbar-fixed">
+    <nav id="headNav" class="bg-color nav-transparent">
+        <div id="navContainer" class="nav-wrapper head-container">
+            <div class="brand-logo">
+                <a href="/" class="waves-effect waves-light">
+                    
+                    <img src="/medias/logo.png" class="logo-img" alt="LOGO">
+                    
+                    <span class="logo-span">阿培</span>
+                </a>
+            </div>
+            
+
+<a href="#" data-target="mobile-nav" class="sidenav-trigger button-collapse"><i class="fas fa-bars"></i></a>
+<ul class="right nav-menu">
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/" class="waves-effect waves-light">
+      
+      <i class="fas fa-home" style="zoom: 0.6;"></i>
+      
+      <span>首页</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/tags" class="waves-effect waves-light">
+      
+      <i class="fas fa-tags" style="zoom: 0.6;"></i>
+      
+      <span>标签</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/categories" class="waves-effect waves-light">
+      
+      <i class="fas fa-bookmark" style="zoom: 0.6;"></i>
+      
+      <span>分类</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/archives" class="waves-effect waves-light">
+      
+      <i class="fas fa-archive" style="zoom: 0.6;"></i>
+      
+      <span>归档</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/about" class="waves-effect waves-light">
+      
+      <i class="fas fa-user-circle" style="zoom: 0.6;"></i>
+      
+      <span>关于</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/contact" class="waves-effect waves-light">
+      
+      <i class="fas fa-comments" style="zoom: 0.6;"></i>
+      
+      <span>留言板</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/friends" class="waves-effect waves-light">
+      
+      <i class="fas fa-address-book" style="zoom: 0.6;"></i>
+      
+      <span>友情链接</span>
+    </a>
+    
+  </li>
+  
+  <li>
+    <a href="#searchModal" class="modal-trigger waves-effect waves-light">
+      <i id="searchIcon" class="fas fa-search" title="搜索" style="zoom: 0.85;"></i>
+    </a>
+  </li>
+</ul>
+
+<div id="mobile-nav" class="side-nav sidenav">
+
+    <div class="mobile-head bg-color">
+        
+        <img src="/medias/logo.png" class="logo-img circle responsive-img">
+        
+        <div class="logo-name">阿培</div>
+        <div class="logo-desc">
+            
+            Never really desperate, only the lost of the soul.
+            
+        </div>
+    </div>
+
+    
+
+    <ul class="menu-list mobile-menu-list">
+        
+        <li class="m-nav-item">
+	  
+		<a href="/" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-home"></i>
+			
+			首页
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/tags" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-tags"></i>
+			
+			标签
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/categories" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-bookmark"></i>
+			
+			分类
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/archives" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-archive"></i>
+			
+			归档
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/about" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-user-circle"></i>
+			
+			关于
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/contact" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-comments"></i>
+			
+			Contact
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/friends" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-address-book"></i>
+			
+			友情链接
+		</a>
+          
+        </li>
+        
+        
+        <li><div class="divider"></div></li>
+        <li>
+            <a href="https://github.com/blinkfox/hexo-theme-matery" class="waves-effect waves-light" target="_blank">
+                <i class="fab fa-github-square fa-fw"></i>Fork Me
+            </a>
+        </li>
+        
+    </ul>
+</div>
+
+        </div>
+
+        
+            <style>
+    .nav-transparent .github-corner {
+        display: none !important;
+    }
+
+    .github-corner {
+        position: absolute;
+        z-index: 10;
+        top: 0;
+        right: 0;
+        border: 0;
+        transform: scale(1.1);
+    }
+
+    .github-corner svg {
+        color: #0f9d58;
+        fill: #fff;
+        height: 64px;
+        width: 64px;
+    }
+
+    .github-corner:hover .octo-arm {
+        animation: a 0.56s ease-in-out;
+    }
+
+    .github-corner .octo-arm {
+        animation: none;
+    }
+
+    @keyframes a {
+        0%,
+        to {
+            transform: rotate(0);
+        }
+        20%,
+        60% {
+            transform: rotate(-25deg);
+        }
+        40%,
+        80% {
+            transform: rotate(10deg);
+        }
+    }
+</style>
+
+<a href="https://github.com/blinkfox/hexo-theme-matery" class="github-corner tooltipped hide-on-med-and-down" target="_blank"
+   data-tooltip="Fork Me" data-position="left" data-delay="50">
+    <svg viewBox="0 0 250 250" aria-hidden="true">
+        <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
+        <path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2"
+              fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path>
+        <path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z"
+              fill="currentColor" class="octo-body"></path>
+    </svg>
+</a>
+        
+    </nav>
+
+</header>
+
+    
+
+
+
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/1.jpg')">
+    <div class="container" style="right: 0px;left: 0px;">
+        <div class="row">
+            <div class="col s12 m12 l12">
+                <div class="brand">
+                    <div class="description center-align post-title">
+                        python循环语句
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<main class="post-container content">
+
+    
+    <link rel="stylesheet" href="/libs/tocbot/tocbot.css">
+<style>
+    #articleContent h1::before,
+    #articleContent h2::before,
+    #articleContent h3::before,
+    #articleContent h4::before,
+    #articleContent h5::before,
+    #articleContent h6::before {
+        display: block;
+        content: " ";
+        height: 100px;
+        margin-top: -100px;
+        visibility: hidden;
+    }
+
+    #articleContent :focus {
+        outline: none;
+    }
+
+    .toc-fixed {
+        position: fixed;
+        top: 64px;
+    }
+
+    .toc-widget {
+        width: 345px;
+        padding-left: 20px;
+    }
+
+    .toc-widget .toc-title {
+        margin: 35px 0 15px 0;
+        padding-left: 17px;
+        font-size: 1.5rem;
+        font-weight: bold;
+        line-height: 1.5rem;
+    }
+
+    .toc-widget ol {
+        padding: 0;
+        list-style: none;
+    }
+
+    #toc-content {
+        height: calc(100vh - 250px);
+        overflow: auto;
+    }
+
+    #toc-content ol {
+        padding-left: 10px;
+    }
+
+    #toc-content ol li {
+        padding-left: 10px;
+    }
+
+    #toc-content .toc-link:hover {
+        color: #42b983;
+        font-weight: 700;
+        text-decoration: underline;
+    }
+
+    #toc-content .toc-link::before {
+        background-color: transparent;
+        max-height: 25px;
+    }
+
+    #toc-content .is-active-link {
+        color: #42b983;
+    }
+
+    #toc-content .is-active-link::before {
+        background-color: #42b983;
+    }
+
+    #floating-toc-btn {
+        position: fixed;
+        right: 15px;
+        bottom: 76px;
+        padding-top: 15px;
+        margin-bottom: 0;
+        z-index: 998;
+    }
+
+    #floating-toc-btn .btn-floating {
+        width: 48px;
+        height: 48px;
+    }
+
+    #floating-toc-btn .btn-floating i {
+        line-height: 48px;
+        font-size: 1.4rem;
+    }
+</style>
+<div class="row">
+    <div id="main-content" class="col s12 m12 l9">
+        <!-- 文章内容详情 -->
+<div id="artDetail">
+    <div class="card">
+        <div class="card-content article-info">
+            <div class="row tag-cate">
+                <div class="col s7">
+                    
+                    <div class="article-tag">
+                        
+                            <a href="/tags/if/">
+                                <span class="chip bg-color">if</span>
+                            </a>
+                        
+                            <a href="/tags/while/">
+                                <span class="chip bg-color">while</span>
+                            </a>
+                        
+                            <a href="/tags/for/">
+                                <span class="chip bg-color">for</span>
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+                <div class="col s5 right-align">
+                    
+                    <div class="post-cate">
+                        <i class="fas fa-bookmark fa-fw icon-category"></i>
+                        
+                            <a href="/categories/python%E5%9F%BA%E7%A1%80/" class="post-category">
+                                python基础
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+            </div>
+
+            <div class="post-info">
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
+                    2017-04-06
+                </div>
+                
+
+                
+
+                
+
+                
+				
+                
+            </div>
+            
+        </div>
+        <hr class="clearfix">
+        <div class="card-content article-card-content">
+            <div id="articleContent">
+                <h1 id="if-测试的语法结构"><a href="#if-测试的语法结构" class="headerlink" title="if 测试的语法结构"></a>if 测试的语法结构</h1><p>if boolean_expression1:<br>    suite1<br>elif boolean_expression2:<br>    suite2<br>…<br>else:<br>    else_suite<br>elif语句是可选的<br>仅用于占位，而后再填充相关语句时，可以使用pass</p>
+<p>if/else三元表达式<br>通常在为某变量设定默认值时通常用到的如下格式<br>if x:<br>    a=y<br>else:<br>    a=z<br>可以改写为如下简短格式<br>a = y if x else z<br>其通用条件表达式语法格式为<br>expression1 if boolean_expression else expression2<br>    如果boolean_expression的值为True,则条件表达式的结果为expression1,否则为expression2</p>
+<a id="more"></a>
+
+<h1 id="while-循环"><a href="#while-循环" class="headerlink" title="while 循环"></a>while 循环</h1><pre><code>    用于编写通用迭代结构
+    顶端测试为真即会执行循环体，并会重复多次测试直到为假后执行循环后的其他语句</code></pre><p>for 循环<br>        一个通用的序列迭代器，用于遍历任何有序的序列对象内的元素<br>        可用于字符串、元组、列表和其它的内置可迭代对象，以及通过类所创建的新对象<br>python也提供了一些能够进行隐性迭代的工具<br>    in成员关系测试<br>    列表解析<br>    map、reduce和filter函数</p>
+<p>while 循环<br>语法格式<br>while boolean_expression:<br>    while…suite<br>else:<br>    else…suite</p>
+<p>else分支为可选部分<br>只要boolean_expression的结果为True，循环就回执行；<br>boolean_expression的结果为False时终止循环，此时如果有else分支，则会执行</p>
+<p>url = ‘<a href="http://www.magedu.com&#39;" target="_blank" rel="noopener">www.magedu.com&#39;</a><br>while url:<br>    print url<br>    url = url[:-1]<br>else:<br>    print “game over”</p>
+<p>输出结果为：<br><a href="http://www.magedu.com" target="_blank" rel="noopener">www.magedu.com</a><br><a href="http://www.magedu.co" target="_blank" rel="noopener">www.magedu.co</a><br><a href="http://www.magedu.c" target="_blank" rel="noopener">www.magedu.c</a><br><a href="http://www.magedu" target="_blank" rel="noopener">www.magedu</a>.<br><a href="http://www.magedu" target="_blank" rel="noopener">www.magedu</a><br><a href="http://www.maged" target="_blank" rel="noopener">www.maged</a><br><a href="http://www.mage" target="_blank" rel="noopener">www.mage</a><br><a href="http://www.mag" target="_blank" rel="noopener">www.mag</a><br><a href="http://www.ma" target="_blank" rel="noopener">www.ma</a><br><a href="http://www.m" target="_blank" rel="noopener">www.m</a><br>www.<br>www<br>ww<br>w<br>game over</p>
+<p>url = ‘<a href="http://www.magedu.com&#39;" target="_blank" rel="noopener">www.magedu.com&#39;</a><br>while url:<br>    print url<br>    url = url[:-1]<br>    x +=1<br>    if x &gt;7:<br>        break<br>else:<br>    print “game over”</p>
+<p>输出结果为：<br><a href="http://www.magedu.com" target="_blank" rel="noopener">www.magedu.com</a><br><a href="http://www.magedu.co" target="_blank" rel="noopener">www.magedu.co</a><br><a href="http://www.magedu.c" target="_blank" rel="noopener">www.magedu.c</a><br><a href="http://www.magedu" target="_blank" rel="noopener">www.magedu</a>.<br><a href="http://www.magedu" target="_blank" rel="noopener">www.magedu</a><br><a href="http://www.maged" target="_blank" rel="noopener">www.maged</a><br><a href="http://www.mage" target="_blank" rel="noopener">www.mage</a></p>
+<p>while:<br>    while bool_expression:<br>        while_suite<br>    else:<br>        else_suite</p>
+<pre><code>break:跳出最内层的循环：
+continue:跳到所处的最近层循环的开始处：
+pass:点位语句
+else代码块：循环正常终止才会执行：如果循环终止是由break跳出导致的，则else不会执行：</code></pre><p>练习题：<br>    练习1：逐一显示指定列表中的所有元素：<br>    代码如下：<br>        l1 = [1,2,3,4,5,6]<br>        while l1:<br>            print l1.pop(0),</p>
+<pre><code>    运行结果：1 2 3 4 5 6
+
+    l2 = [&#39;abc&#39;,&#39;bcd&#39;,&#39;cde&#39;]
+    count = 0
+    while count &lt;len(l2):
+        print l2[count]
+        count +=1
+
+    while l2:
+        print l2[0]
+        l2=l2[1:]
+
+练习2：求100以内所有偶数之和：
+代码如下：
+    i = 1;sum = 0
+    while i&lt;=100:
+        if i%2==0:
+            sum += i
+            i += 2
+        else:
+            i +=1
+    print sum
+    运行结果：2550
+    i = 0;sum = 0
+    while i&lt;=100:
+        if i%2==0:
+            sum += i
+            i += 2
+    print sum
+    运行结果：2550
+    扩展题：求num以内所有奇数之和：
+        num = int(raw_input(&#39;请输入一个num:&#39;))
+        i = 1;sum =0
+        while i&lt;=num:
+            if i%2!=0:
+                sum += i
+                i += 2
+            else:
+                i +=1
+        print sum
+        运行结果：2500
+
+练习3：逐一显示指定字典的所有建：并显示结束后说明总键数：
+运行代码：
+    d1 = {&#39;xiaohao&#39;:78,&#39;xiaoming&#39;:89,&#39;wangwu&#39;:100}
+    count = 0
+    x = d1.keys()
+    while count &lt;len(x):
+        print x[count]
+        count +=1
+    print count
+    运行结果：
+            xiaohao
+            xiaoming
+            wangwu
+            3    
+
+练习4：创建一个包含了100以内所有奇数的列表：
+运行代码：
+        i = 1;sum = 0
+        while i&lt;=100:
+            if i%2!=0:
+                sum += i
+                i +=2
+            else:
+                i +=1
+        print sum
+        运行结果；2500
+
+练习5：逆序逐一显示一个列表的所有元素
+运行代码：
+        l1 = [&quot;Mon&quot;,&quot;Tue&quot;,&quot;Wed&quot;,&quot;Thu&quot;,&quot;Fri&quot;,&quot;Sat&quot;,&quot;Sun&quot;]
+        i = 0
+        while i&lt;len(l1):
+            l1.reverse()
+            print l1[i]
+            i +=1
+        运行结果：
+        Sun
+        Tue
+        Fri
+        Thu
+        Wed
+        Sat
+        Mon
+
+练习6：列表l1=[0,1,2,3,4,5,6],列表l2=[&quot;Sun&quot;,&quot;Mon&quot;,&quot;Tue&quot;,&quot;Wed&quot;,&quot;Thu&quot;,&quot;Fri&quot;,&quot;Sat&quot;],以第一个列表中的元素为键，以第二个列表中的元素为值生成字典d1:
+运行代码：
+    l1=[0,1,2,3,4,5,6]
+    l2=[&quot;Sun&quot;,&quot;Mon&quot;,&quot;Tue&quot;,&quot;Wed&quot;,&quot;Thu&quot;,&quot;Fri&quot;,&quot;Sat&quot;]
+    d1= {}
+    count = 0
+    if len(l1)==len(l2):
+        while count &lt;len(l1):
+            d1[l1[count]]=l2[count]
+            count +=1
+    print d1
+    运行结果：
+    {0: &#39;Sun&#39;, 1: &#39;Mon&#39;, 2: &#39;Tue&#39;, 3: &#39;Wed&#39;, 4: &#39;Thu&#39;, 5: &#39;Fri&#39;, 6: &#39;Sat&#39;}</code></pre><p>死循环<br>        while True:</p>
+<h1 id="for-循环"><a href="#for-循环" class="headerlink" title="for 循环"></a>for 循环</h1><pre><code>语法格式
+for expression1 in iterable:
+    for_suite
+else:
+    else_suite
+
+通常，expression或是一个单独的变量，或是一个变量序列，一般以元组的形式给出
+如果以元组或列表用于expression,则其中的每个数据项都会拆分到表达式的项，例如
+T=[(1,2),(3,4),(5,6),(7,8)]
+for (a,b) in T
+    print a b
+
+for i in range(1,101):
+    sum +=i
+print sum
+
+for i in xrange(1,101):
+    sum +=i</code></pre><p>for 循环形式扩展<br>    语法格式<br>    for expression in iterable:<br>        for_suite<br>        if boolean_expression2:break<br>        if boolean_expression3:continue<br>    else:<br>        else_suite</p>
+<p>编写循环的技巧<br>    for 循环比while循环执行速度快<br>    python提供了两个内置函数，用于在for循环中定制特殊的循环<br>        range或xrange<br>            range:一次性地返回连续地整数列表<br>            xrange:一次产生一个数据元素，相较于range更节约空间<br>        range函数<br>            非完备遍历<br>                用于每隔一定的个数元素挑选一个元素<br>                S = ‘How are you these days?’<br>                range(0,len(S),2)<br>                &gt;&gt; [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22]<br>                for i in range(0,len(S),2):print S[i],<br>                &gt;&gt;H w a e y u t e e d y ?<br>            修改列表<br>                L  = [1,2,3,4,5]<br>                for i in range(len(L)):L[i]+=1<br>                L<br>                &gt;&gt;[2,3,4,5,6]</p>
+<pre><code>    zip
+        返回并行地元素元组的列表，常用于在for循环中遍历数个序列
+        取得一个或多个序列为参数，将给定序列中的并排的元素配成元组，返回这些元组的列表
+        当参数长度不同时，zip会以最短序列的长度为准
+
+        可在for循环中用于实现并行迭代
+        l1 = [1,2,3,4,5,6,7]
+        l2 = [&#39;a&#39;,&#39;b&#39;,&#39;c&#39;,&#39;d&#39;,&#39;e&#39;,&#39;f&#39;,&#39;g&#39;]
+        zip(l1,l2)
+        运行结果：
+        [(1, &#39;a&#39;), (2, &#39;b&#39;), (3, &#39;c&#39;), (4, &#39;d&#39;), (5, &#39;e&#39;), (6, &#39;f&#39;), (7, &#39;g&#39;)]
+
+        zip也常用于动态构造字典
+        keys = [1,2,3,4,5,6,7]
+        values = [&#39;Mon&#39;,&#39;Tus&#39;,&#39;Wed&#39;,&#39;Thu&#39;,&#39;Fri&#39;,&#39;Sat&#39;,&#39;Sun&#39;]
+        D={}
+        for (k,v) in zip(keys,values): D[k] = v
+        print D
+        运行结果：
+        {1: &#39;Mon&#39;, 2: &#39;Tus&#39;, 3: &#39;Wed&#39;, 4: &#39;Thu&#39;, 5: &#39;Fri&#39;, 6: &#39;Sat&#39;, 7: &#39;Sun&#39;}</code></pre><p>for 循环练习：<br>            练习1：逐一分开显示指定字典d1中的所有元素，类似如下<br>            代码如下：<br>            d1 = {‘a’:12,’b’:23,’c’:34}<br>            for (k,v) in d1.items():print k,v<br>            运行结果：<br>            &gt;&gt;<br>                a 12<br>                c 34<br>                b 23</p>
+<pre><code>        练习2：逐一显示列表中l1=[&quot;Sun&quot;,&quot;Mon&quot;,&quot;Tue&quot;,&quot;Wed&quot;,&quot;Thu&quot;,&quot;Fri&quot;,&quot;Sat&quot;]中的索引为奇数的元素：
+        l1=[&quot;Sun&quot;,&quot;Mon&quot;,&quot;Tue&quot;,&quot;Wed&quot;,&quot;Thu&quot;,&quot;Fri&quot;,&quot;Sat&quot;]
+        i = 1
+        for i in range(1,len(l1),2)
+            print l1[i],
+        运行结果：
+        &gt;&gt; Mon Wed Fri
+        练习3：将属于列表l1=[&quot;Sun&quot;,&quot;Mon&quot;,&quot;Tue&quot;,&quot;Wed&quot;,&quot;Thu&quot;,&quot;Fri&quot;,&quot;Sat&quot;],但不属于列表l2=[&quot;Sun&quot;,&quot;Mon&quot;,&quot;Tue&quot;,&quot;Wed&quot;,&quot;Thu&quot;]的所有元素定义为一个新列表l3;
+        代码如下：
+        l1=[&quot;Sun&quot;,&quot;Mon&quot;,&quot;Tue&quot;,&quot;Wed&quot;,&quot;Thu&quot;,&quot;Fri&quot;,&quot;Sat&quot;]
+        l2=[&quot;Sun&quot;,&quot;Mon&quot;,&quot;Tue&quot;,&quot;Wed&quot;,&quot;Thu&quot;]
+        l3 = []
+        for i in l1:
+            if i not i l2:
+                l3.append(i)
+        print l3
+        运行结果：
+            [&#39;Fri&#39;, &#39;Sat&#39;]
+        练习4：已知列表namelist=[&#39;stu1&#39;,&#39;stu2&#39;,&#39;stu3&#39;,&#39;stu4&#39;,&#39;stu5&#39;,&#39;stu6&#39;,&#39;stu7&#39;],删除列表removelist=[&#39;stu3&#39;,&#39;stu7&#39;,&#39;stu9&#39;]:请将属于removelist列表中的每个元素从namelist中移除(属于removelist,但不属于namelist的忽略即可)：
+        代码如下：
+        namelist=[&#39;stu1&#39;,&#39;stu2&#39;,&#39;stu3&#39;,&#39;stu4&#39;,&#39;stu5&#39;,&#39;stu6&#39;,&#39;stu7&#39;]
+        removelist=[&#39;stu3&#39;,&#39;stu7&#39;,&#39;stu9&#39;]
+        for i in removelist:
+            if i in namelist:
+                namelist.remove(i)
+        print namelist
+        运行结果：
+            [&#39;stu1&#39;, &#39;stu2&#39;, &#39;stu4&#39;, &#39;stu5&#39;, &#39;stu6&#39;]</code></pre><h1 id="回顾："><a href="#回顾：" class="headerlink" title="回顾："></a>回顾：</h1><pre><code>1 动态语言
+    sys.getrefcount()
+
+    增加对象的引用计数场景：
+        对象创建时
+        将对象添加到容器时；类似list.append()
+        当对象被当作参数传递给函数时
+        为对象创建另外变量名
+
+    减少引用计数：
+        引用此对象的某变量名被显式销毁： del x
+        给引用此对象的某变量名重新赋值
+        从容器中移除对象时，类似list.pop()
+        容器本身被销毁
+2 if
+    if boolean_expression:
+        ...
+    elif bool_expression:
+        ...
+    else:
+        ...
+3 while
+    while bool_expression:
+        while_suite
+        if bool_expression2:continue
+        if bool_expression3:break
+    else:
+        else_suite
+4 for 
+    for expression in object:
+        for_suite
+        if bool_expression2:continue
+        if bool_expression3:break
+    else:
+        else_suite</code></pre>
+            </div>
+            <hr/>
+
+            
+
+    <div class="reprint" id="reprint-statement">
+        
+            <div class="reprint__author">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-user">
+                        文章作者:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="https://cntsp.github.io" rel="external nofollow noreferrer">阿培</a>
+                </span>
+            </div>
+            <div class="reprint__type">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-link">
+                        文章链接:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="https://cntsp.github.io/2017/04/06/python-if-while-for/">https://cntsp.github.io/2017/04/06/python-if-while-for/</a>
+                </span>
+            </div>
+            <div class="reprint__notice">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-copyright">
+                        版权声明:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    本博客所有文章除特別声明外，均采用
+                    <a href="https://creativecommons.org/licenses/by/4.0/deed.zh" rel="external nofollow noreferrer" target="_blank">CC BY 4.0</a>
+                    许可协议。转载请注明来源
+                    <a href="https://cntsp.github.io" target="_blank">阿培</a>
+                    !
+                </span>
+            </div>
+        
+    </div>
+
+    <script async defer>
+      document.addEventListener("copy", function (e) {
+        let toastHTML = '<span>复制成功，请遵循本文的转载规则</span><button class="btn-flat toast-action" onclick="navToReprintStatement()" style="font-size: smaller">查看</a>';
+        M.toast({html: toastHTML})
+      });
+
+      function navToReprintStatement() {
+        $("html, body").animate({scrollTop: $("#reprint-statement").offset().top - 80}, 800);
+      }
+    </script>
+
+
+
+            <div class="tag_share" style="display: block;">
+                <div class="post-meta__tag-list" style="display: inline-block;">
+                    
+                        <div class="article-tag">
+                            
+                                <a href="/tags/if/">
+                                    <span class="chip bg-color">if</span>
+                                </a>
+                            
+                                <a href="/tags/while/">
+                                    <span class="chip bg-color">while</span>
+                                </a>
+                            
+                                <a href="/tags/for/">
+                                    <span class="chip bg-color">for</span>
+                                </a>
+                            
+                        </div>
+                    
+                </div>
+                <div class="post_share" style="zoom: 80%; width: fit-content; display: inline-block; float: right; margin: -0.15rem 0;">
+                    <link rel="stylesheet" type="text/css" href="/libs/share/css/share.min.css">
+
+<div id="article-share">
+    
+    
+    <div class="social-share" data-sites="twitter,facebook,google,qq,qzone,wechat,weibo,douban,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
+    <script src="/libs/share/js/social-share.min.js"></script>
+    
+
+    
+
+</div>
+
+                </div>
+            </div>
+            
+                <style>
+    #reward {
+        margin: 40px 0;
+        text-align: center;
+    }
+
+    #reward .reward-link {
+        font-size: 1.4rem;
+        line-height: 38px;
+    }
+
+    #reward .btn-floating:hover {
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2), 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    #rewardModal {
+        width: 320px;
+        height: 350px;
+    }
+
+    #rewardModal .reward-title {
+        margin: 15px auto;
+        padding-bottom: 5px;
+    }
+
+    #rewardModal .modal-content {
+        padding: 10px;
+    }
+
+    #rewardModal .close {
+        position: absolute;
+        right: 15px;
+        top: 15px;
+        color: rgba(0, 0, 0, 0.5);
+        font-size: 1.3rem;
+        line-height: 20px;
+        cursor: pointer;
+    }
+
+    #rewardModal .close:hover {
+        color: #ef5350;
+        transform: scale(1.3);
+        -moz-transform:scale(1.3);
+        -webkit-transform:scale(1.3);
+        -o-transform:scale(1.3);
+    }
+
+    #rewardModal .reward-tabs {
+        margin: 0 auto;
+        width: 210px;
+    }
+
+    .reward-tabs .tabs {
+        height: 38px;
+        margin: 10px auto;
+        padding-left: 0;
+    }
+
+    .reward-content ul {
+        padding-left: 0 !important;
+    }
+
+    .reward-tabs .tabs .tab {
+        height: 38px;
+        line-height: 38px;
+    }
+
+    .reward-tabs .tab a {
+        color: #fff;
+        background-color: #ccc;
+    }
+
+    .reward-tabs .tab a:hover {
+        background-color: #ccc;
+        color: #fff;
+    }
+
+    .reward-tabs .wechat-tab .active {
+        color: #fff !important;
+        background-color: #22AB38 !important;
+    }
+
+    .reward-tabs .alipay-tab .active {
+        color: #fff !important;
+        background-color: #019FE8 !important;
+    }
+
+    .reward-tabs .reward-img {
+        width: 210px;
+        height: 210px;
+    }
+</style>
+
+<div id="reward">
+    <a href="#rewardModal" class="reward-link modal-trigger btn-floating btn-medium waves-effect waves-light red">赏</a>
+
+    <!-- Modal Structure -->
+    <div id="rewardModal" class="modal">
+        <div class="modal-content">
+            <a class="close modal-close"><i class="fas fa-times"></i></a>
+            <h4 class="reward-title">你的赏识是我前进的动力</h4>
+            <div class="reward-content">
+                <div class="reward-tabs">
+                    <ul class="tabs row">
+                        <li class="tab col s6 alipay-tab waves-effect waves-light"><a href="#alipay">支付宝</a></li>
+                        <li class="tab col s6 wechat-tab waves-effect waves-light"><a href="#wechat">微 信</a></li>
+                    </ul>
+                    <div id="alipay">
+                        <img src="/medias/reward/alipay.jpg" class="reward-img" alt="支付宝打赏二维码">
+                    </div>
+                    <div id="wechat">
+                        <img src="/medias/reward/wechat.png" class="reward-img" alt="微信打赏二维码">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $('.tabs').tabs();
+    });
+</script>
+            
+        </div>
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+<article id="prenext-posts" class="prev-next articles">
+    <div class="row article-row">
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge left-badge text-color">
+                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
+            <div class="card">
+                <a href="/2017/04/07/python-iter-List-analysis-builder/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/3.jpg" class="responsive-img" alt="迭代器-列表解析-生成器">
+                        
+                        <span class="card-title">迭代器-列表解析-生成器</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            python迭代迭代：重复做一件事
+iterable(可迭代)对象
+    支持每次返回自己所包含的一个成员的对象
+    对象实现了__iter__方法
+        序列类型， 如： list,str,tuple
+        非序
+                        
+                    </div>
+                    <div class="publish-info">
+                        <span class="publish-date">
+                            <i class="far fa-clock fa-fw icon-date"></i>2017-04-07
+                        </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/python%E5%9F%BA%E7%A1%80/" class="post-category">
+                                    python基础
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/%E8%BF%AD%E4%BB%A3%E5%99%A8/">
+                        <span class="chip bg-color">迭代器</span>
+                    </a>
+                    
+                    <a href="/tags/%E5%88%97%E8%A1%A8%E8%A7%A3%E6%9E%90/">
+                        <span class="chip bg-color">列表解析</span>
+                    </a>
+                    
+                    <a href="/tags/%E7%94%9F%E6%88%90%E5%99%A8/">
+                        <span class="chip bg-color">生成器</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                本篇&nbsp;<i class="far fa-dot-circle"></i>
+            </div>
+            <div class="card">
+                <a href="/2017/04/06/python-if-while-for/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/1.jpg" class="responsive-img" alt="python循环语句">
+                        
+                        <span class="card-title">python循环语句</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            if 测试的语法结构if boolean_expression1:    suite1elif boolean_expression2:    suite2…else:    else_suiteelif语句是可选的仅用于占位，而后再填充相
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2017-04-06
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/python%E5%9F%BA%E7%A1%80/" class="post-category">
+                                    python基础
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/if/">
+                        <span class="chip bg-color">if</span>
+                    </a>
+                    
+                    <a href="/tags/while/">
+                        <span class="chip bg-color">while</span>
+                    </a>
+                    
+                    <a href="/tags/for/">
+                        <span class="chip bg-color">for</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+    </div>
+</article>
+
+</div>
+
+
+
+<!-- 代码块功能依赖 -->
+<script type="text/javascript" src="/libs/codeBlock/codeBlockFuction.js"></script>
+
+<!-- 代码语言 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeLang.js"></script>
+
+    
+<!-- 代码块复制 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeCopy.js"></script>
+
+
+<!-- 代码块收缩 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeShrink.js"></script>
+
+
+<!-- 代码块折行 -->
+
+<style type="text/css">
+code[class*="language-"], pre[class*="language-"] { white-space: pre !important; }
+</style>
+
+    </div>
+    <div id="toc-aside" class="expanded col l3 hide-on-med-and-down">
+        <div class="toc-widget">
+            <div class="toc-title"><i class="far fa-list-alt"></i>&nbsp;&nbsp;目录</div>
+            <div id="toc-content"></div>
+        </div>
+    </div>
+</div>
+
+<!-- TOC 悬浮按钮. -->
+
+<div id="floating-toc-btn" class="hide-on-med-and-down">
+    <a class="btn-floating btn-large bg-color">
+        <i class="fas fa-list-ul"></i>
+    </a>
+</div>
+
+
+<script src="/libs/tocbot/tocbot.min.js"></script>
+<script>
+    $(function () {
+        tocbot.init({
+            tocSelector: '#toc-content',
+            contentSelector: '#articleContent',
+            headingsOffset: -($(window).height() * 0.4 - 45),
+            collapseDepth: Number('0'),
+            headingSelector: 'h2, h3, h4'
+        });
+
+        // modify the toc link href to support Chinese.
+        let i = 0;
+        let tocHeading = 'toc-heading-';
+        $('#toc-content a').each(function () {
+            $(this).attr('href', '#' + tocHeading + (++i));
+        });
+
+        // modify the heading title id to support Chinese.
+        i = 0;
+        $('#articleContent').children('h2, h3, h4').each(function () {
+            $(this).attr('id', tocHeading + (++i));
+        });
+
+        // Set scroll toc fixed.
+        let tocHeight = parseInt($(window).height() * 0.4 - 64);
+        let $tocWidget = $('.toc-widget');
+        $(window).scroll(function () {
+            let scroll = $(window).scrollTop();
+            /* add post toc fixed. */
+            if (scroll > tocHeight) {
+                $tocWidget.addClass('toc-fixed');
+            } else {
+                $tocWidget.removeClass('toc-fixed');
+            }
+        });
+
+        
+        /* 修复文章卡片 div 的宽度. */
+        let fixPostCardWidth = function (srcId, targetId) {
+            let srcDiv = $('#' + srcId);
+            if (srcDiv.length === 0) {
+                return;
+            }
+
+            let w = srcDiv.width();
+            if (w >= 450) {
+                w = w + 21;
+            } else if (w >= 350 && w < 450) {
+                w = w + 18;
+            } else if (w >= 300 && w < 350) {
+                w = w + 16;
+            } else {
+                w = w + 14;
+            }
+            $('#' + targetId).width(w);
+        };
+
+        // 切换TOC目录展开收缩的相关操作.
+        const expandedClass = 'expanded';
+        let $tocAside = $('#toc-aside');
+        let $mainContent = $('#main-content');
+        $('#floating-toc-btn .btn-floating').click(function () {
+            if ($tocAside.hasClass(expandedClass)) {
+                $tocAside.removeClass(expandedClass).hide();
+                $mainContent.removeClass('l9');
+            } else {
+                $tocAside.addClass(expandedClass).show();
+                $mainContent.addClass('l9');
+            }
+            fixPostCardWidth('artDetail', 'prenext-posts');
+        });
+        
+    });
+</script>
+
+    
+
+</main>
+
+
+
+    <footer class="page-footer bg-color">
+    <div class="container row center-align">
+        <div class="col s12 m8 l8 copy-right">
+            Copyright&nbsp;&copy;
+            <span id="year">年份</span>
+            <a href="https://cntsp.github.io" target="_blank">阿培</a>
+            |&nbsp;Powered by&nbsp;<a href="https://hexo.io/" target="_blank">Hexo</a>
+            |&nbsp;Theme&nbsp;<a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
+            <br>
+            
+            
+            
+            
+            
+            
+            <span id="busuanzi_container_site_pv">
+                |&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;<span id="busuanzi_value_site_pv"
+                    class="white-color"></span>&nbsp;次
+            </span>
+            
+            
+            <span id="busuanzi_container_site_uv">
+                |&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;<span id="busuanzi_value_site_uv"
+                    class="white-color"></span>&nbsp;人
+            </span>
+            
+            <br>
+            
+            <span id="sitetime">载入运行时间...</span>
+            <script>
+                function siteTime() {
+                    window.setTimeout("siteTime()", 1000);
+                    var seconds = 1000;
+                    var minutes = seconds * 60;
+                    var hours = minutes * 60;
+                    var days = hours * 24;
+                    var years = days * 365;
+                    var today = new Date();
+                    var startYear = "2019";
+                    var startMonth = "6";
+                    var startDate = "28";
+                    var startHour = "0";
+                    var startMinute = "0";
+                    var startSecond = "0";
+                    var todayYear = today.getFullYear();
+                    var todayMonth = today.getMonth() + 1;
+                    var todayDate = today.getDate();
+                    var todayHour = today.getHours();
+                    var todayMinute = today.getMinutes();
+                    var todaySecond = today.getSeconds();
+                    var t1 = Date.UTC(startYear, startMonth, startDate, startHour, startMinute, startSecond);
+                    var t2 = Date.UTC(todayYear, todayMonth, todayDate, todayHour, todayMinute, todaySecond);
+                    var diff = t2 - t1;
+                    var diffYears = Math.floor(diff / years);
+                    var diffDays = Math.floor((diff / days) - diffYears * 365);
+                    var diffHours = Math.floor((diff - (diffYears * 365 + diffDays) * days) / hours);
+                    var diffMinutes = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours) /
+                        minutes);
+                    var diffSeconds = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours -
+                        diffMinutes * minutes) / seconds);
+                    if (startYear == todayYear) {
+                        document.getElementById("year").innerHTML = todayYear;
+                        document.getElementById("sitetime").innerHTML = "本站已安全运行 " + diffDays + " 天 " + diffHours +
+                            " 小时 " + diffMinutes + " 分钟 " + diffSeconds + " 秒";
+                    } else {
+                        document.getElementById("year").innerHTML = startYear + " - " + todayYear;
+                        document.getElementById("sitetime").innerHTML = "本站已安全运行 " + diffYears + " 年 " + diffDays +
+                            " 天 " + diffHours + " 小时 " + diffMinutes + " 分钟 " + diffSeconds + " 秒";
+                    }
+                }
+                setInterval(siteTime, 1000);
+            </script>
+            
+            <br>
+            
+        </div>
+        <div class="col s12 m4 l4 social-link social-statis">
+    <a href="https://github.com/cntsp" class="tooltipped" target="_blank" data-tooltip="访问我的GitHub" data-position="top" data-delay="50">
+        <i class="fab fa-github"></i>
+    </a>
+
+
+
+    <a href="mailto:1909873483@qq.com" class="tooltipped" target="_blank" data-tooltip="邮件联系我" data-position="top" data-delay="50">
+        <i class="fas fa-envelope-open"></i>
+    </a>
+
+
+
+
+
+
+
+    <a href="tencent://AddContact/?fromId=50&fromSubId=1&subcmd=all&uin=1909873483" class="tooltipped" target="_blank" data-tooltip="QQ联系我: 1909873483" data-position="top" data-delay="50">
+        <i class="fab fa-qq"></i>
+    </a>
+
+
+
+
+
+
+
+    <a href="/atom.xml" class="tooltipped" target="_blank" data-tooltip="RSS 订阅" data-position="top" data-delay="50">
+        <i class="fas fa-rss"></i>
+    </a>
+
+</div>
+    </div>
+</footer>
+
+<div class="progress-bar"></div>
+
+
+    <!-- 搜索遮罩框 -->
+<div id="searchModal" class="modal">
+    <div class="modal-content">
+        <div class="search-header">
+            <span class="title"><i class="fas fa-search"></i>&nbsp;&nbsp;搜索</span>
+            <input type="search" id="searchInput" name="s" placeholder="请输入搜索的关键字"
+                   class="search-input">
+        </div>
+        <div id="searchResult"></div>
+    </div>
+</div>
+
+<script src="/js/search.js"></script>
+<script type="text/javascript">
+$(function () {
+    searchFunc("/" + "search.xml", 'searchInput', 'searchResult');
+});
+</script>
+    <!-- 回到顶部按钮 -->
+<div id="backTop" class="top-scroll">
+    <a class="btn-floating btn-large waves-effect waves-light" href="#!">
+        <i class="fas fa-arrow-up"></i>
+    </a>
+</div>
+
+
+    <script src="/libs/materialize/materialize.min.js"></script>
+    <script src="/libs/masonry/masonry.pkgd.min.js"></script>
+    <script src="/libs/aos/aos.js"></script>
+    <script src="/libs/scrollprogress/scrollProgress.min.js"></script>
+    <script src="/libs/lightGallery/js/lightgallery-all.min.js"></script>
+    <script src="/js/matery.js"></script>
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    <script src="/libs/others/clicklove.js" async="async"></script>
+    
+    
+    <script async src="/libs/others/busuanzi.pure.mini.js"></script>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    
+    
+    <script src="/libs/instantpage/instantpage.js" type="module"></script>
+    
+
+</body>
+
+</html>

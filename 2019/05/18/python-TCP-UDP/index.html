@@ -1,0 +1,1272 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+
+
+<head>
+    <meta charset="utf-8">
+    <meta name="keywords" content="python-TCP-UDP, 阿培">
+    <meta name="description" content="Socket通讯及其TCP/IP原语Socket通讯Socket提供了一个通信端口，应用程序在网络上传输/接收的信息都通过Socket接口来实现的。在应用开发中可以像使用文件句柄一样来对Socket句柄进行读写操作。Windows Sock">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="renderer" content="webkit|ie-stand|ie-comp">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>python-TCP-UDP | 阿培</title>
+    <link rel="icon" type="image/x-icon, image/vnd.microsoft.icon" href="/favicon.ico">
+
+    <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
+    <link rel="stylesheet" type="text/css" href="/libs/materialize/materialize.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/aos/aos.css">
+    <link rel="stylesheet" type="text/css" href="/libs/animate/animate.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/lightGallery/css/lightgallery.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/matery.css">
+    <link rel="stylesheet" type="text/css" href="/css/my.css">
+    
+    <script src="/libs/jquery/jquery.min.js"></script>
+    
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+
+<body>
+    <header class="navbar-fixed">
+    <nav id="headNav" class="bg-color nav-transparent">
+        <div id="navContainer" class="nav-wrapper head-container">
+            <div class="brand-logo">
+                <a href="/" class="waves-effect waves-light">
+                    
+                    <img src="/medias/logo.png" class="logo-img" alt="LOGO">
+                    
+                    <span class="logo-span">阿培</span>
+                </a>
+            </div>
+            
+
+<a href="#" data-target="mobile-nav" class="sidenav-trigger button-collapse"><i class="fas fa-bars"></i></a>
+<ul class="right nav-menu">
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/" class="waves-effect waves-light">
+      
+      <i class="fas fa-home" style="zoom: 0.6;"></i>
+      
+      <span>首页</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/tags" class="waves-effect waves-light">
+      
+      <i class="fas fa-tags" style="zoom: 0.6;"></i>
+      
+      <span>标签</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/categories" class="waves-effect waves-light">
+      
+      <i class="fas fa-bookmark" style="zoom: 0.6;"></i>
+      
+      <span>分类</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/archives" class="waves-effect waves-light">
+      
+      <i class="fas fa-archive" style="zoom: 0.6;"></i>
+      
+      <span>归档</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/about" class="waves-effect waves-light">
+      
+      <i class="fas fa-user-circle" style="zoom: 0.6;"></i>
+      
+      <span>关于</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/contact" class="waves-effect waves-light">
+      
+      <i class="fas fa-comments" style="zoom: 0.6;"></i>
+      
+      <span>留言板</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/friends" class="waves-effect waves-light">
+      
+      <i class="fas fa-address-book" style="zoom: 0.6;"></i>
+      
+      <span>友情链接</span>
+    </a>
+    
+  </li>
+  
+  <li>
+    <a href="#searchModal" class="modal-trigger waves-effect waves-light">
+      <i id="searchIcon" class="fas fa-search" title="搜索" style="zoom: 0.85;"></i>
+    </a>
+  </li>
+</ul>
+
+<div id="mobile-nav" class="side-nav sidenav">
+
+    <div class="mobile-head bg-color">
+        
+        <img src="/medias/logo.png" class="logo-img circle responsive-img">
+        
+        <div class="logo-name">阿培</div>
+        <div class="logo-desc">
+            
+            Never really desperate, only the lost of the soul.
+            
+        </div>
+    </div>
+
+    
+
+    <ul class="menu-list mobile-menu-list">
+        
+        <li class="m-nav-item">
+	  
+		<a href="/" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-home"></i>
+			
+			首页
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/tags" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-tags"></i>
+			
+			标签
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/categories" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-bookmark"></i>
+			
+			分类
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/archives" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-archive"></i>
+			
+			归档
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/about" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-user-circle"></i>
+			
+			关于
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/contact" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-comments"></i>
+			
+			Contact
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/friends" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-address-book"></i>
+			
+			友情链接
+		</a>
+          
+        </li>
+        
+        
+        <li><div class="divider"></div></li>
+        <li>
+            <a href="https://github.com/blinkfox/hexo-theme-matery" class="waves-effect waves-light" target="_blank">
+                <i class="fab fa-github-square fa-fw"></i>Fork Me
+            </a>
+        </li>
+        
+    </ul>
+</div>
+
+        </div>
+
+        
+            <style>
+    .nav-transparent .github-corner {
+        display: none !important;
+    }
+
+    .github-corner {
+        position: absolute;
+        z-index: 10;
+        top: 0;
+        right: 0;
+        border: 0;
+        transform: scale(1.1);
+    }
+
+    .github-corner svg {
+        color: #0f9d58;
+        fill: #fff;
+        height: 64px;
+        width: 64px;
+    }
+
+    .github-corner:hover .octo-arm {
+        animation: a 0.56s ease-in-out;
+    }
+
+    .github-corner .octo-arm {
+        animation: none;
+    }
+
+    @keyframes a {
+        0%,
+        to {
+            transform: rotate(0);
+        }
+        20%,
+        60% {
+            transform: rotate(-25deg);
+        }
+        40%,
+        80% {
+            transform: rotate(10deg);
+        }
+    }
+</style>
+
+<a href="https://github.com/blinkfox/hexo-theme-matery" class="github-corner tooltipped hide-on-med-and-down" target="_blank"
+   data-tooltip="Fork Me" data-position="left" data-delay="50">
+    <svg viewBox="0 0 250 250" aria-hidden="true">
+        <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
+        <path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2"
+              fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path>
+        <path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z"
+              fill="currentColor" class="octo-body"></path>
+    </svg>
+</a>
+        
+    </nav>
+
+</header>
+
+    
+
+
+
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/20.jpg')">
+    <div class="container" style="right: 0px;left: 0px;">
+        <div class="row">
+            <div class="col s12 m12 l12">
+                <div class="brand">
+                    <div class="description center-align post-title">
+                        python-TCP-UDP
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<main class="post-container content">
+
+    
+    <link rel="stylesheet" href="/libs/tocbot/tocbot.css">
+<style>
+    #articleContent h1::before,
+    #articleContent h2::before,
+    #articleContent h3::before,
+    #articleContent h4::before,
+    #articleContent h5::before,
+    #articleContent h6::before {
+        display: block;
+        content: " ";
+        height: 100px;
+        margin-top: -100px;
+        visibility: hidden;
+    }
+
+    #articleContent :focus {
+        outline: none;
+    }
+
+    .toc-fixed {
+        position: fixed;
+        top: 64px;
+    }
+
+    .toc-widget {
+        width: 345px;
+        padding-left: 20px;
+    }
+
+    .toc-widget .toc-title {
+        margin: 35px 0 15px 0;
+        padding-left: 17px;
+        font-size: 1.5rem;
+        font-weight: bold;
+        line-height: 1.5rem;
+    }
+
+    .toc-widget ol {
+        padding: 0;
+        list-style: none;
+    }
+
+    #toc-content {
+        height: calc(100vh - 250px);
+        overflow: auto;
+    }
+
+    #toc-content ol {
+        padding-left: 10px;
+    }
+
+    #toc-content ol li {
+        padding-left: 10px;
+    }
+
+    #toc-content .toc-link:hover {
+        color: #42b983;
+        font-weight: 700;
+        text-decoration: underline;
+    }
+
+    #toc-content .toc-link::before {
+        background-color: transparent;
+        max-height: 25px;
+    }
+
+    #toc-content .is-active-link {
+        color: #42b983;
+    }
+
+    #toc-content .is-active-link::before {
+        background-color: #42b983;
+    }
+
+    #floating-toc-btn {
+        position: fixed;
+        right: 15px;
+        bottom: 76px;
+        padding-top: 15px;
+        margin-bottom: 0;
+        z-index: 998;
+    }
+
+    #floating-toc-btn .btn-floating {
+        width: 48px;
+        height: 48px;
+    }
+
+    #floating-toc-btn .btn-floating i {
+        line-height: 48px;
+        font-size: 1.4rem;
+    }
+</style>
+<div class="row">
+    <div id="main-content" class="col s12 m12 l9">
+        <!-- 文章内容详情 -->
+<div id="artDetail">
+    <div class="card">
+        <div class="card-content article-info">
+            <div class="row tag-cate">
+                <div class="col s7">
+                    
+                    <div class="article-tag">
+                        
+                            <a href="/tags/python/">
+                                <span class="chip bg-color">python</span>
+                            </a>
+                        
+                            <a href="/tags/socket/">
+                                <span class="chip bg-color">socket</span>
+                            </a>
+                        
+                            <a href="/tags/TCP/">
+                                <span class="chip bg-color">TCP</span>
+                            </a>
+                        
+                            <a href="/tags/UDP/">
+                                <span class="chip bg-color">UDP</span>
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+                <div class="col s5 right-align">
+                    
+                    <div class="post-cate">
+                        <i class="fas fa-bookmark fa-fw icon-category"></i>
+                        
+                            <a href="/categories/python%E5%9F%BA%E7%A1%80/" class="post-category">
+                                python基础
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+            </div>
+
+            <div class="post-info">
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
+                    2019-05-18
+                </div>
+                
+
+                
+
+                
+
+                
+				
+                
+            </div>
+            
+        </div>
+        <hr class="clearfix">
+        <div class="card-content article-card-content">
+            <div id="articleContent">
+                <h1 id="Socket通讯及其TCP-IP原语"><a href="#Socket通讯及其TCP-IP原语" class="headerlink" title="Socket通讯及其TCP/IP原语"></a>Socket通讯及其TCP/IP原语</h1><h2 id="Socket通讯"><a href="#Socket通讯" class="headerlink" title="Socket通讯"></a>Socket通讯</h2><p>Socket提供了一个通信端口，应用程序在网络上传输/接收的信息都通过Socket接口来实现的。在应用开发中可以像使用文件句柄一样来对Socket句柄进行读写操作。Windows Socket与协议无关并向下兼容，可以使用任何底层传输协议提供的通信能力，来为上层应用程序完成网络数据通讯，而不关心底层网络链路的通讯情况，实现了底层网络通讯对应用程序的透明。在TCP/IP网络应用中，通信的两个进程间相互作用的主要模式是客户/服务器模式。<br>在开始使用socket套接字编程之前，首先必须建立一下概念：</p>
+<h2 id="端口"><a href="#端口" class="headerlink" title="端口"></a>端口</h2><p>传输层与网络层在功能上的最大区别是传输层提供进程通信能力。从这个意义上讲，网络通信的最终地址就不仅仅是主机地址了，还包括可以描述进程的某个标识符。为此，TCP/IP协议提出了协议端口(protocol port 简称端口)的概念，用于标识通信的进程。应用程序(即进程)通过系统调用与某端口建立链接(binding)后，传输层传给该端口的数据都被相应进程所接收，相应进程发给传输层的数据都通过该端口输出。在TCP/IP协议的实现中，端口操作类似于一般的I/O操作，进程获取一个端口，相当于获取本地唯一的I/O文件，可以用一般的读写原语访问。<br>注意：当调用bind()的时候，不要把端口数设置的过小，小于1024的所有端口都是保留下来作为系统使用端口的，没有root权利无法使用，可以使用1024以上的任何端口，一直到65535。最后注意有关bind()的是：有时候并不一定要调用bind()来建立网络连接，比如你只是想连接到一个远程主机上面进行通讯，并不在乎你究竟是用的自己机器上的哪个端口进行通讯（比如Telnet），那么你可以简单的直接调用connect()函数，connect()将自动寻找出本地机器上的一个未使用的端口，然后调用bind()来将其socket 绑定到那个端口上。</p>
+<h2 id="地址"><a href="#地址" class="headerlink" title="地址"></a>地址</h2><p>网络通信中通信的两个进程分别在不同的机器上。在互连网络中，两台机器可能位于不同的网络，这些网络通过网络互连设备(网关，网桥，路由器等)连接，因此需要三级寻址：<br>1.某一个主机可与多个网络相连，必须指定一特定网络地址。<br>2.网络上每一台主机应有其唯一的地址；<br>3.每一个主机上的每一个进程应有在该主机上的唯一标识符。<br>通常主机地址由网络ID和主机ID组成，在TCP/IP协议中用32位整数值表示；TCP和UDP均使用16位端口号标识用户进程。</p>
+<h2 id="重复服务和并发服务"><a href="#重复服务和并发服务" class="headerlink" title="重复服务和并发服务"></a>重复服务和并发服务</h2><p>在客户/服务器模式中，有两种类型的服务：重复服务和并发服务。accept()调用为实现并发服务提供了极大方便，因为它要返回一个新的套接字号，其典型结构为：<br>int initsockid, newsockid;<br>if ((initsockid = socket(….)) &lt; 0)<br>       error(“can’t create socket”);<br>if (bind(initsockid,….) &lt; 0)<br>       error(“bind error”);<br>if (listen(initsockid , 5) &lt; 0)<br>       error(“listen error”);<br>for (;;) {<br>       newsockid = accept(initsockid, …)               /* 阻塞 <em>/<br>       if (newsockid &lt; 0)<br>                error(“accept error”);<br>       if (fork() == 0){                    /</em> 子进程 <em>/<br>                closesocket(initsockid);<br>                do(newsockid);<br> /</em> 处理请求 <em>/<br>                exit(0);<br>       }<br>       closesocket(newsockid);                                    /</em><br>父进程 */<br>}</p>
+<pre><code>  这段程序执行的结果是newsockid与客户的套接字建立相关，子进程启动后，关闭继承下来的主服务器的initsockid,并利用新的newsockid与客户通信。主服务器的initsockid可继续等待新的客户连接请求。由于在Unix等抢先多任务系统中，在系统调度下，多个进程可以同时进行。因此，使用并发服务器可以使服务器进程在同一时间可以有多个子进程和不同的客户程序连接、通信。在客户程序看来，服务器可以同时并发地处理多个客户的请求，这就是并发服务器名称的来由</code></pre><p> 面向连接服务器也可以是重复服务器，其结构如下：<br>int initsockid, newsockid;<br>if ((initsockid = socket(….))&lt;0)<br>       error(“can’t create socket”);<br>if (bind(initsockid,….)&lt;0)<br>       error(“bind error”);<br>if (listen(initsockid,5)&lt;0)<br>       error(“listen error”);<br>for (;;) {<br>       newsockid = accept(initsockid, …)     /* 阻塞 <em>/<br>       if (newsockid &lt; 0)<br>                error(“accept error”);<br>       do(newsockid);                               /</em> 处理请求 */<br>       closesocket(newsockid);<br>}</p>
+<pre><code>        重复服务器在一个时间只能和一个客户程序建立连接，它对多个客户程序的处理是采用循环的方式重复进行，因此叫重复服务器。并发服务器和重复服务器各有利弊：并发服务器可以改善客户程序的响应速度，但它增加了系统调度的开销；重复服务器正好与其相反，因此用户在决定是使用并发服务器还是重复服务器时，要根据应用的实际情况来定。</code></pre><h2 id="网络字节顺序"><a href="#网络字节顺序" class="headerlink" title="网络字节顺序"></a>网络字节顺序</h2><p>不同的计算机存放多字节值的顺序不同，有的机器在起始地址存放低位字节（低价先存），有的存高位字节（高价先存）。为保证数据的正确性，在网络协议中须指定网络字节顺序。TCP/IP协议使用16位整数和32位整数的高价先存格式，它们均含在协议头文件中。</p>
+<p>下面给出套接字字节转换程序的列表：<br>htons()——“Host to Network Short” 主机字节顺序转换为网络字节顺序（对无符号<br>短型进行操作4 bytes）<br>htonl()——“Host to Network Long”　主机字节顺序转换为网络字节顺序（对无符<br>号长型进行操作8 bytes）<br>ntohs()——“Network to Host Short “　网络字节顺序转换为主机字节顺序（对无符<br>号短型进行操作4 bytes）<br>ntohl()——“Network to Host Long “　网络字节顺序转换为主机字节顺序（对无符<br>号长型进行操作8 bytes）<br>在把数据发送到Internet 之前，一定要把它的字节顺序从主机字节顺序转换到网络字节顺序！</p>
+<p>注：在struct sockaddr_in 中的sin_addr 和sin_port 他们的字节顺序都是网络字节顺序，而<br>sin_family 却不是网络字节顺序的。为什么呢？<br>这个是因为sin_addr 和sin_port 是从IP 和UDP 协议层取出来的数据，而在IP 和UDP<br>协议层，是直接和网络相关的，所以，它们必须使用网络字节顺序。然而， sin_family 域<br>只是内核用来判断struct sockaddr_in 是存储的什么类型的数据，并且 sin_family 永远也<br>不会被发送到网络上，所以可以使用主机字节顺序来存储。</p>
+<h2 id="阻塞和非阻塞"><a href="#阻塞和非阻塞" class="headerlink" title="阻塞和非阻塞"></a>阻塞和非阻塞</h2><p>阻塞：一般的I/O操作可以在新建的流中运用，在服务器回应前它等待客户端发送一个空白的行，当会话结束时，服务器关闭流和客户端socket。如果在队列中没有请示将会出现什么情况呢？那个方法将会等待一个的到来，这个行为叫做阻塞。accept()方法会阻塞服务器线程知道一个呼叫到来，当5个连接处理完闭之后，服务器退出，任何的在队列中的呼叫将会被取消。<br>非阻塞：非阻塞套接字是指执行此套接字的网络调用时，不管是否执行成功，都立即返回。比如调用recv()函数读取网络缓冲中数据，不管是否读到数据都立即返回，而不会一直挂载此函数调用上。在实际window网络通信软件开发中，异步非阻塞套接字是用的最多的，平常所说的C/S(客户端/服务器)结构的软件就是异步非阻塞模式的。<br>socket工作过程如下：</p>
+<table>
+<thead>
+<tr>
+<th>服务器</th>
+<th></th>
+<th>客户端</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Socket()</td>
+<td></td>
+<td>socket()</td>
+</tr>
+<tr>
+<td>Bind()</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Linsten()</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>等待连接请求</td>
+<td>&lt;—–请示连接</td>
+<td>connect()</td>
+</tr>
+<tr>
+<td>accept()</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Recv()&amp;Senc()</td>
+<td>&lt;—–数据交互——&gt;</td>
+<td>Recv()&amp;Send()</td>
+</tr>
+<tr>
+<td>closesocket()</td>
+<td></td>
+<td>Closesocket()</td>
+</tr>
+<tr>
+<td>服务器首先启动，通过调用socket()建立一个套接字，然后调用bind()将该套接字和本地网络地址联系在一起，再调用listen()使套接字做好侦听的准备，并规定它的请求队列的长度，之后就调用accept()来接收连接。客户在建立套接字后就可调用connect()和服务器建立连接。连接一旦建立，客户机和服务器之间就可以通过调用read()和write()来发送和接收数据。最后，待数据传送结束后，双方调用close()关闭套接字。</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>## TCP/IP连接原语</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>1. 传输层协议</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>从通信和信息处理的角度看，传输层向它上面的应用层提供通信服务，它属于面向通信部分的最高层，同时也是用户功能中的最低层，为应用进程之间提供端到端的逻辑通信。传输层还要对收到的报文进行差错检测。传输层需要有两种不同的运输协议，即面向连接的TCP和无连接的UDP。</td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<p>TCP/IP结构体系中的传输层协议</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>应用层</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>传输层</td>
+<td>&lt;—–(UDP、TCP)</td>
+</tr>
+<tr>
+<td></td>
+<td>IP</td>
+</tr>
+<tr>
+<td></td>
+<td>与各种网络接口</td>
+</tr>
+</tbody></table>
+<h2 id="传输层协议和网络层协议的主要区别"><a href="#传输层协议和网络层协议的主要区别" class="headerlink" title="传输层协议和网络层协议的主要区别"></a>传输层协议和网络层协议的主要区别</h2><p>| 应用进程&lt;—–&gt;主机&lt;——-&gt;因特网&lt;——-&gt;主机&lt;——-&gt;应用进程 |<br>|——-|——|<br>| IP协议的作用范围 |<br>| ——(提供主机之间的逻辑通信)—— |<br>| TCP和UDP协议的作用范围 |<br>| ——(提供进程之间的逻辑通信)—– |</p>
+<h2 id="TCP头和IP头对应关系"><a href="#TCP头和IP头对应关系" class="headerlink" title="TCP头和IP头对应关系"></a>TCP头和IP头对应关系</h2><p>| TCP报文段=|TCP首部|+|TCP数据部分|<br>|IP首部|IP数据部分|</p>
+<h2 id="下图为TCP首部"><a href="#下图为TCP首部" class="headerlink" title="下图为TCP首部"></a>下图为TCP首部</h2><p>| TCP首部 |<br>| 源端口 | 目的端口 |<br>| 序号 |<br>| 确认号 |<br>| 数据偏移 |保留|URG|ACK|PSH|RST|SYN|FIN|窗口|<br>| 检验和 | 紧急指针 |<br>| 选项(长度可变)|填充 |</p>
+<p>在TCP层，有个FLAGS字段，这个字段有以下几个标识：SYN, FIN, ACK, PSH, RST, URG.其中， SYN表示建立连接；FIN表示关闭连接；ACK表示响应；PSH表示有DATA数据传输；RST表示连接重置。</p>
+<h2 id="用三次握手建立TCP连接"><a href="#用三次握手建立TCP连接" class="headerlink" title="用三次握手建立TCP连接"></a>用三次握手建立TCP连接</h2><p>|主机A| |主机B|<br>|主动打开||被动打开|<br>|连接请求|——SYN,SEQ=X——| |<br>||&lt;——SYN,ACK,SEQ=Y,ACK=x+1—-|确认|<br>||&lt;—–SYN,ACK,SEQ=X+1,ACK=Y+1—–||<br>A的TCP向B发出连接请求报文段，其首部中的同步比特SYN应置为1，并选择序号x，表明传送数据时的第一个数据字节的序号是x。B的TCP收到连接请求报文段后，如同意则发回确认。B在确认报文段中应将SYN置为1，其确认号应为x+1，同时也为自己选择序号y。A收到此报文段后，向B给出确认，其确认号应为y+1。A的TCP通知上层应用进程，连接已经建立。当运行服务器进程的主机B的TCP收到主机A的确认后，也通知其上层应用进程，连接已经建立。 </p>
+<h2 id="TCP连接释放的过程"><a href="#TCP连接释放的过程" class="headerlink" title="TCP连接释放的过程"></a>TCP连接释放的过程</h2><p>|主机A||主机B|<br>|——|——|<br>|应用进程释放连接|—–FIN,SEQ=X—–&gt;|通知主机应用进程|<br>||&lt;—–ACK,SEQ=y,ACK=X+1—–|确认|<br>|确认|——-SEQ=Y+1——-&gt;||</p>
+<h2 id="TCP状态转移"><a href="#TCP状态转移" class="headerlink" title="TCP状态转移"></a>TCP状态转移</h2><p>LISTEN: 侦听来自远方的TCP端口的连接请求<br>SYN-SET: 在发送连接请求后等待匹配的连接请求<br>SYN-RECEIVED: 再收到和发送一个连接请求后等待对方对连接请求的确认<br>ESTABLISHED: 代表一个打开的连接<br>FIN-WAIT-1: 等待远程TCP连接中断请求，或先前的连接中断请求的确认。<br>FIN-WAIT-2:从远程TCP等待连接中断请求<br>CLOSE-WAIT：等待从本地用户发来的连接中断请求<br>CLOSING：等待远程TCP对连接中断的确认<br>LAST-ACK：等待原来的发向远程TCP的连接中断请求的确认<br>TIME-WAIT：等待足够的时间以确保远程TCP接收到连接中断请求的确认<br>CLOSED：没有任何连接状态</p>
+<h3 id="建立连接过程"><a href="#建立连接过程" class="headerlink" title="建立连接过程"></a>建立连接过程</h3><ul>
+<li>所有连接开始于CLOSED状态。</li>
+<li>服务器先执行一个被动TCP打开操作，使TCP转到LISTEN状态。</li>
+<li>客户执行一个主动TCP打开操作，发送SYN，转到SYN_SENT状态。</li>
+<li>当服务器收到SYN后，发送SYN＋ACK, 转到SYN_RCVD。</li>
+<li>当客户收到SYN＋ACK后，向服务器发送ACK，转到ESTABLISHED状态。</li>
+<li>当服务器收到ACK后，转到ESTABLISHED状态。<br>以上完成三次握手。<br>注：1) 如果客户发送到服务器的ACK（第三次握手）丢失，因为客户已经处于ESTABLISHED状态，连接仍能正常工作，所以客户应用进程可以向服务器开始发送数据。<br>2) 超时重传机制没有在状态转移图中显示。大多数状态向另一方发送数据的同时也调用超时机制。如果没有出现期望的响应，则重发该数据。若数次重发仍没有得到期望的响应，TCP则放弃重传并回到CLOSED状态。<h3 id="终止连接过程"><a href="#终止连接过程" class="headerlink" title="终止连接过程"></a>终止连接过程</h3></li>
+</ul>
+<p>终止连接过程：<br>    各方的应用进程必须独立地关闭自己一方的连接。若一方关闭，该方不再发送数据，但仍能接收发来的数据。任何一方从ESTABLISHED状态转到CLOSED状态都有三种转换组合：<br>1） 这一方先关闭：<br>ESTABLISHED -&gt; FIN_WAIT_1 -&gt; FIN_WAIT_2 -&gt; TIME_WAIT -&gt; CLOSED<br>2） 另一方先关闭：<br> ESTABLISHED -&gt; CLOSE_WAIT -&gt;LIST_ACK -&gt; CLOSED<br>3） 双方同时关闭：<br>   ESTABLISHED -&gt; FIN_WAIT_1 -&gt; CLOSING -&gt; TIME_WAIT -&gt; CLOSED</p>
+<h2 id="TCP的重传机制"><a href="#TCP的重传机制" class="headerlink" title="TCP的重传机制"></a>TCP的重传机制</h2><p>TCP每发送一个报文段，就对这个报文段设置一次计时器。只要计时器设置的重传时间到但还没有收到确认，就要重传这一报文段。<br>上面的概念容易理解，我们这里说一下快重传。快重传算法规定，发送端只要一连收到三个重复的ACK即可断定有分组丢失了，就应立即重传丢失的报文段而不必继续等待为该报文段设置的重传计时器的超时。不难看出，快重传并非取消重传计时器，而是在某些情况下可更早地重传丢失的报文段。<br>快重传举例</p>
+<p>|主机A—–主机B||<br>|—M1,M2—-&gt;|A发送M1和M2|<br>|&lt;—-ACK2,ACK3—-|B确认M1和M2|<br>|—–M3—–&gt;丢失|A发送M3但丢失了|<br>|—-M4—–|A发送M4|<br>|&lt;—-ACK3—-|B只能再次确认M2(因为M3没有收到)|<br>|—-M5——-&gt;|A发送M5|<br>|&lt;—-ACK3—-|B发送第二个重复确认ACK3|<br>|—–M6——&gt;|A发送M6|<br>|&lt;—–ACK3——|B发送第三个重复确认ACK3|<br>|—-M3—–&gt;|A收到了三个重复的确认ACK3，就立即重传M3，而不必等待超时重传|</p>
+
+            </div>
+            <hr/>
+
+            
+
+    <div class="reprint" id="reprint-statement">
+        
+            <div class="reprint__author">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-user">
+                        文章作者:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="https://cntsp.github.io" rel="external nofollow noreferrer">阿培</a>
+                </span>
+            </div>
+            <div class="reprint__type">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-link">
+                        文章链接:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="https://cntsp.github.io/2019/05/18/python-TCP-UDP/">https://cntsp.github.io/2019/05/18/python-TCP-UDP/</a>
+                </span>
+            </div>
+            <div class="reprint__notice">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-copyright">
+                        版权声明:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    本博客所有文章除特別声明外，均采用
+                    <a href="https://creativecommons.org/licenses/by/4.0/deed.zh" rel="external nofollow noreferrer" target="_blank">CC BY 4.0</a>
+                    许可协议。转载请注明来源
+                    <a href="https://cntsp.github.io" target="_blank">阿培</a>
+                    !
+                </span>
+            </div>
+        
+    </div>
+
+    <script async defer>
+      document.addEventListener("copy", function (e) {
+        let toastHTML = '<span>复制成功，请遵循本文的转载规则</span><button class="btn-flat toast-action" onclick="navToReprintStatement()" style="font-size: smaller">查看</a>';
+        M.toast({html: toastHTML})
+      });
+
+      function navToReprintStatement() {
+        $("html, body").animate({scrollTop: $("#reprint-statement").offset().top - 80}, 800);
+      }
+    </script>
+
+
+
+            <div class="tag_share" style="display: block;">
+                <div class="post-meta__tag-list" style="display: inline-block;">
+                    
+                        <div class="article-tag">
+                            
+                                <a href="/tags/python/">
+                                    <span class="chip bg-color">python</span>
+                                </a>
+                            
+                                <a href="/tags/socket/">
+                                    <span class="chip bg-color">socket</span>
+                                </a>
+                            
+                                <a href="/tags/TCP/">
+                                    <span class="chip bg-color">TCP</span>
+                                </a>
+                            
+                                <a href="/tags/UDP/">
+                                    <span class="chip bg-color">UDP</span>
+                                </a>
+                            
+                        </div>
+                    
+                </div>
+                <div class="post_share" style="zoom: 80%; width: fit-content; display: inline-block; float: right; margin: -0.15rem 0;">
+                    <link rel="stylesheet" type="text/css" href="/libs/share/css/share.min.css">
+
+<div id="article-share">
+    
+    
+    <div class="social-share" data-sites="twitter,facebook,google,qq,qzone,wechat,weibo,douban,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
+    <script src="/libs/share/js/social-share.min.js"></script>
+    
+
+    
+
+</div>
+
+                </div>
+            </div>
+            
+                <style>
+    #reward {
+        margin: 40px 0;
+        text-align: center;
+    }
+
+    #reward .reward-link {
+        font-size: 1.4rem;
+        line-height: 38px;
+    }
+
+    #reward .btn-floating:hover {
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2), 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    #rewardModal {
+        width: 320px;
+        height: 350px;
+    }
+
+    #rewardModal .reward-title {
+        margin: 15px auto;
+        padding-bottom: 5px;
+    }
+
+    #rewardModal .modal-content {
+        padding: 10px;
+    }
+
+    #rewardModal .close {
+        position: absolute;
+        right: 15px;
+        top: 15px;
+        color: rgba(0, 0, 0, 0.5);
+        font-size: 1.3rem;
+        line-height: 20px;
+        cursor: pointer;
+    }
+
+    #rewardModal .close:hover {
+        color: #ef5350;
+        transform: scale(1.3);
+        -moz-transform:scale(1.3);
+        -webkit-transform:scale(1.3);
+        -o-transform:scale(1.3);
+    }
+
+    #rewardModal .reward-tabs {
+        margin: 0 auto;
+        width: 210px;
+    }
+
+    .reward-tabs .tabs {
+        height: 38px;
+        margin: 10px auto;
+        padding-left: 0;
+    }
+
+    .reward-content ul {
+        padding-left: 0 !important;
+    }
+
+    .reward-tabs .tabs .tab {
+        height: 38px;
+        line-height: 38px;
+    }
+
+    .reward-tabs .tab a {
+        color: #fff;
+        background-color: #ccc;
+    }
+
+    .reward-tabs .tab a:hover {
+        background-color: #ccc;
+        color: #fff;
+    }
+
+    .reward-tabs .wechat-tab .active {
+        color: #fff !important;
+        background-color: #22AB38 !important;
+    }
+
+    .reward-tabs .alipay-tab .active {
+        color: #fff !important;
+        background-color: #019FE8 !important;
+    }
+
+    .reward-tabs .reward-img {
+        width: 210px;
+        height: 210px;
+    }
+</style>
+
+<div id="reward">
+    <a href="#rewardModal" class="reward-link modal-trigger btn-floating btn-medium waves-effect waves-light red">赏</a>
+
+    <!-- Modal Structure -->
+    <div id="rewardModal" class="modal">
+        <div class="modal-content">
+            <a class="close modal-close"><i class="fas fa-times"></i></a>
+            <h4 class="reward-title">你的赏识是我前进的动力</h4>
+            <div class="reward-content">
+                <div class="reward-tabs">
+                    <ul class="tabs row">
+                        <li class="tab col s6 alipay-tab waves-effect waves-light"><a href="#alipay">支付宝</a></li>
+                        <li class="tab col s6 wechat-tab waves-effect waves-light"><a href="#wechat">微 信</a></li>
+                    </ul>
+                    <div id="alipay">
+                        <img src="/medias/reward/alipay.jpg" class="reward-img" alt="支付宝打赏二维码">
+                    </div>
+                    <div id="wechat">
+                        <img src="/medias/reward/wechat.png" class="reward-img" alt="微信打赏二维码">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $('.tabs').tabs();
+    });
+</script>
+            
+        </div>
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+<article id="prenext-posts" class="prev-next articles">
+    <div class="row article-row">
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge left-badge text-color">
+                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
+            <div class="card">
+                <a href="/2019/05/18/python-module-str-bytes/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/23.jpg" class="responsive-img" alt="python-module-str-bytes">
+                        
+                        <span class="card-title">python-module-str-bytes</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            Python3 bytes和str的不同Python3 最重要的新特性之一是对字符串和二进制数据流做了明确区分。文本总是Unicode,由str类型表示，二进制数据则由bytes类型表示。Python3 不会以任意隐式的方式混用str和by
+                        
+                    </div>
+                    <div class="publish-info">
+                        <span class="publish-date">
+                            <i class="far fa-clock fa-fw icon-date"></i>2019-05-18
+                        </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/python%E5%9F%BA%E7%A1%80/" class="post-category">
+                                    python基础
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/python/">
+                        <span class="chip bg-color">python</span>
+                    </a>
+                    
+                    <a href="/tags/str/">
+                        <span class="chip bg-color">str</span>
+                    </a>
+                    
+                    <a href="/tags/bytes/">
+                        <span class="chip bg-color">bytes</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
+            </div>
+            <div class="card">
+                <a href="/2019/05/15/ranche2-0-CN/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/19.jpg" class="responsive-img" alt="ranche2.0-CN">
+                        
+                        <span class="card-title">ranche2.0-CN</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            快速入门遵循以下两步，快速运行rancher2.0Step1:准备一台linux主机准备一台64位Linux主机(推荐centos7.5+),至少4GB内存。安装Kubernetes支持的Docker-ce版本；
+
+
+推荐：18.09.2
+
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2019-05-15
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/%E5%AE%B9%E5%99%A8%E6%8A%80%E6%9C%AF/" class="post-category">
+                                    容器技术
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/docker/">
+                        <span class="chip bg-color">docker</span>
+                    </a>
+                    
+                    <a href="/tags/rancher/">
+                        <span class="chip bg-color">rancher</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+    </div>
+</article>
+
+</div>
+
+
+
+<!-- 代码块功能依赖 -->
+<script type="text/javascript" src="/libs/codeBlock/codeBlockFuction.js"></script>
+
+<!-- 代码语言 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeLang.js"></script>
+
+    
+<!-- 代码块复制 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeCopy.js"></script>
+
+
+<!-- 代码块收缩 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeShrink.js"></script>
+
+
+<!-- 代码块折行 -->
+
+<style type="text/css">
+code[class*="language-"], pre[class*="language-"] { white-space: pre !important; }
+</style>
+
+    </div>
+    <div id="toc-aside" class="expanded col l3 hide-on-med-and-down">
+        <div class="toc-widget">
+            <div class="toc-title"><i class="far fa-list-alt"></i>&nbsp;&nbsp;目录</div>
+            <div id="toc-content"></div>
+        </div>
+    </div>
+</div>
+
+<!-- TOC 悬浮按钮. -->
+
+<div id="floating-toc-btn" class="hide-on-med-and-down">
+    <a class="btn-floating btn-large bg-color">
+        <i class="fas fa-list-ul"></i>
+    </a>
+</div>
+
+
+<script src="/libs/tocbot/tocbot.min.js"></script>
+<script>
+    $(function () {
+        tocbot.init({
+            tocSelector: '#toc-content',
+            contentSelector: '#articleContent',
+            headingsOffset: -($(window).height() * 0.4 - 45),
+            collapseDepth: Number('0'),
+            headingSelector: 'h2, h3, h4'
+        });
+
+        // modify the toc link href to support Chinese.
+        let i = 0;
+        let tocHeading = 'toc-heading-';
+        $('#toc-content a').each(function () {
+            $(this).attr('href', '#' + tocHeading + (++i));
+        });
+
+        // modify the heading title id to support Chinese.
+        i = 0;
+        $('#articleContent').children('h2, h3, h4').each(function () {
+            $(this).attr('id', tocHeading + (++i));
+        });
+
+        // Set scroll toc fixed.
+        let tocHeight = parseInt($(window).height() * 0.4 - 64);
+        let $tocWidget = $('.toc-widget');
+        $(window).scroll(function () {
+            let scroll = $(window).scrollTop();
+            /* add post toc fixed. */
+            if (scroll > tocHeight) {
+                $tocWidget.addClass('toc-fixed');
+            } else {
+                $tocWidget.removeClass('toc-fixed');
+            }
+        });
+
+        
+        /* 修复文章卡片 div 的宽度. */
+        let fixPostCardWidth = function (srcId, targetId) {
+            let srcDiv = $('#' + srcId);
+            if (srcDiv.length === 0) {
+                return;
+            }
+
+            let w = srcDiv.width();
+            if (w >= 450) {
+                w = w + 21;
+            } else if (w >= 350 && w < 450) {
+                w = w + 18;
+            } else if (w >= 300 && w < 350) {
+                w = w + 16;
+            } else {
+                w = w + 14;
+            }
+            $('#' + targetId).width(w);
+        };
+
+        // 切换TOC目录展开收缩的相关操作.
+        const expandedClass = 'expanded';
+        let $tocAside = $('#toc-aside');
+        let $mainContent = $('#main-content');
+        $('#floating-toc-btn .btn-floating').click(function () {
+            if ($tocAside.hasClass(expandedClass)) {
+                $tocAside.removeClass(expandedClass).hide();
+                $mainContent.removeClass('l9');
+            } else {
+                $tocAside.addClass(expandedClass).show();
+                $mainContent.addClass('l9');
+            }
+            fixPostCardWidth('artDetail', 'prenext-posts');
+        });
+        
+    });
+</script>
+
+    
+
+</main>
+
+
+
+    <footer class="page-footer bg-color">
+    <div class="container row center-align">
+        <div class="col s12 m8 l8 copy-right">
+            Copyright&nbsp;&copy;
+            <span id="year">年份</span>
+            <a href="https://cntsp.github.io" target="_blank">阿培</a>
+            |&nbsp;Powered by&nbsp;<a href="https://hexo.io/" target="_blank">Hexo</a>
+            |&nbsp;Theme&nbsp;<a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
+            <br>
+            
+            
+            
+            
+            
+            
+            <span id="busuanzi_container_site_pv">
+                |&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;<span id="busuanzi_value_site_pv"
+                    class="white-color"></span>&nbsp;次
+            </span>
+            
+            
+            <span id="busuanzi_container_site_uv">
+                |&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;<span id="busuanzi_value_site_uv"
+                    class="white-color"></span>&nbsp;人
+            </span>
+            
+            <br>
+            
+            <span id="sitetime">载入运行时间...</span>
+            <script>
+                function siteTime() {
+                    window.setTimeout("siteTime()", 1000);
+                    var seconds = 1000;
+                    var minutes = seconds * 60;
+                    var hours = minutes * 60;
+                    var days = hours * 24;
+                    var years = days * 365;
+                    var today = new Date();
+                    var startYear = "2019";
+                    var startMonth = "6";
+                    var startDate = "28";
+                    var startHour = "0";
+                    var startMinute = "0";
+                    var startSecond = "0";
+                    var todayYear = today.getFullYear();
+                    var todayMonth = today.getMonth() + 1;
+                    var todayDate = today.getDate();
+                    var todayHour = today.getHours();
+                    var todayMinute = today.getMinutes();
+                    var todaySecond = today.getSeconds();
+                    var t1 = Date.UTC(startYear, startMonth, startDate, startHour, startMinute, startSecond);
+                    var t2 = Date.UTC(todayYear, todayMonth, todayDate, todayHour, todayMinute, todaySecond);
+                    var diff = t2 - t1;
+                    var diffYears = Math.floor(diff / years);
+                    var diffDays = Math.floor((diff / days) - diffYears * 365);
+                    var diffHours = Math.floor((diff - (diffYears * 365 + diffDays) * days) / hours);
+                    var diffMinutes = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours) /
+                        minutes);
+                    var diffSeconds = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours -
+                        diffMinutes * minutes) / seconds);
+                    if (startYear == todayYear) {
+                        document.getElementById("year").innerHTML = todayYear;
+                        document.getElementById("sitetime").innerHTML = "本站已安全运行 " + diffDays + " 天 " + diffHours +
+                            " 小时 " + diffMinutes + " 分钟 " + diffSeconds + " 秒";
+                    } else {
+                        document.getElementById("year").innerHTML = startYear + " - " + todayYear;
+                        document.getElementById("sitetime").innerHTML = "本站已安全运行 " + diffYears + " 年 " + diffDays +
+                            " 天 " + diffHours + " 小时 " + diffMinutes + " 分钟 " + diffSeconds + " 秒";
+                    }
+                }
+                setInterval(siteTime, 1000);
+            </script>
+            
+            <br>
+            
+        </div>
+        <div class="col s12 m4 l4 social-link social-statis">
+    <a href="https://github.com/cntsp" class="tooltipped" target="_blank" data-tooltip="访问我的GitHub" data-position="top" data-delay="50">
+        <i class="fab fa-github"></i>
+    </a>
+
+
+
+    <a href="mailto:1909873483@qq.com" class="tooltipped" target="_blank" data-tooltip="邮件联系我" data-position="top" data-delay="50">
+        <i class="fas fa-envelope-open"></i>
+    </a>
+
+
+
+
+
+
+
+    <a href="tencent://AddContact/?fromId=50&fromSubId=1&subcmd=all&uin=1909873483" class="tooltipped" target="_blank" data-tooltip="QQ联系我: 1909873483" data-position="top" data-delay="50">
+        <i class="fab fa-qq"></i>
+    </a>
+
+
+
+
+
+
+
+    <a href="/atom.xml" class="tooltipped" target="_blank" data-tooltip="RSS 订阅" data-position="top" data-delay="50">
+        <i class="fas fa-rss"></i>
+    </a>
+
+</div>
+    </div>
+</footer>
+
+<div class="progress-bar"></div>
+
+
+    <!-- 搜索遮罩框 -->
+<div id="searchModal" class="modal">
+    <div class="modal-content">
+        <div class="search-header">
+            <span class="title"><i class="fas fa-search"></i>&nbsp;&nbsp;搜索</span>
+            <input type="search" id="searchInput" name="s" placeholder="请输入搜索的关键字"
+                   class="search-input">
+        </div>
+        <div id="searchResult"></div>
+    </div>
+</div>
+
+<script src="/js/search.js"></script>
+<script type="text/javascript">
+$(function () {
+    searchFunc("/" + "search.xml", 'searchInput', 'searchResult');
+});
+</script>
+    <!-- 回到顶部按钮 -->
+<div id="backTop" class="top-scroll">
+    <a class="btn-floating btn-large waves-effect waves-light" href="#!">
+        <i class="fas fa-arrow-up"></i>
+    </a>
+</div>
+
+
+    <script src="/libs/materialize/materialize.min.js"></script>
+    <script src="/libs/masonry/masonry.pkgd.min.js"></script>
+    <script src="/libs/aos/aos.js"></script>
+    <script src="/libs/scrollprogress/scrollProgress.min.js"></script>
+    <script src="/libs/lightGallery/js/lightgallery-all.min.js"></script>
+    <script src="/js/matery.js"></script>
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    <script src="/libs/others/clicklove.js" async="async"></script>
+    
+    
+    <script async src="/libs/others/busuanzi.pure.mini.js"></script>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    
+    
+    <script src="/libs/instantpage/instantpage.js" type="module"></script>
+    
+
+</body>
+
+</html>

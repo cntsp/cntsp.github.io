@@ -1,0 +1,1965 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+
+
+<head>
+    <meta charset="utf-8">
+    <meta name="keywords" content="ranche2.0-CN, 阿培">
+    <meta name="description" content="快速入门遵循以下两步，快速运行rancher2.0Step1:准备一台linux主机准备一台64位Linux主机(推荐centos7.5+),至少4GB内存。安装Kubernetes支持的Docker-ce版本；
+
+
+推荐：18.09.2
+">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="renderer" content="webkit|ie-stand|ie-comp">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>ranche2.0-CN | 阿培</title>
+    <link rel="icon" type="image/x-icon, image/vnd.microsoft.icon" href="/favicon.ico">
+
+    <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
+    <link rel="stylesheet" type="text/css" href="/libs/materialize/materialize.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/aos/aos.css">
+    <link rel="stylesheet" type="text/css" href="/libs/animate/animate.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/lightGallery/css/lightgallery.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/matery.css">
+    <link rel="stylesheet" type="text/css" href="/css/my.css">
+    
+    <script src="/libs/jquery/jquery.min.js"></script>
+    
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+
+<body>
+    <header class="navbar-fixed">
+    <nav id="headNav" class="bg-color nav-transparent">
+        <div id="navContainer" class="nav-wrapper head-container">
+            <div class="brand-logo">
+                <a href="/" class="waves-effect waves-light">
+                    
+                    <img src="/medias/logo.png" class="logo-img" alt="LOGO">
+                    
+                    <span class="logo-span">阿培</span>
+                </a>
+            </div>
+            
+
+<a href="#" data-target="mobile-nav" class="sidenav-trigger button-collapse"><i class="fas fa-bars"></i></a>
+<ul class="right nav-menu">
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/" class="waves-effect waves-light">
+      
+      <i class="fas fa-home" style="zoom: 0.6;"></i>
+      
+      <span>首页</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/tags" class="waves-effect waves-light">
+      
+      <i class="fas fa-tags" style="zoom: 0.6;"></i>
+      
+      <span>标签</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/categories" class="waves-effect waves-light">
+      
+      <i class="fas fa-bookmark" style="zoom: 0.6;"></i>
+      
+      <span>分类</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/archives" class="waves-effect waves-light">
+      
+      <i class="fas fa-archive" style="zoom: 0.6;"></i>
+      
+      <span>归档</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/about" class="waves-effect waves-light">
+      
+      <i class="fas fa-user-circle" style="zoom: 0.6;"></i>
+      
+      <span>关于</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/contact" class="waves-effect waves-light">
+      
+      <i class="fas fa-comments" style="zoom: 0.6;"></i>
+      
+      <span>留言板</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/friends" class="waves-effect waves-light">
+      
+      <i class="fas fa-address-book" style="zoom: 0.6;"></i>
+      
+      <span>友情链接</span>
+    </a>
+    
+  </li>
+  
+  <li>
+    <a href="#searchModal" class="modal-trigger waves-effect waves-light">
+      <i id="searchIcon" class="fas fa-search" title="搜索" style="zoom: 0.85;"></i>
+    </a>
+  </li>
+</ul>
+
+<div id="mobile-nav" class="side-nav sidenav">
+
+    <div class="mobile-head bg-color">
+        
+        <img src="/medias/logo.png" class="logo-img circle responsive-img">
+        
+        <div class="logo-name">阿培</div>
+        <div class="logo-desc">
+            
+            Never really desperate, only the lost of the soul.
+            
+        </div>
+    </div>
+
+    
+
+    <ul class="menu-list mobile-menu-list">
+        
+        <li class="m-nav-item">
+	  
+		<a href="/" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-home"></i>
+			
+			首页
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/tags" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-tags"></i>
+			
+			标签
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/categories" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-bookmark"></i>
+			
+			分类
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/archives" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-archive"></i>
+			
+			归档
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/about" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-user-circle"></i>
+			
+			关于
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/contact" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-comments"></i>
+			
+			Contact
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/friends" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-address-book"></i>
+			
+			友情链接
+		</a>
+          
+        </li>
+        
+        
+        <li><div class="divider"></div></li>
+        <li>
+            <a href="https://github.com/blinkfox/hexo-theme-matery" class="waves-effect waves-light" target="_blank">
+                <i class="fab fa-github-square fa-fw"></i>Fork Me
+            </a>
+        </li>
+        
+    </ul>
+</div>
+
+        </div>
+
+        
+            <style>
+    .nav-transparent .github-corner {
+        display: none !important;
+    }
+
+    .github-corner {
+        position: absolute;
+        z-index: 10;
+        top: 0;
+        right: 0;
+        border: 0;
+        transform: scale(1.1);
+    }
+
+    .github-corner svg {
+        color: #0f9d58;
+        fill: #fff;
+        height: 64px;
+        width: 64px;
+    }
+
+    .github-corner:hover .octo-arm {
+        animation: a 0.56s ease-in-out;
+    }
+
+    .github-corner .octo-arm {
+        animation: none;
+    }
+
+    @keyframes a {
+        0%,
+        to {
+            transform: rotate(0);
+        }
+        20%,
+        60% {
+            transform: rotate(-25deg);
+        }
+        40%,
+        80% {
+            transform: rotate(10deg);
+        }
+    }
+</style>
+
+<a href="https://github.com/blinkfox/hexo-theme-matery" class="github-corner tooltipped hide-on-med-and-down" target="_blank"
+   data-tooltip="Fork Me" data-position="left" data-delay="50">
+    <svg viewBox="0 0 250 250" aria-hidden="true">
+        <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
+        <path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2"
+              fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path>
+        <path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z"
+              fill="currentColor" class="octo-body"></path>
+    </svg>
+</a>
+        
+    </nav>
+
+</header>
+
+    
+
+
+
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/19.jpg')">
+    <div class="container" style="right: 0px;left: 0px;">
+        <div class="row">
+            <div class="col s12 m12 l12">
+                <div class="brand">
+                    <div class="description center-align post-title">
+                        ranche2.0-CN
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<main class="post-container content">
+
+    
+    <link rel="stylesheet" href="/libs/tocbot/tocbot.css">
+<style>
+    #articleContent h1::before,
+    #articleContent h2::before,
+    #articleContent h3::before,
+    #articleContent h4::before,
+    #articleContent h5::before,
+    #articleContent h6::before {
+        display: block;
+        content: " ";
+        height: 100px;
+        margin-top: -100px;
+        visibility: hidden;
+    }
+
+    #articleContent :focus {
+        outline: none;
+    }
+
+    .toc-fixed {
+        position: fixed;
+        top: 64px;
+    }
+
+    .toc-widget {
+        width: 345px;
+        padding-left: 20px;
+    }
+
+    .toc-widget .toc-title {
+        margin: 35px 0 15px 0;
+        padding-left: 17px;
+        font-size: 1.5rem;
+        font-weight: bold;
+        line-height: 1.5rem;
+    }
+
+    .toc-widget ol {
+        padding: 0;
+        list-style: none;
+    }
+
+    #toc-content {
+        height: calc(100vh - 250px);
+        overflow: auto;
+    }
+
+    #toc-content ol {
+        padding-left: 10px;
+    }
+
+    #toc-content ol li {
+        padding-left: 10px;
+    }
+
+    #toc-content .toc-link:hover {
+        color: #42b983;
+        font-weight: 700;
+        text-decoration: underline;
+    }
+
+    #toc-content .toc-link::before {
+        background-color: transparent;
+        max-height: 25px;
+    }
+
+    #toc-content .is-active-link {
+        color: #42b983;
+    }
+
+    #toc-content .is-active-link::before {
+        background-color: #42b983;
+    }
+
+    #floating-toc-btn {
+        position: fixed;
+        right: 15px;
+        bottom: 76px;
+        padding-top: 15px;
+        margin-bottom: 0;
+        z-index: 998;
+    }
+
+    #floating-toc-btn .btn-floating {
+        width: 48px;
+        height: 48px;
+    }
+
+    #floating-toc-btn .btn-floating i {
+        line-height: 48px;
+        font-size: 1.4rem;
+    }
+</style>
+<div class="row">
+    <div id="main-content" class="col s12 m12 l9">
+        <!-- 文章内容详情 -->
+<div id="artDetail">
+    <div class="card">
+        <div class="card-content article-info">
+            <div class="row tag-cate">
+                <div class="col s7">
+                    
+                    <div class="article-tag">
+                        
+                            <a href="/tags/docker/">
+                                <span class="chip bg-color">docker</span>
+                            </a>
+                        
+                            <a href="/tags/rancher/">
+                                <span class="chip bg-color">rancher</span>
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+                <div class="col s5 right-align">
+                    
+                    <div class="post-cate">
+                        <i class="fas fa-bookmark fa-fw icon-category"></i>
+                        
+                            <a href="/categories/%E5%AE%B9%E5%99%A8%E6%8A%80%E6%9C%AF/" class="post-category">
+                                容器技术
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+            </div>
+
+            <div class="post-info">
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
+                    2019-05-15
+                </div>
+                
+
+                
+
+                
+
+                
+				
+                
+            </div>
+            
+        </div>
+        <hr class="clearfix">
+        <div class="card-content article-card-content">
+            <div id="articleContent">
+                <h1 id="快速入门"><a href="#快速入门" class="headerlink" title="快速入门"></a>快速入门</h1><h2 id="遵循以下两步，快速运行rancher2-0"><a href="#遵循以下两步，快速运行rancher2-0" class="headerlink" title="遵循以下两步，快速运行rancher2.0"></a>遵循以下两步，快速运行rancher2.0</h2><h3 id="Step1-准备一台linux主机"><a href="#Step1-准备一台linux主机" class="headerlink" title="Step1:准备一台linux主机"></a>Step1:准备一台linux主机</h3><p>准备一台64位Linux主机(推荐centos7.5+),至少4GB内存。安装Kubernetes支持的Docker-ce版本；</p>
+<blockquote>
+<ul>
+<li>推荐：18.09.2</li>
+</ul>
+</blockquote>
+<p>这里安装指定版本的docker-ce.</p>
+<pre class=" language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 安装依赖包</span>
+yum <span class="token function">install</span> -y yum-utils device-mapper-persistent-data lvm2
+<span class="token comment" spellcheck="true"># 添加Docker软件包源</span>
+yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+
+<span class="token comment" spellcheck="true">#关闭测试版本list（只显示稳定版）</span>
+<span class="token function">sudo</span> yum-config-manager --enable docker-ce-edge
+<span class="token function">sudo</span> yum-config-manager --disable docker-ce-test
+
+<span class="token comment" spellcheck="true"># 更新yum包索引</span>
+yum makecache fast
+
+<span class="token comment" spellcheck="true"># 改变docker的部署目录(home下可以挂载很大的磁盘)</span>
+<span class="token function">ln</span> -s /home/docker  /var/lib/docker  
+
+<span class="token comment" spellcheck="true"># 直接安装Docker CE （will always install the highest  possible version，可能不符合你的需求）</span>
+yum <span class="token function">install</span> docker-ce
+
+<span class="token comment" spellcheck="true"># 指定版本安装</span>
+yum list docker-ce --showduplicates<span class="token operator">|</span><span class="token function">sort</span> -r
+<span class="token punctuation">[</span>root@rancherserver ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># yum list docker-ce --showduplicates|sort -r</span>
+已加载插件：fastestmirror
+已安装的软件包
+可安装的软件包
+ * updates: centos.01link.hk
+Loading mirror speeds from cached hostfile
+ * extras: centos.01link.hk
+ * epel: mirror01.idc.hinet.net
+docker-ce.x86_64            3:18.09.6-3.el7                    docker-ce-stable 
+docker-ce.x86_64            3:18.09.5-3.el7                    docker-ce-stable 
+docker-ce.x86_64            3:18.09.4-3.el7                    docker-ce-stable 
+docker-ce.x86_64            3:18.09.3-3.el7                    docker-ce-stable 
+docker-ce.x86_64            3:18.09.2-3.el7                    docker-ce-stable 
+docker-ce.x86_64            3:18.09.1-3.el7                    docker-ce-stable 
+docker-ce.x86_64            3:18.09.0-3.el7                    docker-ce-stable 
+docker-ce.x86_64            18.06.3.ce-3.el7                   docker-ce-stable 
+docker-ce.x86_64            18.06.3.ce-3.el7                   @docker-ce-stable
+docker-ce.x86_64            18.06.2.ce-3.el7                   docker-ce-stable 
+docker-ce.x86_64            18.06.1.ce-3.el7                   docker-ce-stable 
+docker-ce.x86_64            18.06.0.ce-3.el7                   docker-ce-stable 
+docker-ce.x86_64            18.03.1.ce-1.el7.centos            docker-ce-stable 
+docker-ce.x86_64            18.03.0.ce-1.el7.centos            docker-ce-stable 
+docker-ce.x86_64            17.12.1.ce-1.el7.centos            docker-ce-stable 
+docker-ce.x86_64            17.12.0.ce-1.el7.centos            docker-ce-stable 
+docker-ce.x86_64            17.09.1.ce-1.el7.centos            docker-ce-stable 
+docker-ce.x86_64            17.09.0.ce-1.el7.centos            docker-ce-stable 
+docker-ce.x86_64            17.06.2.ce-1.el7.centos            docker-ce-stable 
+docker-ce.x86_64            17.06.1.ce-1.el7.centos            docker-ce-stable 
+docker-ce.x86_64            17.06.0.ce-1.el7.centos            docker-ce-stable 
+docker-ce.x86_64            17.03.3.ce-1.el7                   docker-ce-stable 
+docker-ce.x86_64            17.03.2.ce-1.el7.centos            docker-ce-stable 
+docker-ce.x86_64            17.03.1.ce-1.el7.centos            docker-ce-stable 
+docker-ce.x86_64            17.03.0.ce-1.el7.centos            docker-ce-stable 
+ * base: centos.01link.hk
+
+yum <span class="token function">install</span> docker-ce-3:18.09.2-3.el7 -y
+<span class="token comment" spellcheck="true">#找到需要安装的</span>
+yum <span class="token function">install</span> docker-ce-3:18.09.2-3.el7 -y
+<span class="token comment" spellcheck="true">#启动docker</span>
+systemctl start docker <span class="token operator">&amp;</span> systemctl <span class="token function">enable</span> docker</code></pre>
+<h3 id="Step2-运行Rancher-Server"><a href="#Step2-运行Rancher-Server" class="headerlink" title="Step2:运行Rancher Server"></a>Step2:运行Rancher Server</h3><p> 若要安装和运行Rancher Server,请在主机上执行一下Docker命令：</p>
+<pre class=" language-bash"><code class="language-bash"><span class="token variable">$sudo</span> <span class="token function">mkdir</span> -p /home/var/lib/rancher
+<span class="token variable">$sudo</span> docker run -d -v /home/var/lib/rancher:/var/lib/rancher/ --restart<span class="token operator">=</span>unless-stopped -p 18080:80 -p 1443:443 rancher/rancher:stable</code></pre>
+<p>Rancher Server容器启动很快速，不到一分钟就可以通过https://<server_ip>:1443访问Rancher UI.一旦Rancher Server成功启动安装，用户界面知道你添加第一个集群</p>
+<h1 id="Rancher概述"><a href="#Rancher概述" class="headerlink" title="Rancher概述"></a>Rancher概述</h1><h2 id="架构涉及"><a href="#架构涉及" class="headerlink" title="架构涉及"></a>架构涉及</h2><h3 id="Docker"><a href="#Docker" class="headerlink" title="### Docker"></a>### Docker</h3><p>Docker是容器打包和runtime标准。开发人员从Dockerfiles构建容器镜像，并从Docker镜像仓库中分发容器镜像。<a href="https://hub.docker.com" target="_blank" rel="noopener">DockerHub</a>是最受欢迎的公共镜像仓库，许多组织还设置了私有的Docker镜像仓库，Docker主要用于管理各个节点上的容器。</p>
+<blockquote>
+<p>Note:</p>
+<p>虽然Rancher1.6支持Docker Swarm集群技术，但由于Rancher2.0基于kubernetes调度引擎，所以Rancher2.0不再支持Docker Swarm.    </p>
+</blockquote>
+<h2 id="Kubernetes"><a href="#Kubernetes" class="headerlink" title="Kubernetes"></a>Kubernetes</h2><p>kubernetes已称为容器集群管理标准，通过YAML文件来管理配置应用程序容器和其它资源。Kubernetes执行诸如调度，扩展，服务发现，健康检查，密文管理和配置管理等功能。</p>
+<p>一个kubernetes集群由多个节点组成：</p>
+<blockquote>
+<ul>
+<li>etcd database</li>
+</ul>
+</blockquote>
+<p>通常在一个节点上运行一个etcd实例服务，但生产环境上，建议通过3个或5个(奇数)以上的节点来创建ETCD HA配置。</p>
+<blockquote>
+<ul>
+<li>Master nodes</li>
+</ul>
+</blockquote>
+<p>主节点是无状态的，用于运行Kube-API Server,调度服务(Kube-Scheduler)和控制器服务(Kube-Controll Manager)。</p>
+<blockquote>
+<ul>
+<li>Worker nodes</li>
+</ul>
+</blockquote>
+<p>工作负载在工作节点上运行。</p>
+<p>默认情况下Master节点也会有工作负载调度上去，可通过命令设置其不加入调度。</p>
+<p>出于安全考虑，默认配置下Kubernetes不会将Pod调度到Master节点。如果希望将master也当作Node使用，可以执行如下命令：</p>
+<pre class=" language-bash"><code class="language-bash">kubectl taint node k8s-master node-role.kubernetes.io/master-</code></pre>
+<p>如果想恢复Master Only状态，执行如下命令：</p>
+<pre class=" language-bash"><code class="language-bash">kubectl taint node k8s-master node-role.kubernetes.io/master<span class="token operator">=</span><span class="token string">""</span>:NoSchedule</code></pre>
+<h2 id="Rancher"><a href="#Rancher" class="headerlink" title="Rancher"></a>Rancher</h2><p>大多数Rancher2.0软件运行在Rancher Server节点上，Rancher Server包括用于管理整个Rancher部署的所有组件。</p>
+<p>下图说明了Rancher2.0的运行架构。该图描绘了管理两个Kubernetes集群的Rancher server安装：一个由RKE创建，一个由GKE创建：</p>
+<p><img src="https://cntsp.github.io/images/rancher-architecture.png" alt="架构图"></p>
+<p>在本节中，我们将介绍Rancher Server组件的功能：</p>
+<p>Rancher API服务器</p>
+<p>Rancher API server建立在嵌入式Kubernetes API服务器和etcd数据库之上。它实现了一下功能：</p>
+<blockquote>
+<ul>
+<li>Rancher API服务器</li>
+</ul>
+</blockquote>
+<p>Rancher API server管理与外部身份验证提供程序(如Active Directory或GitHub)对应的用户身份</p>
+<blockquote>
+<ul>
+<li>认证授权</li>
+</ul>
+</blockquote>
+<p>Rancher API server管理访问控制和安全策略</p>
+<blockquote>
+<ul>
+<li>项目</li>
+</ul>
+</blockquote>
+<p>项目是集群中的一组多个命名空间和访问控制策略的集合</p>
+<blockquote>
+<ul>
+<li>节点</li>
+</ul>
+</blockquote>
+<p>Rancher API server跟踪所有集群中所有节点的标识。</p>
+<h3 id="集群控制和Agent"><a href="#集群控制和Agent" class="headerlink" title="集群控制和Agent"></a>集群控制和Agent</h3><p>集群控制器和集群代理实现管理kubernetes集群所续的业务逻辑：</p>
+<blockquote>
+<ul>
+<li>集群控制器实现Rancher安装所需的全局逻辑。它执行一下操作：</li>
+<li>​       为集群和项目配置访问控制策略    </li>
+<li>​       通过调用一下方式配置集群</li>
+<li>​                    所需的Docker machine驱动程序</li>
+<li>​                    像RKE和GKE这样的Kubernetes引擎</li>
+<li>单独的集群代理实例实现相应集群所需的逻辑，它执行以下活动：</li>
+<li>​         工作负载管理，例如每个集群中的pod创建和部署</li>
+<li>​          绑定并应用每个集群全局策略中定义的角色</li>
+<li>​          集群与Rancher Server之间的通信：事件，统计信息，节点信息和运行状况</li>
+</ul>
+</blockquote>
+<h3 id="认证代理"><a href="#认证代理" class="headerlink" title="认证代理"></a>认证代理</h3><p>该认证代理转发所有kubernetes API调用。它集成了身份验证服务，如本地身份验证，Active Directory和GitHub.在每个kubernetes API调用中，身份验证代理会对调用放进行身份验证，并在将调用转发给kubernetes主服务器之前设置的kubernetes模拟标头。rancher使用服务账户与kubernetes集群通信。</p>
+<h2 id="相关术语"><a href="#相关术语" class="headerlink" title="相关术语"></a>相关术语</h2><h3 id="一-全局层"><a href="#一-全局层" class="headerlink" title="一 全局层"></a>一 全局层</h3><p>全局层主要对rancher server自身的基础配置，比如rancher server url、登录认证等。</p>
+<blockquote>
+<ul>
+<li>1：集群</li>
+<li>​          全局层的集群菜单，用于列出集群中所有的k8s集群</li>
+<li>2：主机驱动</li>
+<li>​           用于与第三方云平台API对接的中间件程序</li>
+<li>3:应用商店-全局</li>
+<li>​           全局层的应用商店，负责应用商店的开关和添加</li>
+<li>4：用户</li>
+<li>​            添加或者删除用户，或者修改用户的权限。</li>
+<li>5：系统设置</li>
+<li>​            全局下系统的基础配置，比如系统默认镜像仓库地址。</li>
+<li>6：安全</li>
+<li>​      角色</li>
+<li>​      一组权限的集合</li>
+<li>​     Pod安全策略</li>
+<li>​     Pod安全设置</li>
+<li>​     登录认证</li>
+<li>​      用户的登录访问认证     </li>
+</ul>
+</blockquote>
+<h3 id="集群层"><a href="#集群层" class="headerlink" title="集群层"></a>集群层</h3><blockquote>
+<ul>
+<li>1： 集群</li>
+<li>显示当前集群的资源配置情况，各系统组件的健康状态：2.2之前，集群仪表盘显示当前集群的资源预留状态(并非实际资源使用)</li>
+<li>2：主机</li>
+<li>当前集群中添加的所有的主机</li>
+<li>3：存储</li>
+<li>​    存储类</li>
+<li>​    持久卷</li>
+<li>4： 项目与命名空间</li>
+<li>此集群拥有的项目和命名空间</li>
+<li>5： 集群成员</li>
+<li>6： 工具<ul>
+<li>告警</li>
+<li>通知</li>
+<li>日志</li>
+<li>CI/CD</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<h3 id="项目层"><a href="#项目层" class="headerlink" title="项目层"></a>项目层</h3><blockquote>
+<ul>
+<li><p>1:    工作负载</p>
+<blockquote>
+<ul>
+<li>工作负载服务</li>
+<li>负载均衡</li>
+<li>服务防线</li>
+<li>数据卷</li>
+<li>CI/CD</li>
+</ul>
+</blockquote>
+</li>
+<li><p>2：应用商店-项目</p>
+</li>
+<li><p>3：资源</p>
+<blockquote>
+<ul>
+<li>告警</li>
+<li>证书</li>
+<li>配置映射</li>
+<li>日志收集</li>
+<li>镜像仓库</li>
+<li>密文</li>
+</ul>
+</blockquote>
+</li>
+<li><p>4：命名空间</p>
+</li>
+<li><p>5：项目成员</p>
+</li>
+</ul>
+</blockquote>
+<h2 id="四-其它-右上角登录菜单"><a href="#四-其它-右上角登录菜单" class="headerlink" title="四 其它(右上角登录菜单)"></a>四 其它(右上角登录菜单)</h2><blockquote>
+<ul>
+<li>1： API Kyes</li>
+<li>2：主机模板</li>
+<li>3：喜好设定</li>
+</ul>
+</blockquote>
+<h2 id="3-快速入门"><a href="#3-快速入门" class="headerlink" title="3 快速入门"></a>3 快速入门</h2><blockquote>
+<ul>
+<li>注意：本入门指南的目的是让你快速的运行一个rancher2.0环境，它不适用与生产，有关更全面的说明，请查阅</li>
+</ul>
+</blockquote>
+<p>本教程将指导你完成：</p>
+<blockquote>
+<ul>
+<li>安装Rancher v2.0;</li>
+<li>创建第一个集群</li>
+<li>部署一个应用程序，如Nginx</li>
+</ul>
+</blockquote>
+<h4 id="1-入门须知"><a href="#1-入门须知" class="headerlink" title="1 入门须知"></a>1 入门须知</h4><blockquote>
+<ul>
+<li>熟悉Linux基础命令；</li>
+<li>了解SSH使用方法，了解公钥/私钥工作原理；</li>
+<li>熟悉Docker基本使用方法级基础命令，比如：容器日志查看</li>
+<li>了解SSL证书使用方法</li>
+<li>了解负载均衡工作原理(L4/L7)</li>
+<li>了解域名解析原理</li>
+<li>了解K8s基本概念</li>
+</ul>
+</blockquote>
+<h4 id="二-配置Linux主机"><a href="#二-配置Linux主机" class="headerlink" title="二 配置Linux主机"></a>二 配置Linux主机</h4><p>通过配置Linux主机开始创建自定义集群，你的主机可以是：</p>
+<blockquote>
+<ul>
+<li>云主机</li>
+<li>本地虚拟机</li>
+<li>本地物理机</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Note</li>
+<li>在使用云主机时，你需要允许TCP/80和TCP/443入站通信端口。</li>
+</ul>
+</blockquote>
+<p>根据一下要求配置主机：</p>
+<blockquote>
+<ul>
+<li>Ubuntu 16.04 +(64)</li>
+<li>Centos/RedHat Linux 7.5+(64位)</li>
+<li>RancherOS 1.3.0(64位)</li>
+</ul>
+</blockquote>
+<h4 id="1-硬件要求"><a href="#1-硬件要求" class="headerlink" title="1 硬件要求"></a>1 硬件要求</h4><blockquote>
+<ul>
+<li>CPU: 2C</li>
+<li>内存：4GB</li>
+</ul>
+</blockquote>
+<h4 id="2-软件需求"><a href="#2-软件需求" class="headerlink" title="2 软件需求"></a>2 软件需求</h4><blockquote>
+<ul>
+<li><p>软件：Docker</p>
+</li>
+<li><p>支持的Docker版本</p>
+</li>
+<li><blockquote>
+<ul>
+<li>1.12.6</li>
+<li>1.13.1</li>
+<li>17.03.2</li>
+</ul>
+</blockquote>
+</li>
+</ul>
+</blockquote>
+<h3 id="三-安装Rancher"><a href="#三-安装Rancher" class="headerlink" title="三 安装Rancher"></a>三 安装Rancher</h3><p>要想在主机上安装Rancher，需要先登录到主机上，接着进行以下步骤：</p>
+<blockquote>
+<ul>
+<li>1： 通过xshell工具(例如Putty或远程终端连接)登录到主机</li>
+<li>2：在shell中执行一下命令</li>
+<li>sudo docker run -d –restart=unless-stopped -v &lt;主机路径&gt;:/var/lib/rancher/ -p 80:80 -p 443:443 rancher/rancher</li>
+</ul>
+</blockquote>
+<h3 id="四登录Rancher"><a href="#四登录Rancher" class="headerlink" title="四登录Rancher"></a>四登录Rancher</h3><p>登录并开始使用Rancher。登录后，你将进行一些一次性配置。</p>
+<blockquote>
+<p>1    打开浏览器，输入https://<server_ip>,server_ip替换为运行Rancher容器主机的IP;</p>
+<p>2      因为是自动使用的自签名证书，在第一次登录会提示安全授信问题，信任即可；</p>
+<p>3    设置管理员密码</p>
+<p>​    第一次登录会要求设置管理员密码，默认管理员账号为：admin</p>
+<p>4    设置Rancher Server URL</p>
+<p>​    这个Rancher Server URL是agent节点注册的地址，需要保证 这个地址能够被其它主机访问</p>
+</blockquote>
+<h3 id="五-创建K8S集群"><a href="#五-创建K8S集群" class="headerlink" title="五 创建K8S集群"></a>五 创建K8S集群</h3><p>现在创建第一个Kubernetes集群，可以使用自定义选项。你可以添加云主机、内部虚拟机或物理主机作为集群节点，节点可以运行任何一种或多种主流Linux发行版；</p>
+<blockquote>
+<ul>
+<li>1    页面右下角可以切换语言；</li>
+<li>2      在全局试图下，点击菜单中的集群，并点击添加集群</li>
+<li>3       选择Custom,并设置集群名称，其它参数可不用修改，点击下一步；</li>
+<li>4       选择节点运行的角色<ul>
+<li>默认会勾选Worker角色，根据需要可以一次勾选多种角色，比如，假设我只有一个节点，那就需要把所有角色都选择上，选择后上面的命令行自动添加相应的命令参数；</li>
+</ul>
+</li>
+<li>5       如果是云主机，需要添加主机的内网址和对应的公网地址，如果是没有公网的云主机，可以跳过这步；</li>
+<li>6       其它参数保持默认，点击命令行右侧的复制按钮，复制命令参数<ul>
+<li>如果是多台主机，根据角色的不同，需要复制多次</li>
+</ul>
+</li>
+<li>7        登录预添加集群的主机，执行以上复制的命令；</li>
+<li>8        在主机上执行完命令后，最后点击完成；</li>
+<li>9        回到全局视图，可以查看集群的部署状态;</li>
+<li>10      点击集群名称，进入集群视图；</li>
+<li>11       点击菜单主机按钮</li>
+<li>12       集群创建完成</li>
+<li>13       集群创建完成后，默认会生成Default项目，点击Default切换到项目视图；</li>
+</ul>
+</blockquote>
+<h3 id="六-部署工作负载"><a href="#六-部署工作负载" class="headerlink" title="六 部署工作负载"></a>六 部署工作负载</h3><p>工作负载是一个对象，包括Pod以及部署应用程序所需要的其它文件和信息。我们以nginx作为例如：</p>
+<blockquote>
+<ul>
+<li>1    在Default视图下，点击工作负载部署服务</li>
+<li>2    在部署工作负载页面，设置工作负载名称、副本数量、镜像名称、命名空间、端口映射、其它参数保持默认，最后点击启动；</li>
+<li>3    部署完成</li>
+<li>4    通过端口去访问nginx服务；</li>
+</ul>
+</blockquote>
+<h2 id="4-功能列表"><a href="#4-功能列表" class="headerlink" title="4 功能列表"></a>4 功能列表</h2> <table border="0" cellpadding="0" cellspacing="0" id="sheet0" class="sheet0 gridlines">
+            <colgroup><col class="col0">
+            <col class="col1">
+            <col class="col2">
+            </colgroup><tbody>
+                <tr class="row0">
+                    <td class="column0 style22 s">对比内容</td>
+                    <td class="column1 style9 s">分类</td>
+                    <td class="column2 style9 s">描述　</td>
+                </tr>
+                <tr class="row1">
+                    <td class="column0 style1 s style13" rowspan="7">K8S集群管理</td>
+                    <td class="column1 style8 s">多集群管理</td>
+                    <td class="column2 style5 s">容器平台能同时对多个Kubernetes集群进行管理，包括创建集群、删除集群、集群搜索、为集群添加主机等。每个集群有自己独立的管理视图，包括控制面板、主机视图、容器视图、应用视图，可图形化显示其所包含的节点状态和容器运行状态，并可以对节点和容器操作。每个集群上运行的应用和其他集群隔离。</td>
+                </tr>
+                <tr class="row2">
+                    <td class="column1 style3 s">集群基础设施管理和部署</td>
+                    <td class="column2 style7 s">容器云平台能够指定Kubernetes集群的部署角色，包括etcd数据节点、API Server、Controller
+                        Manager控制节点、worker计算节点等。不同集群能够指定不同的容器网络模式，灵活支持目前社区主流的容器网络解决方案，包括flannel、Calico、Canal等。平台能够提供自动化部署工具，快速灵活的部署kubernetes集群。</td>
+                </tr>
+                <tr class="row3">
+                    <td class="column1 style3 s">集群管理权限设定</td>
+                    <td class="column2 style7 s">可设定每个集群的用户角色和权限，除默认内置角色外，支持在图形界面进行细粒度的RBAC权限自定义和角色创建。管理员可以创建自定义角色，指定对平台内各种资源对象（包括但不限于Cluster、Pod、Deployment、ConfigMap等）的创建、删除、编辑、枚举等各种细粒度的操作权限。</td>
+                </tr>
+                <tr class="row4">
+                    <td class="column1 style3 s">导入外部Kubernetes集群管理</td>
+                    <td class="column2 style7 s">容器云平台必须能够导入外部Kubernetes集群并进行管理的功能，以满足对各种Kubernetes集群统一纳管的需求。导入的Kubernetes集群能够通过容器云平台界面进行统一的角色管理，应用部署等各种操作。</td>
+                </tr>
+                <tr class="row5">
+                    <td class="column1 style3 s">Kubernetes多版本支持</td>
+                    <td class="column2 style7 s">支持Kubernetes目前的主要稳定开源版本，包括1.9、1.10、1.11、1.12。用户在部署Kubernetes集群时可以根据需要选择相应的版本进行部署。</td>
+                </tr>
+                <tr class="row6">
+                    <td class="column1 style3 s">集群升级</td>
+                    <td class="column2 style7 s">通过平台创建的Kubernetes集群，集群的系统软件，如Kubernetes版本、网络等系统服务软件，可通过图形界面在线升级或回退，不影响集群环境中业务的使用。</td>
+                </tr>
+                <tr class="row7">
+                    <td class="column1 style3 s">Windows 集群支持</td>
+                    <td class="column2 style7 s">可管理 Windows Kubernetes 集群主机。</td>
+                </tr>
+                <tr class="row8">
+                    <td class="column0 style14 s style17" rowspan="3">多租户功能</td>
+                    <td class="column1 style8 s">基于独立集群的多租户支持</td>
+                    <td class="column2 style15 s">容器云平台支持基于独立集群的多租户隔离，可以为不同租户创建并使用独立的Kubernetes集群。各集群可以按需配置独立的管理员、用户及自定义角色，彼此之间完全隔离。</td>
+                </tr>
+                <tr class="row9">
+                    <td class="column1 style3 s">基于共享集群的多租户支持</td>
+                    <td class="column2 style7 s">容器云平台应支持集群内部的多租户隔离，集群内租户支持设置管理员、用户及自定义RBAC角色，以满足权限管理需求。当基于单个集群实现多租户隔离时，同一个集群内部的租户应用彼此隔离，单个租户内部的用户仅能查看和管理自己租户内部的应用，且不同租户应用容器之间需要实现网络隔离。</td>
+                </tr>
+                <tr class="row10">
+                    <td class="column1 style3 s">&nbsp;租户权限管理</td>
+                    <td class="column2 style7 s">支持租户内用户角色的管理和设置，支持RBAC自定义创建租户内用户角色和权限，以实现灵活的权限管理。</td>
+                </tr>
+                <tr class="row11">
+                    <td class="column0 style24 s style26" rowspan="7">容器主机管理</td>
+                    <td class="column1 style4 s">纳管虚拟机</td>
+                    <td class="column2 style15 s">支持以图形界面在线添加虚拟机主机，新的主机被添加成功后将会显示活动状态，并可在图形界查看主机的具体配置信息，包括但不限于主机名，IP地址，docker引擎版本号，操作系统版本，CPU/内存/磁盘配置信息等。</td>
+                </tr>
+                <tr class="row12">
+                    <td class="column1 style4 s">纳管物理机</td>
+                    <td class="column2 style7 s">支持以图形界面在线添加物理机主机，新的主机被添加成功后将会显示活动状态，并可在图形界面看到主机的具体配置信息，包括但不限于主机名，IP地址，docker引擎版本号，操作系统版本，CPU/内存/磁盘配置信息等。</td>
+                </tr>
+                <tr class="row13">
+                    <td class="column1 style4 s">内置Docker Machine驱动管理</td>
+                    <td class="column2 style7 s">内置Docker Machine驱动，可以对各类Docker的machine
+                        drivers进行配置和管理，方便用户对接各类云平台、vSphere环境、OpenStack环境等。</td>
+                </tr>
+                <tr class="row14">
+                    <td class="column1 style4 s">主机分组管理</td>
+                    <td class="column2 style7 s">支持对不同的主机进行分组管理，可以使用标签（或类似方式）标识，如按物理区域、安全区域、组织架构、项目、应用划分打标签逻辑分组，支持多标签。</td>
+                </tr>
+                <tr class="row15">
+                    <td class="column1 style4 s">查看主机性能状态信息</td>
+                    <td class="column2 style7 s">系统提供便捷的图形化界面，以实现对容器主机相关性能和状态信息的监控和查看。可以查看的主机性能信息包括，CPU、内存、网络和磁盘，容器分配情况、端口使用情况、标签、存储等关键信息。</td>
+                </tr>
+                <tr class="row16">
+                    <td class="column1 style4 s">驱散容器功能</td>
+                    <td class="column2 style7 s">在对主机进行维护时，例如升级内核，硬件维护等，这个功能首先会禁止新的容器调度到这个节点，然后会对该节点上的容器有规则的进行驱散。完成主机维护后，可以恢复节点功能。</td>
+                </tr>
+                <tr class="row17">
+                    <td class="column1 style4 s">容器主机故障自动检测和自动应用漂移</td>
+                    <td class="column2 style7 s">当某个主机故障时，无法和管理节点时间正常通信时，则该主机将被表示为不可用状态，并在图形界面显示。该状态下管理节点将视图重连该主机，同时会将该主机上运行的容器自动漂移到其他正常主机节点，以保证该情况下相关容器的服务访问正常。</td>
+                </tr>
+                <tr class="row18">
+                    <td class="column0 style24 s style26" rowspan="5">容器调度与管理</td>
+                    <td class="column1 style4 s">容器生命周期管理</td>
+                    <td class="column2 style15 s">平台提供便捷操作容器服务图形化界面，可以编辑容器信息，可以启动、重启、停止、删除、克隆容器。<br>
+                        并可在图形界面上展示容器的信息和运行状态，包括健康状态，容器名、IP地址、所在主机、镜像和命令等</td>
+                </tr>
+                <tr class="row19">
+                    <td class="column1 style4 s">查看容器状态和性能</td>
+                    <td class="column2 style7 s">管理平台可以通过图形界面查看容器关键性能和配置信息，可以查看标签、存储卷、端口映射、实时监控信等关键信息，包括但不限于: CPU、内存、网络和磁盘、容器IP、Image、所使用主机等情况。</td>
+                </tr>
+                <tr class="row20">
+                    <td class="column1 style4 s">容器控制台</td>
+                    <td class="column2 style7 s">图形化界面可以直接调出该容器控制台，管理界面可以操作容器的CLI，方便后台控制人员执行命令行操作容器。</td>
+                </tr>
+                <tr class="row21">
+                    <td class="column1 style4 s">查看容器日志</td>
+                    <td class="column2 style7 s">管理平台图形化界面可以直接展示容器日志信息，并实时刷新。</td>
+                </tr>
+                <tr class="row22">
+                    <td class="column1 style4 s">指定容器运行的主机</td>
+                    <td class="column2 style7 s">支持标签或其它方式唯一限定容器运行主机。系统提供图形化界面，设置容器编排调度规则。支持亲和性/反亲和性容器调度设置，系统提供图形化界面，设置容器编排调度规则，支持基于标签的亲和性/反亲和性调度，支持全部满足/部分等过滤条件。</td>
+                </tr>
+                <tr class="row23">
+                    <td class="column0 style24 s style26" rowspan="5">容器应用管理</td>
+                    <td class="column1 style8 s">容器应用堆栈管理</td>
+                    <td class="column2 style15 s">支持使用应用模板一键创建容器应用栈。可以从应用集合，服务集合的角度对容器进行集中的管理和配置。</td>
+                </tr>
+                <tr class="row24">
+                    <td class="column1 style3 s">应用管理视图</td>
+                    <td class="column2 style7 s">支持以不同方式查看、展现应用容器。至少支持根据命令空间Namespace、应用分类、容器运行节点、列表等方式展示容器列表。</td>
+                </tr>
+                <tr class="row25">
+                    <td class="column1 style3 s">通过上传编排文件直接部署应用</td>
+                    <td class="column2 style7 s">支持通过上yaml编排 文件，一键部署和启动应用。极大提高部署效率，降低部署难度和时间。</td>
+                </tr>
+                <tr class="row26">
+                    <td class="column1 style3 s">查看、下载编排配置文件</td>
+                    <td class="column2 style7 s">支持实时查看kubernetes编排文件配置内容。支持下载和保存kubernetes编排文件，方便配置编辑、保存、重新部署和故障恢复。</td>
+                </tr>
+                <tr class="row27">
+                    <td class="column1 style3 s">统一调用非容器化服务或系统</td>
+                    <td class="column2 style7 s">管理平台可方便的实现容器访问外部的应用和服务，容器可以访问如不适合进行容器化的大型应用（如MySQL/Oracle数据库）。支持通过图形界面创建相应的服务发现记录，包括外部IP地址、外部主机名、DNS别名等多种方</td>
+                </tr>
+                <tr class="row28">
+                    <td class="column0 style24 s style26" rowspan="7">容器管理</td>
+                    <td class="column1 style3 s">项目管理功能</td>
+                    <td class="column2 style7 s">项目是一个或多个 namespace
+                        集合，集群管理员和项目管理员可以从项目层级设置配额。可以配置该项目的CPU，内存，存储，Pod数量等等的配额。同时，在每个项目里，管理员也可以对每个namespace的配额进行控制。</td>
+                </tr>
+                <tr class="row29">
+                    <td class="column1 style4 s">容器服务健康检查</td>
+                    <td class="column2 style6 s">系统内置对容器服务的健康检查功能，支持在图形界面进行以下健康检查设置，包括: <br>
+                        ?  可以设定基于HTTP的健康检查。<br>
+                        ?  可以设定基于TCP的健康检查。<br>
+                        ?  可以设定基于命令行命令的健康检查。<br>
+                        ?  可以设定健康检查的颗粒度，如检查次数、间隔、超时时间等。<br>
+                        支持通过图形界面对容器设置不同的Liveness Check和Readniess check规则。</td>
+                </tr>
+                <tr class="row30">
+                    <td class="column1 style4 s">容器服务伸缩</td>
+                    <td class="column2 style6 s">提供图形界面，可以便捷手动进行容器扩容和收缩。还提供容器基于CPU、内存等资源使用率状态数值触发的自动扩容缩容。</td>
+                </tr>
+                <tr class="row31">
+                    <td class="column1 style4 s">容器升级和回滚功能</td>
+                    <td class="column2 style6 s">提供图形界面，可以便捷实现容器的升级和回滚操作。部署应用时可以设置应用的升级策略，包括新旧容器启停顺序、批量大小、最小就绪时间等等。</td>
+                </tr>
+                <tr class="row32">
+                    <td class="column1 style4 s">支持灰度发布</td>
+                    <td class="column2 style6 s">可以实现灰度升级，升级过程中服务不中断。升级后，图形界面提供UI回滚到之前版本。当部署之前包括多个版本时，可提供多个版本进行回滚选择。</td>
+                </tr>
+                <tr class="row33">
+                    <td class="column1 style4 s">伴随容器服务</td>
+                    <td class="column2 style6 s">可以为主容器提供伴随容器服务，在进行复杂应用部署时，可以提供支持。支持通过图形界面创建伴随容器。<br>
+                        1.可以为主容器创建伴随容器。<br>
+                        2.伴随容器可以和主容器同时启动和同时关闭。<br>
+                        3.伴随容器可以和主容器共享容器数据卷和容器网络。</td>
+                </tr>
+                <tr class="row34">
+                    <td class="column1 style4 s">容器可用性保障机制</td>
+                    <td class="column2 style6 s">可以设定服务容器的需要保证的有效数量，当系统故障时，平台可保证有效的的容器数量。可以保证应用服务维持一定的容器数量，用来保证服务正常。服务故障时可以重新创建容器，保证服务正常。</td>
+                </tr>
+                <tr class="row35">
+                    <td class="column0 style18 s style20" rowspan="3">容器网络管理</td>
+                    <td class="column1 style4 s">容器网络访问策略控制</td>
+                    <td class="column2 style6 s">容器网络支持多租户隔离和策略控制，同集群内部的不同租户可以实现网络的隔离和限制。</td>
+                </tr>
+                <tr class="row36">
+                    <td class="column1 style4 s">支持容器基本网络模式</td>
+                    <td class="column2 style6 s">支持容器共享主机网络方式，可以在管理界面上设置容器网络为主机共享网路模式，容器共享主机网络namespace，使用主机网卡进行容器内外部通信。</td>
+                </tr>
+                <tr class="row37">
+                    <td class="column1 style4 s">支持高级网络模式</td>
+                    <td class="column2 style6 s">支持多种网络模式，容器平台提供网络插件，实现对容器IP和容器网络的管理，支持容器网络IP的自定义和跨主机容器网络互访。至少同时支持Flannel/Calico、Canal主流网络技术。</td>
+                </tr>
+                <tr class="row38">
+                    <td class="column0 style24 s style26" rowspan="5">负载均衡服务</td>
+                    <td class="column1 style4 s">内置负载均衡服务</td>
+                    <td class="column2 style6 s">内置容器负载均衡服务。通过图形界面创建负载均衡，可以进行端口指定、服务指定、SSL证书、会话保持、自定义负载均衡配置、标签及调度等各项功能。</td>
+                </tr>
+                <tr class="row39">
+                    <td class="column1 style4 s">可定义负载均衡会话保持策略</td>
+                    <td class="column2 style6 s">内置负载均衡服务可以配置可以配置并使用基于cookie的会话保持功能。</td>
+                </tr>
+                <tr class="row40">
+                    <td class="column1 style4 s">支持SSL终结功能</td>
+                    <td class="column2 style6 s">内置负载均衡服务可以配置可以配置并使用基于HTTPS的SSL终结功能。</td>
+                </tr>
+                <tr class="row41">
+                    <td class="column1 style4 s">负载均衡后端支持</td>
+                    <td class="column2 style6 s">提供图形界面，负载均衡后端同时支持Kubernetes Service对象和Pod直连，以支持话保持设置。</td>
+                </tr>
+                <tr class="row42">
+                    <td class="column1 style4 s">支持高级访问路由功能</td>
+                    <td class="column2 style6 s">提供图形界面，可以配置负载均衡高级路由功能，实现根据URL头信息、Domain name、访问路径等不同实现七层信息的转发。</td>
+                </tr>
+                <tr class="row43">
+                    <td class="column0 style24 s style26" rowspan="4">容器存储服务</td>
+                    <td class="column1 style4 s">存储类型支持</td>
+                    <td class="column2 style6 s">容器云平台应支持Kubernetes社区版本内置支持的所有存储类型，包括FC、iSCSI、Ceph、Cinder、GlusterFS、AzureDisk、AWS
+                        EBS、ScaleIO等等。<br>
+                        方案提供方应该能够提供自主产权且开源的分布式块存储方案，以满足业务上对持久化存储的要求</td>
+                </tr>
+                <tr class="row44">
+                    <td class="column1 style4 s">Persistent Volume支持</td>
+                    <td class="column2 style6 s">支持通过图形界面创建Persistent
+                        Volume，支持的类型包括上述所列Kubernetes标准版本内置的存储类型。用户可以通过图形界面方便的设置相关存储参数。PV创建后可以在应用部署时通过图形界面创建PVC使用。</td>
+                </tr>
+                <tr class="row45">
+                    <td class="column1 style4 s">Storage Class支持</td>
+                    <td class="column2 style6 s">支持通过图形界面创建Storage
+                        Class以满足存储动态自动创建需求，支持的类型包括上述所列Kubernetes标准版本内置的存储类型。用户可以通过图形界面方便的设置相关存储参数。Storage
+                        Class创建后可以在应用部署时通过图形界面使用。</td>
+                </tr>
+                <tr class="row46">
+                    <td class="column1 style4 s">超融合存储支持</td>
+                    <td class="column2 style6 s">提供超融合存储解决方案，支持基于容器集群宿主机本地磁盘构建存储池并与容器集群进行集成。容器可利用本集群内部的存储池实现数据的持久化和高可用。</td>
+                </tr>
+                <tr class="row47">
+                    <td class="column0 style24 s style26" rowspan="4">系统监控及日志</td>
+                    <td class="column1 style4 s">系统监控</td>
+                    <td class="column2 style6 s">支持集群和集群内部租户不同层级的监控设置，监控内容至少应包括: <br>
+                        ?  系统组件健康状态，如etcd、API Server等<br>
+                        ?  系统部署事件，如创建Deployment、Service对象等。<br>
+                        ?  主机资源利用率，如CPU、内存等<br>
+                        ?  应用可用状态，如Deployment中可用容器低于一定比例等。</td>
+                </tr>
+                <tr class="row48">
+                    <td class="column1 style4 s">系统告警</td>
+                    <td class="column2 style6 s">?  需要提供系统内建的告警系统<br>
+                        ?  告警系统支持通过图形界面设置告警目标，不同告警规则可按需设置告警目标。告警目标应支持多种企业级集成，至少要同时支持对电子邮件、Slack、PageDuty系统的支持。同时需要提供
+                        Webhook扩展方式，实现对其他告警方式的支持和扩展。<br>
+                        ?  告警规则支持临时暂停、恢复，初始发送延迟、发送间隔等高级设置，以按需控制告警信息的发送。</td>
+                </tr>
+                <tr class="row49">
+                    <td class="column1 style4 s">系统日志</td>
+                    <td class="column2 style6 s">平台提供日志收集代理，支持自动收集容器和应用程序日志。<br>
+                        ? 日志系统能够在集群层面、项目层面分别对应不同的日志平台，以满足用户部门对日志功能使用的灵活性，以满足不同应用场景需求。</td>
+                </tr>
+                <tr class="row50">
+                    <td class="column1 style4 s">日志平台集成</td>
+                    <td class="column2 style6 s">? 日志代理应支持业内主流日志平台集成，可以同时支持对ElasticSearch、Kafka、Splunk和Syslog的对接，用户在图形界面即可设置与上述平台的自动化集成对接。<br>
+                        ? 日志系统能够在集群层面、项目层面分别对应不同的日志平台，以满足用户部门对日志功能使用的灵活性</td>
+                </tr>
+                <tr class="row51">
+                    <td class="column0 style24 s style26" rowspan="5">应用商店管理</td>
+                    <td class="column1 style4 s">容器应用商店</td>
+                    <td class="column2 style6 s">容器平台支持容器化应用商店，实现容器应用的模板化展示和快速部署。应用商店应支持Kubernetes社区的Helm Charts模板。</td>
+                </tr>
+                <tr class="row52">
+                    <td class="column1 style4 s">企业级应用商店展示、组织及管理</td>
+                    <td class="column2 style6 s">提供图形界面，可以查看应用商店、实现应用模板的组织和管理。支持搜索和分类选择展示。</td>
+                </tr>
+                <tr class="row53">
+                    <td class="column1 style4 s">支持用户交互的参数配置</td>
+                    <td class="column2 style6 s">在应用商店配置页面中可配置模板版本和自定义参数，在配置过程中可以通过界面进行自定义配置。在启动应用过程中，进行交互的参数可以自定义。同时不同的应用可以定义不同的参数。支持在应用商店模板中定义参数的类型、提示信息、默认值等相关设置，应用部署展示UI可根据参数定义动态生成并展示相关页面。</td>
+                </tr>
+                <tr class="row54">
+                    <td class="column1 style4 s">支持应用发布版本管理</td>
+                    <td class="column2 style6 s">可以在应用商店中选择应用的不同发布版本，并启动运行。应用商店出现该应用的新版本时，可自动提示正在运行的应用实例有新版本可以升级。</td>
+                </tr>
+                <tr class="row55">
+                    <td class="column1 style4 s">支持部署私有隔离的应用商店</td>
+                    <td class="column2 style6 s">管理平台可以设置不同的应用商店路径。每个路径都可以指向一个独立的应用商店，可以设置多个应用商店，应用可以放在不同的应用商店中进行隔离管理。</td>
+                </tr>
+                <tr class="row56">
+                    <td class="column0 style24 s style26" rowspan="6">&nbsp;系统管理及安全</td>
+                    <td class="column1 style4 s">认证方式</td>
+                    <td class="column2 style6 s">容器云平台支持多种认证集成方式，除本地认证外，需支持主流的认证系统如微软活动目录、OpenLDAP、Github、Keycloak等，支持自定义认证插件实现集成认证。</td>
+                </tr>
+                <tr class="row57">
+                    <td class="column1 style4 s">容器安全策略</td>
+                    <td class="column2 style6 s">容器云平台支持设置容器安全策略，对创建的容器进行安全管控，例如限制启动特权容器、限制容器使用主机IPC模式、主机网络模式，限制容器可以映射的主机数据卷路径等。容器安全策略应当支持绑定到特定集群和集群内部的多租户隔离实现。</td>
+                </tr>
+                <tr class="row58">
+                    <td class="column1 style4 s">API秘钥管理</td>
+                    <td class="column2 style6 s">容器云平台支持为不同用户创建独立的API秘钥，API秘钥仅当首次创建时可查看。且支持进行API秘钥自动过期设置，以确保系统安全。</td>
+                </tr>
+                <tr class="row59">
+                    <td class="column1 style4 s">配置映射（configmap)</td>
+                    <td class="column2 style6 s">提供图形化界面，配置configmap以供服务调用。</td>
+                </tr>
+                <tr class="row60">
+                    <td class="column1 style4 s">密文管理（secret）</td>
+                    <td class="column2 style6 s">提供图形化界面，配置secret以供服务调用。</td>
+                </tr>
+                <tr class="row61">
+                    <td class="column1 style4 s">证书管理</td>
+                    <td class="column2 style6 s">平台提供图形界面，可以对SSL证书进行管理。包括导入证书、删除证书等。证书可用于应用访问SSL加密。</td>
+                </tr>
+                <tr class="row62">
+                    <td class="column0 style24 s style26" rowspan="4">镜像库功能</td>
+                    <td class="column1 style4 s">对接外部私有镜像仓库</td>
+                    <td class="column2 style6 s">提供图形界面，设置连接外部的镜像仓库，可设置外部仓库的认证信息实现认证集成。可以设置默认镜像库，设置镜像库白名单等。</td>
+                </tr>
+                <tr class="row63">
+                    <td class="column1 style4 s">项目管理</td>
+                    <td class="column2 style6 s">支持公有和私有项目类型: <br>
+                        ?  公有: 公有项目中的镜像所有用户均有下载权限；<br>
+                        ?  私有: 私有项目中的镜像只有项目内的成员有相应的操作权限；<br>
+                        新建项目: 每当新建一个用户时，系统都会默认创建一个以该用户的用户名为项目名称的私有项目；系统管理员可以创建新的项目，项目详情页，可查看镜像和访问控制列表。<br>
+                        搜索项目: 支持输入关键字进行项目搜索；</td>
+                </tr>
+                <tr class="row64">
+                    <td class="column1 style4 s">镜像生命周期管理</td>
+                    <td class="column2 style6 s">镜像生命生命周期主要功能如下所示: <br>
+                        镜像下载: 若镜像为私有镜像，用户至少要获得对应项目的下载权限才能成功下载镜像；<br>
+                        镜像上传: 用户首先要拥有对应项目的提交权限才能在该项目下上传镜像；<br>
+                        镜像修改: 用户可以修改镜像的描述信息，以及dockerfile；<br>
+                        镜像复制: 实现镜像在不同项目间的复制，用户至少必须同时拥有源项目与目标项目的提交权限；<br>
+                        镜像删除: 在镜像列表可以选择删除镜像的某个版本，也可以直接删除整个镜像。</td>
+                </tr>
+                <tr class="row65">
+                    <td class="column1 style4 s">异地镜像仓库同步</td>
+                    <td class="column2 style6 s">支持设置好同步关系，并且多镜像仓库之间镜像自动同步。镜像同步的最小颗粒度是容器项目。</td>
+                </tr>
+                <tr class="row66">
+                    <td class="column0 style24 s style26" rowspan="3">系统集成支持</td>
+                    <td class="column1 style4 s">支持通过纯命令行方式进行配置和管理</td>
+                    <td class="column2 style6 s">容器平台提供命令行管理工具，可以通过命令行对容器管理平台进行配置和管理。 方便运维人员开发自动化运维脚本。</td>
+                </tr>
+                <tr class="row67">
+                    <td class="column1 style4 s">提供API接口</td>
+                    <td class="column2 style6 s">容器云平台应支持Restful API调用，以方便的与内部系统进行集成。API接口需求如下: <br>
+                        ＊支持页面直接展现API调用内容<br>
+                        ＊所有页面上的操作都能通过API支持<br>
+                        支持基于多租户API调用的访问授权。<br>
+                        针对不同的用户，都可以生成Access key和Secret key秘钥对，在获取正确的秘钥对后方能对API接口进行访问。</td>
+                </tr>
+                <tr class="row68">
+                    <td class="column1 style4 s">容器操作系统</td>
+                    <td class="column2 style6 s">容器云厂商在提供容器平台的同时，还拥有知名的自主品牌的容器化操作系统平台，以实现容器宿主机的快速创建和部署，降低系统资源消耗和受攻击面。</td>
+                </tr>
+                <tr class="row69">
+                    <td class="column0 style24 s style26" rowspan="4">CI/CD功能</td>
+                    <td class="column1 style4 s">同时支持多源码管理</td>
+                    <td class="column2 style6 s">CI/CD支持公有Github、Gitlab和私有Gitlab代码库的对接。 </td>
+                </tr>
+                <tr class="row70">
+                    <td class="column1 style4 s">自动部署镜像</td>
+                    <td class="column2 style6 s">打通了从代码提交，自动测试，自动构建镜像，自动部署镜像的全流程。</td>
+                </tr>
+                <tr class="row71">
+                    <td class="column1 style4 s">与应用商店集成</td>
+                    <td class="column2 style6 s">打通与应用商店的集成，可根据CI/CD的产物动态更新应用商店中的配置文件，应用商店提示有更新可用。</td>
+                </tr>
+                <tr class="row72">
+                    <td class="column1 style4 s">灵活的流程控制</td>
+                    <td class="column2 style6 s">可以在最初的设置阶段配置符合某既定要求的表达式或标签，而系统会在执行阶段根据执行情况自动跳过不符合该表达式或标签的阶段或步骤。如此一来，不同的代码分支可以自动匹配不同的CI流程，从而支持较为复杂的流程控制。</td>
+     </tr>
+
+<h2 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h2><h3 id="1-基础环境配置"><a href="#1-基础环境配置" class="headerlink" title="1   基础环境配置"></a>1   基础环境配置</h3><h3 id="一-主机配置"><a href="#一-主机配置" class="headerlink" title="一 主机配置"></a>一 主机配置</h3><p>1.配置要求</p>
+<p>参考节点要求</p>
+<p>2.主机名配置</p>
+<p>因为K8S的规定，主机名只支持包含<strong>-</strong>和<strong style="color:red;">.</strong>(中横线和点)两种特殊符号，并且主机名不能出现重复。</p>
+<p>3.Hosts</p>
+<p>配置每台主机的hosts(/etc/hosts),添加host_ip $hostname到/etc/hosts文件中。</p>
+<p>4.Centos关闭selinux</p>
+<pre class=" language-bash"><code class="language-bash"><span class="token function">sudo</span> <span class="token function">sed</span> -i <span class="token string">'s/SELINUX=enforcing/SELINUX=disable/g'</span> /etc/selinux/config</code></pre>
+<p>5.关闭防火墙(可选)或者放行相应端口</p>
+<p>对于刚刚接触Rancher的用户，建议在关闭防火墙的测试环境或者桌面虚拟机来运行Rancher,以免出现网络通信问题。</p>
+<blockquote>
+<ul>
+<li><p>关闭防火墙</p>
+<ul>
+<li>1 Centos</li>
+</ul>
+<p>​    systemctl stop firewalld.service &amp;&amp; systemctl disable firewalld.service</p>
+<p>​    2 Ubuntu</p>
+<p>​    ufw disable</p>
+<p>端口放行</p>
+<blockquote>
+<ul>
+<li></li>
+</ul>
+</blockquote>
+</li>
+</ul>
+</blockquote>
+<h4 id="6-配置主机时间、时区、系统语言"><a href="#6-配置主机时间、时区、系统语言" class="headerlink" title="6 配置主机时间、时区、系统语言"></a>6 配置主机时间、时区、系统语言</h4><blockquote>
+<ul>
+<li>查看时区<ul>
+<li>date -R 或者timedatecte</li>
+</ul>
+</li>
+<li>修改时区<ul>
+<li>ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime</li>
+</ul>
+</li>
+<li>修改系统语言环境<ul>
+<li>sudo echo ‘ LANG=”en_us.UTF-8” ‘ &gt;&gt;/etc/profile; source /etc/profile</li>
+</ul>
+</li>
+<li>配置主机NTP时间同步</li>
+</ul>
+</blockquote>
+<h4 id="7-Kernel性能调优"><a href="#7-Kernel性能调优" class="headerlink" title="7 Kernel性能调优"></a>7 Kernel性能调优</h4><pre class=" language-bash"><code class="language-bash"><span class="token function">cat</span> <span class="token operator">>></span> /etc/sysctl.conf<span class="token operator">&lt;&lt;</span><span class="token string">EOF
+net.ipv4.ip_forward=1
+net.bridge.bridge-nf-call-iptables=1
+net.ipv4.neigh.default.gc_thresh1=4096
+net.ipv4.neigh.default.gc_thresh2=6144
+net.ipv4.neigh.default.gc_thresh3=8192
+EOF</span>
+stsctl -p</code></pre>
+<h3 id="Docker配置"><a href="#Docker配置" class="headerlink" title="Docker配置"></a>Docker配置</h3><p>对于通过systemd来管理服务的系统(比如Centos7.x、Ubuntu16.x)，Docker有两处可以配置参数；一个是docker.service服务配置文件，一个是Docker daemon配置文件daemon.json。</p>
+<pre class=" language-bash"><code class="language-bash">1: docker.service
+对于Centos系统，docker.service默认位于/usr/lib/systemd/system/docker.service<span class="token punctuation">;</span>对于Ubuntu系统，docker.service默认位于/lib/systemd/system/docker.service
+2: daemon.json
+daemon.json默认位于/etc/docker/daemon.json,如果没有可手动创建，基于systemd管理的系统都是相同的路径。通过修改daemon.json来改过Docker配置，也是Docker官方推荐的方法。</code></pre>
+<blockquote>
+<ul>
+<li>以下说明均基于systemd，并通过/etc/docker/daemon.json来修改配置。</li>
+</ul>
+</blockquote>
+<p>配置镜像下载和上传并发数</p>
+<p>从Docker1.12开始，支持自定义下载和上传镜像的并发数，默认值上传为3个并发，下载为5个并发。通过添加“max-concurrent-downloads”和”max-concurrent-uploads”参数对其修改：</p>
+<pre class=" language-bash"><code class="language-bash"><span class="token string">"max-concurrent-downloads"</span>:3,
+<span class="token string">"max-concurrent-uploads"</span><span class="token keyword">:</span> 5</code></pre>
+<p>配置镜像加速地址</p>
+<p>rancher从v1.6.15开始到v2.x.x,Rancher系统相关的所有镜像(包括1.6.x上的K8S镜像)都托管在Dockerhub仓库。Dockerhub节点在国外，国内直接拉取镜像会有写缓慢，为了加速镜像的下载，可以给Docker配置国内的镜像地址。</p>
+<p>编辑<strong style="color:green">/etc/docker/daemon.json</strong>加入一下内容：</p>
+<pre class=" language-bash"><code class="language-bash"><span class="token punctuation">{</span>
+    <span class="token string">"registry-mirros"</span>:<span class="token punctuation">[</span><span class="token string">"https://7bezldxe.mirror.aliyuncs.com/"</span>,<span class="token string">"https://IP:PORT/"</span><span class="token punctuation">]</span>,
+<span class="token punctuation">}</span></code></pre>
+<blockquote>
+<ul>
+<li>可以设置多个<strong style="color:green">registry-mirrors</strong>地址，以数组形式书写，地址需要添加协议头(https或者http)。</li>
+</ul>
+</blockquote>
+<p>配置<strong style="color:green">insecure-registries</strong>私有仓库</p>
+<p>Docker默认只信任TLS加密的仓库地址(https)，所有非https仓库默认无法登陆也无法拉取镜像。<strong style="color:green">insecure-registries</strong>字面意思为不安全的仓库，通过添加这个参数对非https仓库进行受信。可以设置多个<strong style="color:green">insecure-registries</strong>地址，以数组形式书写，地址不能添加协议头(http)。</p>
+<p>编辑<strong style="color:green">/etc/docker/daemon.json</strong>加入以下内容：</p>
+<pre class=" language-bash"><code class="language-bash"><span class="token punctuation">{</span>
+    <span class="token string">"insecure-registries"</span>:<span class="token punctuation">[</span><span class="token string">"192.168.1.100"</span>,<span class="token string">"IP:PORT"</span><span class="token punctuation">]</span>
+<span class="token punctuation">}</span></code></pre>
+<p>配置Docker存储驱动</p>
+<p>OverlayFS是一个新一代的联合文件系统，类似于AUFS，但速度更快，实现更简单。Docker为OverlayFS提供了两个存储驱动程序：旧版的<strong style="color:blue">overlay</strong>，新版的<strong style="color:blue">overlay2</strong>(更稳定)</p>
+<p>先决条件：</p>
+<blockquote>
+<ul>
+<li><strong style="color:green">overlay2:</strong>Linux内核版本4.0或更高版本，，或使用内核版本3.10.0-514+的RHEL或CentOS.</li>
+<li><strong style="color:green">overlay:</strong>主机Linux内核版本3.18+</li>
+<li>支持的磁盘文件系统<ul>
+<li>ext4(仅限RHEL7.1)</li>
+<li>xfs(RHEL7.2及更高版本)，需要启用d_typ=true。</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<p>编辑<strong style="color:green">/etc/docker/daemon.json</strong>加入一下内容</p>
+<pre class=" language-bash"><code class="language-bash"><span class="token punctuation">{</span>
+    <span class="token string">"storage-driver"</span><span class="token keyword">:</span><span class="token string">"overlay2"</span>,
+    <span class="token string">"storage-opts"</span>:<span class="token punctuation">[</span><span class="token string">"overlay2.override_kernel_check=true"</span><span class="token punctuation">]</span>
+<span class="token punctuation">}</span></code></pre>
+<p>配置日志驱动</p>
+<p>容器在运行时会产生大量日志文件，很容易占满磁盘空间。通过配置日志驱动来限制文件大小与文件的数量。&gt;限制单个日志文件为<strong style="color:red">100M</strong>,最多产生<strong style="color:red">3</strong>个日志文件。</p>
+<pre class=" language-bash"><code class="language-bash"><span class="token punctuation">{</span>
+    <span class="token string">"log-driver"</span><span class="token keyword">:</span><span class="token string">"json-file"</span>,
+    <span class="token string">"log-opts"</span>:<span class="token punctuation">{</span>
+        <span class="token string">"max-size"</span><span class="token keyword">:</span><span class="token string">"100m"</span>,
+        <span class="token string">"max-file"</span><span class="token keyword">:</span><span class="token string">"3"</span>
+    <span class="token punctuation">}</span>
+
+<span class="token punctuation">}</span></code></pre>
+<h4 id="3-Ubuntu-Debian系统，docker-info提示WARNING-No-swap-limit-support"><a href="#3-Ubuntu-Debian系统，docker-info提示WARNING-No-swap-limit-support" class="headerlink" title="3 Ubuntu\Debian系统，docker info提示WARNING:No swap limit support"></a>3 Ubuntu\Debian系统，docker info提示WARNING:No swap limit support</h4><p>Ubuntu\Debian系统下，默认cgroup未开启swap account功能，这样会导致设置容器内存或者swap资源限制不生效。可以通过一下命令解决：</p>
+<pre class=" language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 统一网卡名称为ethx</span>
+<span class="token function">sudo</span> <span class="token function">sed</span> -i <span class="token string">'s/en[[:alnum:]]*/eth0/g'</span>  /etc/network/interfaces<span class="token punctuation">;</span>
+<span class="token function">sudo</span> <span class="token function">sed</span> -i <span class="token string">'s/GRUB_CMDLINE_LINUX="\(.*\)"/GRUB_CMDLINE_LINUX="net.ifnames=0 cgroup_enable=memory swapaccount=1 biosdevname=0 \1"/g'</span> /etc/default/grub<span class="token punctuation">;</span>
+<span class="token function">sudo</span> update-grub<span class="token punctuation">;</span></code></pre>
+<h3 id="2-节点需求"><a href="#2-节点需求" class="headerlink" title="2   节点需求"></a>2   节点需求</h3><p>不管是单节点安装Rancher server,或搞可用安装Rancher server,所有节点都需要满足以下的节点要求。</p>
+<p>操作系统和Docker</p>
+<h3 id="3-端口要求"><a href="#3-端口要求" class="headerlink" title="3   端口要求"></a>3   端口要求</h3><h3 id="4-镜像仓库安装"><a href="#4-镜像仓库安装" class="headerlink" title="4   镜像仓库安装"></a>4   镜像仓库安装</h3><h3 id="5-自签名SSL证书"><a href="#5-自签名SSL证书" class="headerlink" title="5   自签名SSL证书"></a>5   自签名SSL证书</h3><h3 id="6-HTTP代理配置"><a href="#6-HTTP代理配置" class="headerlink" title="6   HTTP代理配置"></a>6   HTTP代理配置</h3><h3 id="7-安装和配置kubectl"><a href="#7-安装和配置kubectl" class="headerlink" title="7   安装和配置kubectl"></a>7   安装和配置kubectl</h3><h3 id="8-文件下载"><a href="#8-文件下载" class="headerlink" title="8   文件下载"></a>8   文件下载</h3><h3 id="9-最佳实践"><a href="#9-最佳实践" class="headerlink" title="9   最佳实践"></a>9   最佳实践</h3><h3 id="10-清理节点"><a href="#10-清理节点" class="headerlink" title="10 清理节点"></a>10 清理节点</h3><h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><h3 id="1-版本选择"><a href="#1-版本选择" class="headerlink" title="1 版本选择"></a>1 版本选择</h3><h3 id="2-镜像选择"><a href="#2-镜像选择" class="headerlink" title="2 镜像选择"></a>2 镜像选择</h3><h3 id="3-单节点安装"><a href="#3-单节点安装" class="headerlink" title="3 单节点安装"></a>3 单节点安装</h3><h3 id="4-Rancher-HA安装"><a href="#4-Rancher-HA安装" class="headerlink" title="4 Rancher HA安装"></a>4 Rancher HA安装</h3><h3 id="5-离线安装"><a href="#5-离线安装" class="headerlink" title="5 离线安装"></a>5 离线安装</h3><h3 id="6-其它方法"><a href="#6-其它方法" class="headerlink" title="6 其它方法"></a>6 其它方法</h3>
+            </div>
+            <hr/>
+
+            
+
+    <div class="reprint" id="reprint-statement">
+        
+            <div class="reprint__author">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-user">
+                        文章作者:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="https://cntsp.github.io" rel="external nofollow noreferrer">阿培</a>
+                </span>
+            </div>
+            <div class="reprint__type">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-link">
+                        文章链接:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="https://cntsp.github.io/2019/05/15/ranche2-0-CN/">https://cntsp.github.io/2019/05/15/ranche2-0-CN/</a>
+                </span>
+            </div>
+            <div class="reprint__notice">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-copyright">
+                        版权声明:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    本博客所有文章除特別声明外，均采用
+                    <a href="https://creativecommons.org/licenses/by/4.0/deed.zh" rel="external nofollow noreferrer" target="_blank">CC BY 4.0</a>
+                    许可协议。转载请注明来源
+                    <a href="https://cntsp.github.io" target="_blank">阿培</a>
+                    !
+                </span>
+            </div>
+        
+    </div>
+
+    <script async defer>
+      document.addEventListener("copy", function (e) {
+        let toastHTML = '<span>复制成功，请遵循本文的转载规则</span><button class="btn-flat toast-action" onclick="navToReprintStatement()" style="font-size: smaller">查看</a>';
+        M.toast({html: toastHTML})
+      });
+
+      function navToReprintStatement() {
+        $("html, body").animate({scrollTop: $("#reprint-statement").offset().top - 80}, 800);
+      }
+    </script>
+
+
+
+            <div class="tag_share" style="display: block;">
+                <div class="post-meta__tag-list" style="display: inline-block;">
+                    
+                        <div class="article-tag">
+                            
+                                <a href="/tags/docker/">
+                                    <span class="chip bg-color">docker</span>
+                                </a>
+                            
+                                <a href="/tags/rancher/">
+                                    <span class="chip bg-color">rancher</span>
+                                </a>
+                            
+                        </div>
+                    
+                </div>
+                <div class="post_share" style="zoom: 80%; width: fit-content; display: inline-block; float: right; margin: -0.15rem 0;">
+                    <link rel="stylesheet" type="text/css" href="/libs/share/css/share.min.css">
+
+<div id="article-share">
+    
+    
+    <div class="social-share" data-sites="twitter,facebook,google,qq,qzone,wechat,weibo,douban,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
+    <script src="/libs/share/js/social-share.min.js"></script>
+    
+
+    
+
+</div>
+
+                </div>
+            </div>
+            
+                <style>
+    #reward {
+        margin: 40px 0;
+        text-align: center;
+    }
+
+    #reward .reward-link {
+        font-size: 1.4rem;
+        line-height: 38px;
+    }
+
+    #reward .btn-floating:hover {
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2), 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    #rewardModal {
+        width: 320px;
+        height: 350px;
+    }
+
+    #rewardModal .reward-title {
+        margin: 15px auto;
+        padding-bottom: 5px;
+    }
+
+    #rewardModal .modal-content {
+        padding: 10px;
+    }
+
+    #rewardModal .close {
+        position: absolute;
+        right: 15px;
+        top: 15px;
+        color: rgba(0, 0, 0, 0.5);
+        font-size: 1.3rem;
+        line-height: 20px;
+        cursor: pointer;
+    }
+
+    #rewardModal .close:hover {
+        color: #ef5350;
+        transform: scale(1.3);
+        -moz-transform:scale(1.3);
+        -webkit-transform:scale(1.3);
+        -o-transform:scale(1.3);
+    }
+
+    #rewardModal .reward-tabs {
+        margin: 0 auto;
+        width: 210px;
+    }
+
+    .reward-tabs .tabs {
+        height: 38px;
+        margin: 10px auto;
+        padding-left: 0;
+    }
+
+    .reward-content ul {
+        padding-left: 0 !important;
+    }
+
+    .reward-tabs .tabs .tab {
+        height: 38px;
+        line-height: 38px;
+    }
+
+    .reward-tabs .tab a {
+        color: #fff;
+        background-color: #ccc;
+    }
+
+    .reward-tabs .tab a:hover {
+        background-color: #ccc;
+        color: #fff;
+    }
+
+    .reward-tabs .wechat-tab .active {
+        color: #fff !important;
+        background-color: #22AB38 !important;
+    }
+
+    .reward-tabs .alipay-tab .active {
+        color: #fff !important;
+        background-color: #019FE8 !important;
+    }
+
+    .reward-tabs .reward-img {
+        width: 210px;
+        height: 210px;
+    }
+</style>
+
+<div id="reward">
+    <a href="#rewardModal" class="reward-link modal-trigger btn-floating btn-medium waves-effect waves-light red">赏</a>
+
+    <!-- Modal Structure -->
+    <div id="rewardModal" class="modal">
+        <div class="modal-content">
+            <a class="close modal-close"><i class="fas fa-times"></i></a>
+            <h4 class="reward-title">你的赏识是我前进的动力</h4>
+            <div class="reward-content">
+                <div class="reward-tabs">
+                    <ul class="tabs row">
+                        <li class="tab col s6 alipay-tab waves-effect waves-light"><a href="#alipay">支付宝</a></li>
+                        <li class="tab col s6 wechat-tab waves-effect waves-light"><a href="#wechat">微 信</a></li>
+                    </ul>
+                    <div id="alipay">
+                        <img src="/medias/reward/alipay.jpg" class="reward-img" alt="支付宝打赏二维码">
+                    </div>
+                    <div id="wechat">
+                        <img src="/medias/reward/wechat.png" class="reward-img" alt="微信打赏二维码">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $('.tabs').tabs();
+    });
+</script>
+            
+        </div>
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+<article id="prenext-posts" class="prev-next articles">
+    <div class="row article-row">
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge left-badge text-color">
+                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
+            <div class="card">
+                <a href="/2019/05/18/python-TCP-UDP/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/20.jpg" class="responsive-img" alt="python-TCP-UDP">
+                        
+                        <span class="card-title">python-TCP-UDP</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            Socket通讯及其TCP/IP原语Socket通讯Socket提供了一个通信端口，应用程序在网络上传输/接收的信息都通过Socket接口来实现的。在应用开发中可以像使用文件句柄一样来对Socket句柄进行读写操作。Windows Sock
+                        
+                    </div>
+                    <div class="publish-info">
+                        <span class="publish-date">
+                            <i class="far fa-clock fa-fw icon-date"></i>2019-05-18
+                        </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/python%E5%9F%BA%E7%A1%80/" class="post-category">
+                                    python基础
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/python/">
+                        <span class="chip bg-color">python</span>
+                    </a>
+                    
+                    <a href="/tags/socket/">
+                        <span class="chip bg-color">socket</span>
+                    </a>
+                    
+                    <a href="/tags/TCP/">
+                        <span class="chip bg-color">TCP</span>
+                    </a>
+                    
+                    <a href="/tags/UDP/">
+                        <span class="chip bg-color">UDP</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
+            </div>
+            <div class="card">
+                <a href="/2019/04/30/%E4%BA%8C%E8%BF%9B%E5%88%B6%E9%83%A8%E7%BD%B2k8s/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/3.jpg" class="responsive-img" alt="二进制部署k8s">
+                        
+                        <span class="card-title">二进制部署k8s</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            Centos7系统使用二进制包部署kubernetes1.13集群
+一 简述Kubernetes1.13 的核心特性包括：利用kubeadm简化集群管理、容器存储接口(CSI)以及将CoreDNS作为默认DNS。利用kubeadm简化集群管
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2019-04-30
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/%E5%AE%B9%E5%99%A8%E6%8A%80%E6%9C%AF/" class="post-category">
+                                    容器技术
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/kubernetes-docker/">
+                        <span class="chip bg-color">kubernetes,docker</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+    </div>
+</article>
+
+</div>
+
+
+
+<!-- 代码块功能依赖 -->
+<script type="text/javascript" src="/libs/codeBlock/codeBlockFuction.js"></script>
+
+<!-- 代码语言 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeLang.js"></script>
+
+    
+<!-- 代码块复制 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeCopy.js"></script>
+
+
+<!-- 代码块收缩 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeShrink.js"></script>
+
+
+<!-- 代码块折行 -->
+
+<style type="text/css">
+code[class*="language-"], pre[class*="language-"] { white-space: pre !important; }
+</style>
+
+    </div>
+    <div id="toc-aside" class="expanded col l3 hide-on-med-and-down">
+        <div class="toc-widget">
+            <div class="toc-title"><i class="far fa-list-alt"></i>&nbsp;&nbsp;目录</div>
+            <div id="toc-content"></div>
+        </div>
+    </div>
+</div>
+
+<!-- TOC 悬浮按钮. -->
+
+<div id="floating-toc-btn" class="hide-on-med-and-down">
+    <a class="btn-floating btn-large bg-color">
+        <i class="fas fa-list-ul"></i>
+    </a>
+</div>
+
+
+<script src="/libs/tocbot/tocbot.min.js"></script>
+<script>
+    $(function () {
+        tocbot.init({
+            tocSelector: '#toc-content',
+            contentSelector: '#articleContent',
+            headingsOffset: -($(window).height() * 0.4 - 45),
+            collapseDepth: Number('0'),
+            headingSelector: 'h2, h3, h4'
+        });
+
+        // modify the toc link href to support Chinese.
+        let i = 0;
+        let tocHeading = 'toc-heading-';
+        $('#toc-content a').each(function () {
+            $(this).attr('href', '#' + tocHeading + (++i));
+        });
+
+        // modify the heading title id to support Chinese.
+        i = 0;
+        $('#articleContent').children('h2, h3, h4').each(function () {
+            $(this).attr('id', tocHeading + (++i));
+        });
+
+        // Set scroll toc fixed.
+        let tocHeight = parseInt($(window).height() * 0.4 - 64);
+        let $tocWidget = $('.toc-widget');
+        $(window).scroll(function () {
+            let scroll = $(window).scrollTop();
+            /* add post toc fixed. */
+            if (scroll > tocHeight) {
+                $tocWidget.addClass('toc-fixed');
+            } else {
+                $tocWidget.removeClass('toc-fixed');
+            }
+        });
+
+        
+        /* 修复文章卡片 div 的宽度. */
+        let fixPostCardWidth = function (srcId, targetId) {
+            let srcDiv = $('#' + srcId);
+            if (srcDiv.length === 0) {
+                return;
+            }
+
+            let w = srcDiv.width();
+            if (w >= 450) {
+                w = w + 21;
+            } else if (w >= 350 && w < 450) {
+                w = w + 18;
+            } else if (w >= 300 && w < 350) {
+                w = w + 16;
+            } else {
+                w = w + 14;
+            }
+            $('#' + targetId).width(w);
+        };
+
+        // 切换TOC目录展开收缩的相关操作.
+        const expandedClass = 'expanded';
+        let $tocAside = $('#toc-aside');
+        let $mainContent = $('#main-content');
+        $('#floating-toc-btn .btn-floating').click(function () {
+            if ($tocAside.hasClass(expandedClass)) {
+                $tocAside.removeClass(expandedClass).hide();
+                $mainContent.removeClass('l9');
+            } else {
+                $tocAside.addClass(expandedClass).show();
+                $mainContent.addClass('l9');
+            }
+            fixPostCardWidth('artDetail', 'prenext-posts');
+        });
+        
+    });
+</script>
+
+    
+
+</main>
+
+
+
+    <footer class="page-footer bg-color">
+    <div class="container row center-align">
+        <div class="col s12 m8 l8 copy-right">
+            Copyright&nbsp;&copy;
+            <span id="year">年份</span>
+            <a href="https://cntsp.github.io" target="_blank">阿培</a>
+            |&nbsp;Powered by&nbsp;<a href="https://hexo.io/" target="_blank">Hexo</a>
+            |&nbsp;Theme&nbsp;<a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
+            <br>
+            
+            
+            
+            
+            
+            
+            <span id="busuanzi_container_site_pv">
+                |&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;<span id="busuanzi_value_site_pv"
+                    class="white-color"></span>&nbsp;次
+            </span>
+            
+            
+            <span id="busuanzi_container_site_uv">
+                |&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;<span id="busuanzi_value_site_uv"
+                    class="white-color"></span>&nbsp;人
+            </span>
+            
+            <br>
+            
+            <span id="sitetime">载入运行时间...</span>
+            <script>
+                function siteTime() {
+                    window.setTimeout("siteTime()", 1000);
+                    var seconds = 1000;
+                    var minutes = seconds * 60;
+                    var hours = minutes * 60;
+                    var days = hours * 24;
+                    var years = days * 365;
+                    var today = new Date();
+                    var startYear = "2019";
+                    var startMonth = "6";
+                    var startDate = "28";
+                    var startHour = "0";
+                    var startMinute = "0";
+                    var startSecond = "0";
+                    var todayYear = today.getFullYear();
+                    var todayMonth = today.getMonth() + 1;
+                    var todayDate = today.getDate();
+                    var todayHour = today.getHours();
+                    var todayMinute = today.getMinutes();
+                    var todaySecond = today.getSeconds();
+                    var t1 = Date.UTC(startYear, startMonth, startDate, startHour, startMinute, startSecond);
+                    var t2 = Date.UTC(todayYear, todayMonth, todayDate, todayHour, todayMinute, todaySecond);
+                    var diff = t2 - t1;
+                    var diffYears = Math.floor(diff / years);
+                    var diffDays = Math.floor((diff / days) - diffYears * 365);
+                    var diffHours = Math.floor((diff - (diffYears * 365 + diffDays) * days) / hours);
+                    var diffMinutes = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours) /
+                        minutes);
+                    var diffSeconds = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours -
+                        diffMinutes * minutes) / seconds);
+                    if (startYear == todayYear) {
+                        document.getElementById("year").innerHTML = todayYear;
+                        document.getElementById("sitetime").innerHTML = "本站已安全运行 " + diffDays + " 天 " + diffHours +
+                            " 小时 " + diffMinutes + " 分钟 " + diffSeconds + " 秒";
+                    } else {
+                        document.getElementById("year").innerHTML = startYear + " - " + todayYear;
+                        document.getElementById("sitetime").innerHTML = "本站已安全运行 " + diffYears + " 年 " + diffDays +
+                            " 天 " + diffHours + " 小时 " + diffMinutes + " 分钟 " + diffSeconds + " 秒";
+                    }
+                }
+                setInterval(siteTime, 1000);
+            </script>
+            
+            <br>
+            
+        </div>
+        <div class="col s12 m4 l4 social-link social-statis">
+    <a href="https://github.com/cntsp" class="tooltipped" target="_blank" data-tooltip="访问我的GitHub" data-position="top" data-delay="50">
+        <i class="fab fa-github"></i>
+    </a>
+
+
+
+    <a href="mailto:1909873483@qq.com" class="tooltipped" target="_blank" data-tooltip="邮件联系我" data-position="top" data-delay="50">
+        <i class="fas fa-envelope-open"></i>
+    </a>
+
+
+
+
+
+
+
+    <a href="tencent://AddContact/?fromId=50&fromSubId=1&subcmd=all&uin=1909873483" class="tooltipped" target="_blank" data-tooltip="QQ联系我: 1909873483" data-position="top" data-delay="50">
+        <i class="fab fa-qq"></i>
+    </a>
+
+
+
+
+
+
+
+    <a href="/atom.xml" class="tooltipped" target="_blank" data-tooltip="RSS 订阅" data-position="top" data-delay="50">
+        <i class="fas fa-rss"></i>
+    </a>
+
+</div>
+    </div>
+</footer>
+
+<div class="progress-bar"></div>
+
+
+    <!-- 搜索遮罩框 -->
+<div id="searchModal" class="modal">
+    <div class="modal-content">
+        <div class="search-header">
+            <span class="title"><i class="fas fa-search"></i>&nbsp;&nbsp;搜索</span>
+            <input type="search" id="searchInput" name="s" placeholder="请输入搜索的关键字"
+                   class="search-input">
+        </div>
+        <div id="searchResult"></div>
+    </div>
+</div>
+
+<script src="/js/search.js"></script>
+<script type="text/javascript">
+$(function () {
+    searchFunc("/" + "search.xml", 'searchInput', 'searchResult');
+});
+</script>
+    <!-- 回到顶部按钮 -->
+<div id="backTop" class="top-scroll">
+    <a class="btn-floating btn-large waves-effect waves-light" href="#!">
+        <i class="fas fa-arrow-up"></i>
+    </a>
+</div>
+
+
+    <script src="/libs/materialize/materialize.min.js"></script>
+    <script src="/libs/masonry/masonry.pkgd.min.js"></script>
+    <script src="/libs/aos/aos.js"></script>
+    <script src="/libs/scrollprogress/scrollProgress.min.js"></script>
+    <script src="/libs/lightGallery/js/lightgallery-all.min.js"></script>
+    <script src="/js/matery.js"></script>
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    <script src="/libs/others/clicklove.js" async="async"></script>
+    
+    
+    <script async src="/libs/others/busuanzi.pure.mini.js"></script>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    
+    
+    <script src="/libs/instantpage/instantpage.js" type="module"></script>
+    
+
+</body>
+
+</html>
