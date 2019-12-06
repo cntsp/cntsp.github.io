@@ -4,12 +4,8 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="keywords" content="kubernetes-调度器-调度说明, 阿培">
-    <meta name="description" content="简介Scheduler 是kubernetes的调度器，主要的任务是把定义的Pod分配到集群的节点上。听起来非常简单，单有很多要考虑的问题
-
-公平：如何保证每个节点都能被分配资源
-资源高效利用：集群所有资源最大化被使用
-效率：调度的性能要好">
+    <meta name="keywords" content="部署-Helm, 阿培">
+    <meta name="description" content="什么是Helm">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -17,7 +13,7 @@
     <meta name="format-detection" content="telephone=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>kubernetes-调度器-调度说明 | 阿培</title>
+    <title>部署-Helm | 阿培</title>
     <link rel="icon" type="image/x-icon, image/vnd.microsoft.icon" href="/favicon.ico">
 
     <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
@@ -307,13 +303,13 @@
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/12.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/15.jpg')">
     <div class="container" style="right: 0px;left: 0px;">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
                     <div class="description center-align post-title">
-                        kubernetes-调度器-调度说明
+                        部署-Helm
                     </div>
                 </div>
             </div>
@@ -435,8 +431,8 @@
                                 <span class="chip bg-color">kubernetes</span>
                             </a>
                         
-                            <a href="/tags/%E8%B0%83%E5%BA%A6%E5%99%A8/">
-                                <span class="chip bg-color">调度器</span>
+                            <a href="/tags/helm/">
+                                <span class="chip bg-color">helm</span>
                             </a>
                         
                     </div>
@@ -460,7 +456,7 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
-                    2019-12-04
+                    2019-12-06
                 </div>
                 
 
@@ -477,42 +473,7 @@
         <hr class="clearfix">
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p><strong>Scheduler 是kubernetes的调度器，主要的任务是把定义的Pod分配到集群的节点上。听起来非常简单，单有很多要考虑的问题</strong></p>
-<ul>
-<li><strong>公平：如何保证每个节点都能被分配资源</strong></li>
-<li><strong>资源高效利用：集群所有资源最大化被使用</strong></li>
-<li><strong>效率：调度的性能要好，能够尽快地对大批量的Pod 完成调度工作</strong></li>
-<li><strong>灵活：允许用户根据自己的需求控制调度的逻辑</strong></li>
-</ul>
-<p><strong>Scheduler 是作为单独的程序运行的，启动之后会一直监听API Server，获取 <code>PodSpec.Nodename</code>为空的pod,对每个pod都会创建一个binding,表明该Pod应该放到哪个节点上</strong></p>
-<h2 id="调度过程"><a href="#调度过程" class="headerlink" title="调度过程"></a>调度过程</h2><p><strong>调度分为几个部分：首先是过滤掉不满足条件的节点，这个过程为<code>predicate</code>；然后对通过的几点按照优先级排序，这个是<code>priority</code>;最后从中选择优先级最高的节点。如果中间任何一步骤有错误，就直接返回错误</strong></p>
-<p><strong>Predicate 有一系列的算法可以使用：</strong></p>
-<ul>
-<li><code>PodFitsResources</code>:<strong>节点上剩余的资源是否大于pod请求的资源</strong></li>
-<li><code>PodFitHost</code>:<strong>如果pod指定了NodeName,检查节点名称是否和NodeName匹配</strong></li>
-<li><code>PodFitsHostPorts</code>:<strong>节点上已经使用的port是否和pod申请的port冲突</strong></li>
-<li><code>PodSelectorMatches</code>: <strong>过滤掉和pod指定的label不匹配的节点</strong></li>
-<li><code>NoDiskConflict</code>:<strong>已经mount的volume和pod指定的volume不冲突，除非它们都是只读</strong></li>
-</ul>
-<p><strong>如果在predicate过程中没有合适的节点，pod会一直在<code>pending</code>状态，不断重试调度，直到有节点满足条件。经过这个步骤，如果有多个节点满足条件，就继续priorities过程：安装优先级大小对节点排序</strong></p>
-<ul>
-<li><code>LeastRequestedPriority</code>：<strong>通过计算CPU和Memory使用率越接近，权重越高。这个应该和上面的一起使用，不应该单独使用</strong></li>
-<li><code>ImageLocalityPriority</code>:<strong>倾向于已经有要使用镜像的节点，镜像总大小值越大，权重越高</strong></li>
-</ul>
-<p><strong>通过算法对所有的优先级项目和权重进行计算，得出最终的结果</strong></p>
-<h2 id="自定义调度器"><a href="#自定义调度器" class="headerlink" title="自定义调度器"></a>自定义调度器</h2><p><strong>除了kubernetes自带的调度器，你也可以编写自己的调度器。通过<code>spec:schedulername</code>参数指定调度器的名字，可以为pod选择某个调度器进行调度。比如下面的pod选择<code>my.scheduler</code>进行调度，而不是默认的<code>default.scheduler</code>;</strong></p>
-<pre class=" language-yaml"><code class="language-yaml"><span class="token key atrule">apiVersion</span><span class="token punctuation">:</span> v1
-<span class="token key atrule">kind</span><span class="token punctuation">:</span> Pod
-<span class="token key atrule">metadata</span><span class="token punctuation">:</span>
-  <span class="token key atrule">name</span><span class="token punctuation">:</span> annotation<span class="token punctuation">-</span>second<span class="token punctuation">-</span>scheduler
-  <span class="token key atrule">labels</span><span class="token punctuation">:</span>
-    <span class="token key atrule">name</span><span class="token punctuation">:</span> multischeduler<span class="token punctuation">-</span>example
-<span class="token key atrule">spec</span><span class="token punctuation">:</span>
-  <span class="token key atrule">schedulername</span><span class="token punctuation">:</span> my<span class="token punctuation">-</span>scheduler
-  <span class="token key atrule">containers</span><span class="token punctuation">:</span>
-  <span class="token punctuation">-</span> <span class="token key atrule">name</span><span class="token punctuation">:</span> pod<span class="token punctuation">-</span>with<span class="token punctuation">-</span>second<span class="token punctuation">-</span>annotation<span class="token punctuation">-</span>container
-    <span class="token key atrule">image</span><span class="token punctuation">:</span> gcr.io/google_containers/pause<span class="token punctuation">:</span><span class="token number">2.0</span></code></pre>
-
+                <h2 id="什么是Helm"><a href="#什么是Helm" class="headerlink" title="什么是Helm"></a>什么是Helm</h2>
             </div>
             <hr/>
 
@@ -537,7 +498,7 @@
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="https://cntsp.github.io/2019/12/04/kubernetes-%E8%B0%83%E5%BA%A6%E5%99%A8-%E8%B0%83%E5%BA%A6%E8%AF%B4%E6%98%8E/">https://cntsp.github.io/2019/12/04/kubernetes-%E8%B0%83%E5%BA%A6%E5%99%A8-%E8%B0%83%E5%BA%A6%E8%AF%B4%E6%98%8E/</a>
+                    <a href="https://cntsp.github.io/2019/12/06/kubernetes-%E9%83%A8%E7%BD%B2Helm/">https://cntsp.github.io/2019/12/06/kubernetes-%E9%83%A8%E7%BD%B2Helm/</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -579,8 +540,8 @@
                                     <span class="chip bg-color">kubernetes</span>
                                 </a>
                             
-                                <a href="/tags/%E8%B0%83%E5%BA%A6%E5%99%A8/">
-                                    <span class="chip bg-color">调度器</span>
+                                <a href="/tags/helm/">
+                                    <span class="chip bg-color">helm</span>
                                 </a>
                             
                         </div>
@@ -746,32 +707,30 @@
 <article id="prenext-posts" class="prev-next articles">
     <div class="row article-row">
         
-        <div class="article col s12 m6" data-aos="fade-up">
+        <div class="article col s12 m6" data-aos="fade-up" data-aos="fade-up">
             <div class="article-badge left-badge text-color">
-                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
+                <i class="far fa-dot-circle"></i>&nbsp;本篇
+            </div>
             <div class="card">
-                <a href="/2019/12/04/kubernetes-%E8%B0%83%E5%BA%A6%E5%99%A8-%E8%B0%83%E5%BA%A6%E4%BA%B2%E5%92%8C%E6%80%A7/">
+                <a href="/2019/12/06/kubernetes-%E9%83%A8%E7%BD%B2Helm/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/3.jpg" class="responsive-img" alt="kubernetes-调度器-调度亲和性">
+                        <img src="/medias/featureimages/15.jpg" class="responsive-img" alt="部署-Helm">
                         
-                        <span class="card-title">kubernetes-调度器-调度亲和性</span>
+                        <span class="card-title">部署-Helm</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            节点的亲和性pod.spec.nodeAffinity
-
-preferredDuringSchedulinglgnoredDuringExecution:软策略
-requireDuringSchedulinglgnoredDuringExe
+                            什么是Helm
                         
                     </div>
                     <div class="publish-info">
-                        <span class="publish-date">
-                            <i class="far fa-clock fa-fw icon-date"></i>2019-12-04
-                        </span>
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2019-12-06
+                            </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
@@ -784,6 +743,7 @@ requireDuringSchedulinglgnoredDuringExe
                         </span>
                     </div>
                 </div>
+
                 
                 <div class="card-action article-tags">
                     
@@ -791,8 +751,8 @@ requireDuringSchedulinglgnoredDuringExe
                         <span class="chip bg-color">kubernetes</span>
                     </a>
                     
-                    <a href="/tags/%E4%BA%B2%E5%92%8C%E6%80%A7/">
-                        <span class="chip bg-color">亲和性</span>
+                    <a href="/tags/helm/">
+                        <span class="chip bg-color">helm</span>
                     </a>
                     
                 </div>
@@ -806,25 +766,25 @@ requireDuringSchedulinglgnoredDuringExe
                 下一篇&nbsp;<i class="fas fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/2019/12/01/kubernetes-persistent-volume/">
+                <a href="/2019/12/06/Kubernetes-%E9%9B%86%E7%BE%A4%E5%AE%89%E5%85%A8-%E5%87%86%E5%85%A5%E6%8E%A7%E5%88%B6/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/10.jpg" class="responsive-img" alt="kubernetes-pvc-pvc">
+                        <img src="/medias/featureimages/7.jpg" class="responsive-img" alt="Kubernetes-集群安全-准入控制">
                         
-                        <span class="card-title">kubernetes-pvc-pvc</span>
+                        <span class="card-title">Kubernetes-集群安全-准入控制</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            概念PersistentVolume（PV）
-是由管理员设置的存储，它是集群中的一部分。就像节点是集群中的资源一样，PV也是集群中的资源。PV是Volume之类的卷插件，但具有独立于使用PV的Pod的生命周期。此 API 对象包含存储实现的
+                            准入控制准入控制是API Server的插件集合，通过添加不同的插件，实现额外的准入控制规则。甚至于API Server的一些主要的功能都需要通过Admission Controllers实现，比如ServiceAccount
+官方文档上有
                         
                     </div>
                     <div class="publish-info">
                             <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2019-12-01
+                                <i class="far fa-clock fa-fw icon-date"></i>2019-12-06
                             </span>
                         <span class="publish-author">
                             
@@ -845,12 +805,8 @@ requireDuringSchedulinglgnoredDuringExe
                         <span class="chip bg-color">kubernetes</span>
                     </a>
                     
-                    <a href="/tags/pv/">
-                        <span class="chip bg-color">pv</span>
-                    </a>
-                    
-                    <a href="/tags/pvc/">
-                        <span class="chip bg-color">pvc</span>
+                    <a href="/tags/%E5%87%86%E5%85%A5%E6%8E%A7%E5%88%B6/">
+                        <span class="chip bg-color">准入控制</span>
                     </a>
                     
                 </div>
