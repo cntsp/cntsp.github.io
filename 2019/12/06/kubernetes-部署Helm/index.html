@@ -534,7 +534,97 @@ cp helm /usr/local/bin</code></pre>
     <span class="token key atrule">namespace</span><span class="token punctuation">:</span> kube<span class="token punctuation">-</span>system</code></pre>
 <pre class=" language-shell"><code class="language-shell">kubectl create -f rbac-config.yaml</code></pre>
 <pre class=" language-shell"><code class="language-shell">helm init --service-account tiller --skip-refresh</code></pre>
-<h3 id="tiller-默认被部署在k8s集群中的kube-system-这个namespace下"><a href="#tiller-默认被部署在k8s集群中的kube-system-这个namespace下" class="headerlink" title="tiller 默认被部署在k8s集群中的kube-system 这个namespace下"></a>tiller 默认被部署在k8s集群中的kube-system 这个namespace下</h3>
+<h3 id="tiller-默认被部署在k8s集群中的kube-system-这个namespace下"><a href="#tiller-默认被部署在k8s集群中的kube-system-这个namespace下" class="headerlink" title="tiller 默认被部署在k8s集群中的kube-system 这个namespace下"></a>tiller 默认被部署在k8s集群中的kube-system 这个namespace下</h3><pre class=" language-shell"><code class="language-shell">[root@k8s-master helm]# kubectl get svc -n kube-system
+NAME            TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)                  AGE
+kube-dns        ClusterIP   10.96.0.10       <none>        53/UDP,53/TCP,9153/TCP   14d
+tiller-deploy   ClusterIP   10.102.235.237   <none>        44134/TCP                81s
+
+[root@k8s-master helm]# kubectl get deployment -n kube-system
+NAME            READY   UP-TO-DATE   AVAILABLE   AGE
+coredns         2/2     2            2           14d
+tiller-deploy   1/1     1            1           55s
+
+[root@k8s-master helm]# kubectl get rs -n kube-system
+NAME                       DESIRED   CURRENT   READY   AGE
+coredns-5c98db65d4         2         2         2       14d
+tiller-deploy-58565b5464   1         1         1       112s
+
+
+[root@k8s-master helm]# kubectl get pod -n kube-system
+NAME                                 READY   STATUS    RESTARTS   AGE
+coredns-5c98db65d4-pxl78             1/1     Running   0          14d
+coredns-5c98db65d4-vdtsr             1/1     Running   0          14d
+etcd-k8s-master                      1/1     Running   0          14d
+kube-apiserver-k8s-master            1/1     Running   0          14d
+kube-controller-manager-k8s-master   1/1     Running   0          14d
+kube-flannel-ds-amd64-852cl          1/1     Running   0          14d
+kube-flannel-ds-amd64-p5h64          1/1     Running   0          14d
+kube-flannel-ds-amd64-rglvq          1/1     Running   0          12d
+kube-proxy-6sp4j                     1/1     Running   0          14d
+kube-proxy-hbnkf                     1/1     Running   0          12d
+kube-proxy-ttjcn                     1/1     Running   0          14d
+kube-scheduler-k8s-master            1/1     Running   0          14d
+tiller-deploy-58565b5464-8vrfb       1/1     Running   0          65s
+
+[root@k8s-master helm]# helm version
+Client: &version.Version{SemVer:"v2.13.1", GitCommit:"618447cbf203d147601b4b9bd7f8c37a5d39fbb4", GitTreeState:"clean"}
+Server: &version.Version{SemVer:"v2.13.1", GitCommit:"618447cbf203d147601b4b9bd7f8c37a5d39fbb4", GitTreeState:"clean"}</code></pre>
+<h2 id="Helm-自定义模板"><a href="#Helm-自定义模板" class="headerlink" title="Helm 自定义模板"></a>Helm 自定义模板</h2><pre class=" language-shell"><code class="language-shell"># 创建文件夹
+$ mkdir ./hello-world
+$ cd ./hello-world</code></pre>
+<pre class=" language-shell"><code class="language-shell"># 创建自描述文件 Chart.yaml ，这个文件必须有 name 和 version 定义
+$ cat << 'EOF' >./Chart.yaml
+name: hello-world
+version: 1.0.0
+EOF</code></pre>
+<pre class=" language-shell"><code class="language-shell"># 创建模板文件，用于生成kubernetes 资源清单 (manifests)
+$ mkdir ./templates
+$ cat << 'EOF' >./templates/deployment.yaml
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: hello-world
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: hello-world
+    spec:
+      containers:
+        - name: hello-world
+          image: harbor.bwingame8.com/library/myapp:v1
+          ports:
+            - containerPort: 80
+              protocol: TCP
+EOF
+$ cat << 'EOF' > ./templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: hello-world
+spec:
+  type: NodePort
+  ports:
+  - port: 8080
+    targetPort: 8080
+    protocol: TCP
+  selector:
+    app: hello-world
+EOF
+</code></pre>
+<pre class=" language-shell"><code class="language-shell"># 使用命令 helm install RELATIVE_PATH_TO_CHART 创建一次Release
+$ helm install .</code></pre>
+<pre class=" language-shell"><code class="language-shell"># 列出已经部署的 Release
+$ helm ls
+# 查询一个特定的 Release 的状态
+$ helm status RELEASE_NAME
+# 移除所有于这个 Release 相关的 kubernetes 资源
+$ helm delete cautious-shrimp 
+# helm rollback RELEASE_NAME REVISION_NUMBER
+$ helm rollback cautious-shrimp 1
+# 使用 helm delete --purge RELEASE_NAME 移除所有者与指定 Release 相关的 kubernetes 资源和所有这个Release</code></pre>
+
             </div>
             <hr/>
 
