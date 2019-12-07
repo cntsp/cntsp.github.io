@@ -476,7 +476,7 @@ Se">
         <div class="card-content article-card-content">
             <div id="articleContent">
                 <h2 id="Service-的概念"><a href="#Service-的概念" class="headerlink" title="Service 的概念"></a>Service 的概念</h2><p><strong>Kubernetes service 定义了这样一种抽象：一个 Pod 的逻辑分组，一种可以访问它们的策略 – 通常称为微服务。这一组 <code>Pod</code> 能够被<code>Service</code>访问到，通常是通过<code>Lable Selector</code></strong></p>
-<p><img src="./images/14.png" alt=""></p>
+<p><img src="https://cntsp.github.io/medias/contents/14.png" alt=""></p>
 <p><strong>Service能够提供负载均衡的能力，但是在使用上有以下限制：</strong></p>
 <ul>
 <li><strong>只提供4层负载均衡能力，而没有7层功能，但有时我们可能需要更多的匹配规则来转发请求，这点上4层负载均衡是不支持的</strong></li>
@@ -488,13 +488,13 @@ Se">
 <li><strong>LoadBalancer:在NodePort的基础上，借助cloud provider创建一个外部负载均衡器，并将请求转发到<NodeIP>:NodePort</strong></li>
 <li><strong>ExternalName: 把集群外部的服务引入到集群内部来，在集群内部直接使用。没有任何类型代理被创建，这只有kubernetes1.7或更高版本的kube-dns才支持</strong></li>
 </ul>
-<p><img src="./images/15.png" alt=""></p>
+<p><img src="https://cntsp.github.io/medias/contents/15.png" alt=""></p>
 <h2 id="VIP-和-Service-代理"><a href="#VIP-和-Service-代理" class="headerlink" title="VIP 和 Service 代理"></a>VIP 和 Service 代理</h2><p><strong>在 Kubernetes 集群中，每个 Node 运行一个 <code>kube-proxy</code>进程。<code>kube-proxy</code> 负责为 <code>Service</code>实现了一种VIP（虚拟IP）的形式，而不是 <code>ExternalName</code>的形式。在 Kubernetes v1.0 版本，代理完全在userspace。在Kubernetes v1.1版本，新增了 iptables 代理，但并不是默认的运行模式。从Kubernetes v1.2起，默认就是iptables代理。在Kubernetes v1.8.0-beta.0中，添加了ipvs代理</strong></p>
 <p><strong>在kubernetes 1.14版本中开始默认使用 ipvs 代理</strong></p>
 <p><strong>在 kubernetes v1.0 版本， <code>Service</code>是”4层”（TCP/UDP over IP）概念。在kubernetes v1.1版本，新增了 <code>Ingress</code> API(beta版)，用来表示“7层”(HTTP)服务</strong></p>
 <p><strong>！为何不使用 round-robin DNS?</strong>（DNS缓存问题）</p>
-<h2 id="代理模式的分类"><a href="#代理模式的分类" class="headerlink" title="代理模式的分类"></a>代理模式的分类</h2><p><img src="./images/16.png" alt=""></p>
-<p><img src="./images/17.png" alt=""></p>
+<h2 id="代理模式的分类"><a href="#代理模式的分类" class="headerlink" title="代理模式的分类"></a>代理模式的分类</h2><p><img src="https://cntsp.github.io/medias/contents/16.png" alt=""></p>
+<p><img src="https://cntsp.github.io/medias/contents/17.png" alt=""></p>
 <h2>III、ipvs 代理模式</h2>
 
 <p><strong>这种模式，kube-proxy会监视kubernetes <code>Service</code>对象和<code>Endpoints</code>，调用<code>netlink</code>接口以响应地创建 ipvs 规则并定期与Kubernetes <code>Service</code>对象和<code>Endpoints</code>对象同步ipvs规则，以确保ipvs状态与期望一致。访问服务时，流量将被重定向到其中一个后端Pod</strong></p>
@@ -509,9 +509,9 @@ Se">
 </ul>
 <!--注意： ipvs 模式假定在运行 kube-proxy 之前在节点上都已经安装了 IPVS 内核模块。当kube-proxy 以 ipvs 代理模式启动时，kube-proxy 将验证节点上是否安装了 IPVS 模块，如果未安装，则 kube-proxy 将回退到 iptables 代理模式-->
 
-<p><img src="./images/18.png" alt=""></p>
+<p><img src="https://cntsp.github.io/medias/contents/18.png" alt=""></p>
 <h2 id="ClusterIP"><a href="#ClusterIP" class="headerlink" title="ClusterIP"></a>ClusterIP</h2><p><strong>clusterIP 主要在每个node节点使用iptables，将发向clusterIP对应端口的数据，转发到kube-proxy中。然后kube-proxy自己内部实现有负载均衡的方法，并可以查询到这个service下对应的pod的地址和端口，进而把数据转发给对应的pod的地址和端口</strong></p>
-<p><img src="./images/19.png" alt=""></p>
+<p><img src="https://cntsp.github.io/medias/contents/19.png" alt=""></p>
 <p><strong>为了实现图上的功能，主要需要以下几个组件协同工作：</strong></p>
 <ul>
 <li><strong>apiserver用户通过kubectl命令向apiserver发送创建service的命令，apiserver接收到请求后将数据存储到etcd中</strong></li>
@@ -636,7 +636,7 @@ tsgj-deployment-855476f755-crkrn   1/1     Running   0          34h
 </code></pre>
 <h2 id="查询流程"><a href="#查询流程" class="headerlink" title="查询流程"></a>查询流程</h2><p>iptables  -t nat</p>
 <h2 id="LoadBalancer"><a href="#LoadBalancer" class="headerlink" title="LoadBalancer"></a>LoadBalancer</h2><p><strong>loadBalancer 和 nodePort 其实是同一种方式。区别在于loadBalancer 比 nodePort多了以步，就是可以调用cloud provider 去创建LB来向节点导流</strong></p>
-<p><img src="./images/20.png" alt=""></p>
+<p><img src="https://cntsp.github.io/medias/contents/20.png" alt=""></p>
 <h2 id="ExternalName"><a href="#ExternalName" class="headerlink" title="ExternalName"></a>ExternalName</h2><p><strong>这种类型的 Service 通过返回 CNAME 和它的值，可以将服务映射到 externalName 字段的内容(例如：<code>harbor.bwingame8.com</code>)。ExternalName Service 是 Service 的特例，它没有selector，也没有定义任何的端口和 Endpoint。相反的，对于运行在集群外部的服务，它通过返回该外部服务的别名这种方式来提供服务。</strong></p>
 <pre class=" language-bash"><code class="language-bash">kind: Service
 apiVersion: v1
