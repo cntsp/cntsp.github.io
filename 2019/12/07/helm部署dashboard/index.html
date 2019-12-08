@@ -5,7 +5,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="keywords" content="helm部署dashboard, 阿培">
-    <meta name="description" content="helm部署dashboard | 阿培">
+    <meta name="description" content="使用 Helm 部署 dashboard之前我们对于kubernetes集群的所有操作都是通过命令行工具kubectl完成的。为了提供更丰富的用户体验，kubernetes还开发了一个基于Web 的Dashboard，用户可以用kubern">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -425,12 +425,29 @@
             <div class="row tag-cate">
                 <div class="col s7">
                     
-                          <div class="article-tag">
-                            <span class="chip bg-color">无标签</span>
-                          </div>
+                    <div class="article-tag">
+                        
+                            <a href="/tags/kuberntes/">
+                                <span class="chip bg-color">kuberntes</span>
+                            </a>
+                        
+                            <a href="/tags/dashboard/">
+                                <span class="chip bg-color">dashboard</span>
+                            </a>
+                        
+                    </div>
                     
                 </div>
                 <div class="col s5 right-align">
+                    
+                    <div class="post-cate">
+                        <i class="fas fa-bookmark fa-fw icon-category"></i>
+                        
+                            <a href="/categories/%E5%AE%B9%E5%99%A8%E6%8A%80%E6%9C%AF/" class="post-category">
+                                容器技术
+                            </a>
+                        
+                    </div>
                     
                 </div>
             </div>
@@ -456,7 +473,305 @@
         <hr class="clearfix">
         <div class="card-content article-card-content">
             <div id="articleContent">
-                
+                <h2 id="使用-Helm-部署-dashboard"><a href="#使用-Helm-部署-dashboard" class="headerlink" title="使用 Helm 部署 dashboard"></a>使用 Helm 部署 dashboard</h2><p><strong>之前我们对于kubernetes集群的所有操作都是通过命令行工具kubectl完成的。为了提供更丰富的用户体验，kubernetes还开发了一个基于Web 的Dashboard，用户可以用kubernetes dashboard 部署容器化的应用、监控应用的状态、执行故障排查任务以及管理kubernetes的各种资源。</strong></p>
+<p><strong>在Kubernetes Dashboard 中可以查看集群中应用的运行状态，也能够创建和修改各种kubernetes资源，比如Deployment、Job、DeamonSet 等。用户可以 Scale Up/Down Deployment、执行 Rolling Update、重启某个Pod 或者通过向导部署新的应用。Dashboard 能显示集群中各个资源的状态以及日志信息。(虽然dashboard也提供了kubectl的绝大部分功能，但是界面太简陋，我们更倾向于rancher)</strong></p>
+<p><strong>kubernetes-dashboard.yaml</strong></p>
+<pre class=" language-yaml"><code class="language-yaml"><span class="token key atrule">image</span><span class="token punctuation">:</span>
+  <span class="token key atrule">repository</span><span class="token punctuation">:</span> k8s.gcr.io/kubernetes<span class="token punctuation">-</span>dashboard<span class="token punctuation">-</span>amd64
+  <span class="token key atrule">tag</span><span class="token punctuation">:</span> v1.10.1
+<span class="token key atrule">ingress</span><span class="token punctuation">:</span>
+  <span class="token key atrule">enabled</span><span class="token punctuation">:</span> <span class="token boolean important">true</span>
+  <span class="token key atrule">hosts</span><span class="token punctuation">:</span>
+    <span class="token punctuation">-</span> k8s.frognew.com
+  <span class="token key atrule">annotationss</span><span class="token punctuation">:</span>
+    <span class="token key atrule">nginx.ingress.kubernetes.io/ssl-redirect</span><span class="token punctuation">:</span> <span class="token string">"true"</span>
+    <span class="token key atrule">nginx.ingress.kubernetes.io/backend-protocol</span><span class="token punctuation">:</span> <span class="token string">"HTTPS"</span>
+  <span class="token key atrule">tls</span><span class="token punctuation">:</span>
+    <span class="token punctuation">-</span> <span class="token key atrule">secretName</span><span class="token punctuation">:</span> frognew<span class="token punctuation">-</span>com<span class="token punctuation">-</span>tls<span class="token punctuation">-</span>secret
+      <span class="token key atrule">hosts</span><span class="token punctuation">:</span>
+      <span class="token punctuation">-</span> k8s.frognew.com
+<span class="token key atrule">rbac</span><span class="token punctuation">:</span>
+  <span class="token key atrule">clusterAdminRole</span><span class="token punctuation">:</span> <span class="token boolean important">true</span></code></pre>
+<pre class=" language-shell"><code class="language-shell">helm install stable/kubernetes-dashboard \
+-n kubernetes-dashboard \
+--namespace kube-system \
+-f kubernetes-dashboard.yaml</code></pre>
+<pre class=" language-bash"><code class="language-bash">kubectl -n kube-system get secret <span class="token operator">|</span> <span class="token function">grep</span> kubernetes-dashboard-token
+kubernetes </code></pre>
+<pre class=" language-shell"><code class="language-shell"># 操作过程
+[root@k8s-master dashboard]# helm fetch stable/kubernetes-dashboard 
+[root@k8s-master dashboard]# helm search dashboard
+NAME                           CHART VERSION    APP VERSION    DESCRIPTION                                                 
+stable/kubernetes-dashboard    1.10.1           1.10.1         General-purpose web UI for Kubernetes clusters              
+stable/jasperreports           7.0.1            7.2.0          The JasperReports server can be used as a stand-alone or ...
+stable/kube-ops-view           1.1.1            19.9.0         Kubernetes Operational View - read-only system dashboard ...
+stable/uchiwa                  1.0.0            0.22           Dashboard for the Sensu monitoring framework                
+stable/weave-cloud             0.3.7            1.4.0          Weave Cloud is a add-on to Kubernetes which provides Cont...
+stable/weave-scope             1.1.7            1.11.6         A Helm chart for the Weave Scope cluster visualizer.        
+[root@k8s-master dashboard]# helm repo list
+NAME      URL                                             
+stable    https://kubernetes-charts.storage.googleapis.com
+local     http://127.0.0.1:8879/charts                    
+[root@k8s-master dashboard]# ls
+kubernetes-dashboard-1.10.1.tgz
+[root@k8s-master dashboard]# tar -zxf kubernetes-dashboard-1.10.1.tgz 
+tar: kubernetes-dashboard/Chart.yaml：不可信的旧时间戳 1970-01-01 08:00:00
+tar: kubernetes-dashboard/values.yaml：不可信的旧时间戳 1970-01-01 08:00:00
+tar: kubernetes-dashboard/templates/NOTES.txt：不可信的旧时间戳 1970-01-01 08:00:00
+tar: kubernetes-dashboard/templates/_helpers.tpl：不可信的旧时间戳 1970-01-01 08:00:00
+tar: kubernetes-dashboard/templates/clusterrole-readonly.yaml：不可信的旧时间戳 1970-01-01 08:00:00
+tar: kubernetes-dashboard/templates/deployment.yaml：不可信的旧时间戳 1970-01-01 08:00:00
+tar: kubernetes-dashboard/templates/ingress.yaml：不可信的旧时间戳 1970-01-01 08:00:00
+tar: kubernetes-dashboard/templates/networkpolicy.yaml：不可信的旧时间戳 1970-01-01 08:00:00
+tar: kubernetes-dashboard/templates/pdb.yaml：不可信的旧时间戳 1970-01-01 08:00:00
+tar: kubernetes-dashboard/templates/role.yaml：不可信的旧时间戳 1970-01-01 08:00:00
+tar: kubernetes-dashboard/templates/rolebinding.yaml：不可信的旧时间戳 1970-01-01 08:00:00
+tar: kubernetes-dashboard/templates/secret.yaml：不可信的旧时间戳 1970-01-01 08:00:00
+tar: kubernetes-dashboard/templates/serviceaccount.yaml：不可信的旧时间戳 1970-01-01 08:00:00
+tar: kubernetes-dashboard/templates/svc.yaml：不可信的旧时间戳 1970-01-01 08:00:00
+tar: kubernetes-dashboard/.helmignore：不可信的旧时间戳 1970-01-01 08:00:00
+tar: kubernetes-dashboard/README.md：不可信的旧时间戳 1970-01-01 08:00:00
+[root@k8s-master dashboard]# ls
+kubernetes-dashboard  kubernetes-dashboard-1.10.1.tgz
+[root@k8s-master dashboard]# cd kubernetes-dashboard
+[root@k8s-master kubernetes-dashboard]# ls
+Chart.yaml  README.md  templates  values.yaml
+[root@k8s-master kubernetes-dashboard]# vim kubernetes-dashboard.yaml
+image:
+  repository: k8s.gcr.io/kubernetes-dashboard-amd64
+  tag: v1.10.1
+ingress:
+  enabled: true
+  hosts:
+    - k8s.frognew.com
+  annotationss:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+  tls:
+    - secretName: frognew-com-tls-secret
+      hosts:
+      - k8s.frognew.com
+rbac:
+  clusterAdminRole: true
+
+[root@k8s-master kubernetes-dashboard]# ls
+Chart.yaml  kubernetes-dashboard.yaml  README.md  templates  values.yaml
+
+[root@k8s-master kubernetes-dashboard]# helm install . -n kubernetes-dashboard --namespace kube-system -f kubernetes-dashboard.yaml 
+NAME:   kubernetes-dashboard
+LAST DEPLOYED: Sat Dec  7 22:17:49 2019
+NAMESPACE: kube-system
+STATUS: DEPLOYED
+
+RESOURCES:
+==> v1/ClusterRoleBinding
+NAME                  AGE
+kubernetes-dashboard  0s
+
+==> v1/Deployment
+NAME                  READY  UP-TO-DATE  AVAILABLE  AGE
+kubernetes-dashboard  0/1    1           0          0s
+
+==> v1/Pod(related)
+NAME                                   READY  STATUS             RESTARTS  AGE
+kubernetes-dashboard-77f54dc48f-jvtns  0/1    ContainerCreating  0         0s
+
+==> v1/Secret
+NAME                  TYPE    DATA  AGE
+kubernetes-dashboard  Opaque  0     0s
+
+==> v1/Service
+NAME                  TYPE       CLUSTER-IP     EXTERNAL-IP  PORT(S)  AGE
+kubernetes-dashboard  ClusterIP  10.108.213.51  <none>       443/TCP  0s
+
+==> v1/ServiceAccount
+NAME                  SECRETS  AGE
+kubernetes-dashboard  1        0s
+
+==> v1beta1/Ingress
+NAME                  HOSTS            ADDRESS  PORTS  AGE
+kubernetes-dashboard  k8s.frognew.com  80, 443  0s
+
+
+NOTES:
+*********************************************************************************
+*** PLEASE BE PATIENT: kubernetes-dashboard may take a few minutes to install ***
+*********************************************************************************
+From outside the cluster, the server URL(s) are:
+     https://k8s.frognew.com
+
+[root@k8s-master kubernetes-dashboard]# kubectl get pod -n kube-system
+NAME                                    READY   STATUS    RESTARTS   AGE
+coredns-5c98db65d4-pxl78                1/1     Running   0          14d
+coredns-5c98db65d4-vdtsr                1/1     Running   0          14d
+etcd-k8s-master                         1/1     Running   0          14d
+kube-apiserver-k8s-master               1/1     Running   0          14d
+kube-controller-manager-k8s-master      1/1     Running   0          14d
+kube-flannel-ds-amd64-852cl             1/1     Running   0          14d
+kube-flannel-ds-amd64-p5h64             1/1     Running   0          14d
+kube-flannel-ds-amd64-rglvq             1/1     Running   0          12d
+kube-proxy-6sp4j                        1/1     Running   0          14d
+kube-proxy-hbnkf                        1/1     Running   0          12d
+kube-proxy-ttjcn                        1/1     Running   0          14d
+kube-scheduler-k8s-master               1/1     Running   0          14d
+kubernetes-dashboard-77f54dc48f-jvtns   1/1     Running   0          26s
+tiller-deploy-58565b5464-8vrfb          1/1     Running   0          7h50m
+[root@k8s-master kubernetes-dashboard]# kubectl get svc -n kube-system
+NAME                   TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)                  AGE
+kube-dns               ClusterIP   10.96.0.10       <none>        53/UDP,53/TCP,9153/TCP   14d
+kubernetes-dashboard   ClusterIP   10.108.213.51    <none>        443/TCP                  115s
+tiller-deploy          ClusterIP   10.102.235.237   <none>        44134/TCP                7h51m
+[root@k8s-master kubernetes-dashboard]# ls
+Chart.yaml  kubernetes-dashboard.yaml  README.md  templates  values.yaml
+[root@k8s-master kubernetes-dashboard]# cat kubernetes-dashboard.yaml 
+image:
+  repository: k8s.gcr.io/kubernetes-dashboard-amd64
+  tag: v1.10.1
+ingress:
+  enabled: true
+  hosts:
+    - k8s.frognew.com
+  annotationss:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+  tls:
+    - secretName: frognew-com-tls-secret
+      hosts:
+      - k8s.frognew.com
+rbac:
+  clusterAdminRole: true
+[root@k8s-master kubernetes-dashboard]# kubectl get ingress -n kube-system
+NAME                   HOSTS             ADDRESS       PORTS     AGE
+kubernetes-dashboard   k8s.frognew.com   10.109.8.33   80, 443   2m51s
+[root@k8s-master kubernetes-dashboard]# kubectl get svc -n kube-system
+NAME                   TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)                  AGE
+kube-dns               ClusterIP   10.96.0.10       <none>        53/UDP,53/TCP,9153/TCP   14d
+kubernetes-dashboard   ClusterIP   10.108.213.51    <none>        443/TCP                  3m39s
+tiller-deploy          ClusterIP   10.102.235.237   <none>        44134/TCP                7h53m
+[root@k8s-master kubernetes-dashboard]# kubectl get deployment -n kube-system
+NAME                   READY   UP-TO-DATE   AVAILABLE   AGE
+coredns                2/2     2            2           14d
+kubernetes-dashboard   1/1     1            1           3m50s
+tiller-deploy          1/1     1            1           7h53m
+[root@k8s-master kubernetes-dashboard]# kubectl get deployment -n kube-system -o wide
+NAME                   READY   UP-TO-DATE   AVAILABLE   AGE     CONTAINERS             IMAGES                                          SELECTOR
+coredns                2/2     2            2           14d     coredns                k8s.gcr.io/coredns:1.3.1                        k8s-app=kube-dns
+kubernetes-dashboard   1/1     1            1           3m58s   kubernetes-dashboard   k8s.gcr.io/kubernetes-dashboard-amd64:v1.10.1   app=kubernetes-dashboard,release=kubernetes-dashboard
+tiller-deploy          1/1     1            1           7h53m   tiller                 gcr.io/kubernetes-helm/tiller:v2.13.1           app=helm,name=tiller
+[root@k8s-master kubernetes-dashboard]# kubectl get pod  -n kube-system -o wide
+NAME                                    READY   STATUS    RESTARTS   AGE     IP             NODE         NOMINATED NODE   READINESS GATES
+coredns-5c98db65d4-pxl78                1/1     Running   0          14d     10.244.0.2     k8s-master   <none>           <none>
+coredns-5c98db65d4-vdtsr                1/1     Running   0          14d     10.244.0.3     k8s-master   <none>           <none>
+etcd-k8s-master                         1/1     Running   0          14d     192.168.1.85   k8s-master   <none>           <none>
+kube-apiserver-k8s-master               1/1     Running   0          14d     192.168.1.85   k8s-master   <none>           <none>
+kube-controller-manager-k8s-master      1/1     Running   0          14d     192.168.1.85   k8s-master   <none>           <none>
+kube-flannel-ds-amd64-852cl             1/1     Running   0          14d     192.168.1.85   k8s-master   <none>           <none>
+kube-flannel-ds-amd64-p5h64             1/1     Running   0          14d     192.168.1.38   k8s-node1    <none>           <none>
+kube-flannel-ds-amd64-rglvq             1/1     Running   0          12d     192.168.1.86   k8s-node2    <none>           <none>
+kube-proxy-6sp4j                        1/1     Running   0          14d     192.168.1.85   k8s-master   <none>           <none>
+kube-proxy-hbnkf                        1/1     Running   0          12d     192.168.1.86   k8s-node2    <none>           <none>
+kube-proxy-ttjcn                        1/1     Running   0          14d     192.168.1.38   k8s-node1    <none>           <none>
+kube-scheduler-k8s-master               1/1     Running   0          14d     192.168.1.85   k8s-master   <none>           <none>
+kubernetes-dashboard-77f54dc48f-jvtns   1/1     Running   0          4m8s    10.244.1.60    k8s-node1    <none>           <none>
+tiller-deploy-58565b5464-8vrfb          1/1     Running   0          7h54m   10.244.1.57    k8s-node1    <none>           <none>
+[root@k8s-master kubernetes-dashboard]# kubectl get svc -n kube-system
+NAME                   TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)                  AGE
+kube-dns               ClusterIP   10.96.0.10       <none>        53/UDP,53/TCP,9153/TCP   14d
+kubernetes-dashboard   ClusterIP   10.108.213.51    <none>        443/TCP                  6m33s
+tiller-deploy          ClusterIP   10.102.235.237   <none>        44134/TCP                7h56m
+
+[root@k8s-master kubernetes-dashboard]# kubectl edit svc kubernetes-dashboard -n kube-system
+service/kubernetes-dashboard edited
+[root@k8s-master kubernetes-dashboard]# kubectl get svc -n kube-system
+NAME                   TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)                  AGE
+kube-dns               ClusterIP   10.96.0.10       <none>        53/UDP,53/TCP,9153/TCP   14d
+kubernetes-dashboard   NodePort    10.108.213.51    <none>        443:31417/TCP            9m46s
+tiller-deploy          ClusterIP   10.102.235.237   <none>        44134/TCP                7h59m
+[root@k8s-master kubernetes-dashboard]# kubectl get svc -n kube-system
+NAME                   TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)                  AGE
+kube-dns               ClusterIP   10.96.0.10       <none>        53/UDP,53/TCP,9153/TCP   14d
+kubernetes-dashboard   NodePort    10.108.213.51    <none>        443:31417/TCP            9m59s
+tiller-deploy          ClusterIP   10.102.235.237   <none>        44134/TCP                7h59m
+[root@k8s-master kubernetes-dashboard]# kubectl get ingress -n kube-system
+NAME                   HOSTS             ADDRESS       PORTS     AGE
+kubernetes-dashboard   k8s.frognew.com   10.109.8.33   80, 443   10m
+[root@k8s-master kubernetes-dashboard]# ls
+Chart.yaml  kubernetes-dashboard.yaml  README.md  templates  values.yaml
+[root@k8s-master kubernetes-dashboard]# cat kubernetes-dashboard.yaml 
+image:
+  repository: k8s.gcr.io/kubernetes-dashboard-amd64
+  tag: v1.10.1
+ingress:
+  enabled: true
+  hosts:
+    - k8s.frognew.com
+  annotationss:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+  tls:
+    - secretName: frognew-com-tls-secret
+      hosts:
+      - k8s.frognew.com
+rbac:
+  clusterAdminRole: true
+[root@k8s-master kubernetes-dashboard]# kubectl get secret -n  kube-system
+NAME                                             TYPE                                  DATA   AGE
+attachdetach-controller-token-lr85z              kubernetes.io/service-account-token   3      14d
+bootstrap-signer-token-lqklw                     kubernetes.io/service-account-token   3      14d
+bootstrap-token-28wdcv                           bootstrap.kubernetes.io/token         6      12d
+bootstrap-token-5q91af                           bootstrap.kubernetes.io/token         4      14d
+bootstrap-token-abcdef                           bootstrap.kubernetes.io/token         6      14d
+bootstrap-token-uw6dfy                           bootstrap.kubernetes.io/token         6      13d
+certificate-controller-token-ncc46               kubernetes.io/service-account-token   3      14d
+clusterrole-aggregation-controller-token-wl29h   kubernetes.io/service-account-token   3      14d
+coredns-token-xwkxz                              kubernetes.io/service-account-token   3      14d
+cronjob-controller-token-5vd7t                   kubernetes.io/service-account-token   3      14d
+daemon-set-controller-token-7hp2n                kubernetes.io/service-account-token   3      14d
+default-token-nf2rq                              kubernetes.io/service-account-token   3      14d
+deployment-controller-token-gx8q7                kubernetes.io/service-account-token   3      14d
+disruption-controller-token-gm6m2                kubernetes.io/service-account-token   3      14d
+endpoint-controller-token-5wthb                  kubernetes.io/service-account-token   3      14d
+expand-controller-token-mpxwh                    kubernetes.io/service-account-token   3      14d
+flannel-token-mz7br                              kubernetes.io/service-account-token   3      14d
+generic-garbage-collector-token-9zsbr            kubernetes.io/service-account-token   3      14d
+horizontal-pod-autoscaler-token-hlk95            kubernetes.io/service-account-token   3      14d
+job-controller-token-j4kc8                       kubernetes.io/service-account-token   3      14d
+kube-proxy-token-nx78p                           kubernetes.io/service-account-token   3      14d
+kubeadm-certs                                    Opaque                                8      14d
+kubernetes-dashboard                             Opaque                                0      31m
+kubernetes-dashboard-key-holder                  Opaque                                2      30m
+kubernetes-dashboard-token-sfk4h                 kubernetes.io/service-account-token   3      31m
+namespace-controller-token-4dh92                 kubernetes.io/service-account-token   3      14d
+node-controller-token-8fh9x                      kubernetes.io/service-account-token   3      14d
+persistent-volume-binder-token-w4hsl             kubernetes.io/service-account-token   3      14d
+pod-garbage-collector-token-ktnq8                kubernetes.io/service-account-token   3      14d
+pv-protection-controller-token-wrpk7             kubernetes.io/service-account-token   3      14d
+pvc-protection-controller-token-fg2s8            kubernetes.io/service-account-token   3      14d
+replicaset-controller-token-c8kvp                kubernetes.io/service-account-token   3      14d
+replication-controller-token-t8nv5               kubernetes.io/service-account-token   3      14d
+resourcequota-controller-token-q7q65             kubernetes.io/service-account-token   3      14d
+service-account-controller-token-jdp6f           kubernetes.io/service-account-token   3      14d
+service-controller-token-44bsm                   kubernetes.io/service-account-token   3      14d
+statefulset-controller-token-cd7hf               kubernetes.io/service-account-token   3      14d
+tiller-token-4zv2h                               kubernetes.io/service-account-token   3      8h
+token-cleaner-token-hv8mb                        kubernetes.io/service-account-token   3      14d
+ttl-controller-token-vml2r                       kubernetes.io/service-account-token   3      14d
+[root@k8s-master kubernetes-dashboard]# kubectl describe secret kubernetes-dashboard-token-sfk4h -n kube-system
+Name:         kubernetes-dashboard-token-sfk4h
+Namespace:    kube-system
+Labels:       <none>
+Annotations:  kubernetes.io/service-account.name: kubernetes-dashboard
+              kubernetes.io/service-account.uid: c3491009-8247-471c-a2ec-c91ddf3e71b9
+
+Type:  kubernetes.io/service-account-token
+
+Data
+====
+ca.crt:     1025 bytes
+namespace:  11 bytes
+token:      eyJhbGciOiJSUzI1NiIsImtpZCI6IiJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJrdWJlLXN5c3RlbSIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VjcmV0Lm5hbWUiOiJrdWJlcm5ldGVzLWRhc2hib2FyZC10b2tlbi1zZms0aCIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50Lm5hbWUiOiJrdWJlcm5ldGVzLWRhc2hib2FyZCIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50LnVpZCI6ImMzNDkxMDA5LTgyNDctNDcxYy1hMmVjLWM5MWRkZjNlNzFiOSIsInN1YiI6InN5c3RlbTpzZXJ2aWNlYWNjb3VudDprdWJlLXN5c3RlbTprdWJlcm5ldGVzLWRhc2hib2FyZCJ9.Ug4DVwjxJVP_MlPj27s0n4UD4us27w6XLsYzLv0Neq4Sa06NgtpiUauN-cFNjPrrQJITbQ6_rsyaA8TN0-uWcz1UMY0riiOXZ6FHed1kmGj109IIgpWazgR_Ue5vhFR2jUbh7XhW1ElB9CaOCcqhkwDVwitb7TMXelA3AuVZGcatVjGc4aeYpAqHFBcI4TWB2C2ekPJqrAY-MUOo-ra-TPJ-wBsvtqq497uLpGGI3VrUyGHNRegq7lASxHvZWMCc939WkPw1D24ysIaHsdN6BBPxDyU8BwixDJhtdX5evbJkQTCmunYKMIcYK0PoVNRAj4AInvjJwU5c4wOM48rx7Q
+</code></pre>
+
             </div>
             <hr/>
 
@@ -518,7 +833,15 @@
                 <div class="post-meta__tag-list" style="display: inline-block;">
                     
                         <div class="article-tag">
-                            <span class="chip bg-color">无标签</span>
+                            
+                                <a href="/tags/kuberntes/">
+                                    <span class="chip bg-color">kuberntes</span>
+                                </a>
+                            
+                                <a href="/tags/dashboard/">
+                                    <span class="chip bg-color">dashboard</span>
+                                </a>
+                            
                         </div>
                     
                 </div>
@@ -699,7 +1022,7 @@
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            
+                            使用 Helm 部署 dashboard之前我们对于kubernetes集群的所有操作都是通过命令行工具kubectl完成的。为了提供更丰富的用户体验，kubernetes还开发了一个基于Web 的Dashboard，用户可以用kubern
                         
                     </div>
                     <div class="publish-info">
@@ -708,13 +1031,29 @@
                             </span>
                         <span class="publish-author">
                             
-                            <i class="fas fa-user fa-fw"></i>
-                            阿培
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/%E5%AE%B9%E5%99%A8%E6%8A%80%E6%9C%AF/" class="post-category">
+                                    容器技术
+                                </a>
+                            
                             
                         </span>
                     </div>
                 </div>
 
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/kuberntes/">
+                        <span class="chip bg-color">kuberntes</span>
+                    </a>
+                    
+                    <a href="/tags/dashboard/">
+                        <span class="chip bg-color">dashboard</span>
+                    </a>
+                    
+                </div>
                 
             </div>
         </div>
