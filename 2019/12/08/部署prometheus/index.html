@@ -589,7 +589,7 @@ prometheus-operated     ClusterIP   None             <none>        9090/TCP     
 prometheus-operator     ClusterIP   None             <none>        8080/TCP                     4m11s
 </code></pre>
 <h2 id="访问prometheus"><a href="#访问prometheus" class="headerlink" title="访问prometheus"></a>访问prometheus</h2><p><strong>prometheus 对应的nodeport端口为30200，访问： <a href="http://k8s-master:30200或者http://k8s-node1:302200或者http://k8s-node2:30200" target="_blank" rel="noopener">http://k8s-master:30200或者http://k8s-node1:302200或者http://k8s-node2:30200</a></strong></p>
-<p><img src="https://cntsp.github.io/medias/content/28.png" alt=""></p>
+<p><img src="https://cntsp.github.io/medias/contents/28.png" alt=""></p>
 <p><strong>通过访问 <a href="http://k8s-master:30200/target" target="_blank" rel="noopener">http://k8s-master:30200/target</a> 可以看出prometheus 已经成功连接上 k8s 的apiserver</strong></p>
 <p><img src="https://cntsp.github.io/medias/contents/29.png" alt=""></p>
 <p><img src="https://cntsp.github.io/medias/contents/30.png" alt=""></p>
@@ -616,6 +616,9 @@ grafana                 NodePort    10.96.206.146    <none>        3000:30100/TC
 <p><img src="https://cntsp.github.io/medias/contents/41.png" alt=""></p>
 <p><img src="https://cntsp.github.io/medias/contents/42.png" alt=""></p>
 <p><img src="https://cntsp.github.io/medias/contents/43.png" alt=""></p>
+<h2 id="Horizontal-Pod-Autoscaling"><a href="#Horizontal-Pod-Autoscaling" class="headerlink" title="Horizontal Pod Autoscaling"></a>Horizontal Pod Autoscaling</h2><p><strong>Horizontal Pod Autoscaling 可以根据 CPU 利用率自动伸缩一个 Replication Controller、 Deployment 或者 Replica Set 中的 Pod 数量</strong></p>
+<!-- 为了-->
+
 
             </div>
             <hr/>
