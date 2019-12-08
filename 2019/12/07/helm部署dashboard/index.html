@@ -771,7 +771,10 @@ ca.crt:     1025 bytes
 namespace:  11 bytes
 token:      eyJhbGciOiJSUzI1NiIsImtpZCI6IiJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJrdWJlLXN5c3RlbSIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VjcmV0Lm5hbWUiOiJrdWJlcm5ldGVzLWRhc2hib2FyZC10b2tlbi1zZms0aCIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50Lm5hbWUiOiJrdWJlcm5ldGVzLWRhc2hib2FyZCIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50LnVpZCI6ImMzNDkxMDA5LTgyNDctNDcxYy1hMmVjLWM5MWRkZjNlNzFiOSIsInN1YiI6InN5c3RlbTpzZXJ2aWNlYWNjb3VudDprdWJlLXN5c3RlbTprdWJlcm5ldGVzLWRhc2hib2FyZCJ9.Ug4DVwjxJVP_MlPj27s0n4UD4us27w6XLsYzLv0Neq4Sa06NgtpiUauN-cFNjPrrQJITbQ6_rsyaA8TN0-uWcz1UMY0riiOXZ6FHed1kmGj109IIgpWazgR_Ue5vhFR2jUbh7XhW1ElB9CaOCcqhkwDVwitb7TMXelA3AuVZGcatVjGc4aeYpAqHFBcI4TWB2C2ekPJqrAY-MUOo-ra-TPJ-wBsvtqq497uLpGGI3VrUyGHNRegq7lASxHvZWMCc939WkPw1D24ysIaHsdN6BBPxDyU8BwixDJhtdX5evbJkQTCmunYKMIcYK0PoVNRAj4AInvjJwU5c4wOM48rx7Q
 </code></pre>
-
+<p>kubernetes-dashboard   NodePort    10.108.213.51    <none>        443:31417/TCP            9m59s</p>
+<p><strong>通过火狐浏览器访问dashboard： <a href="http://k8s-master:31417" target="_blank" rel="noopener">http://k8s-master:31417</a></strong></p>
+<p><img src="https://cntsp.github.io/medias/contents/27.png" alt=""></p>
+<h3 id="Dashboard界面结构介绍-待续"><a href="#Dashboard界面结构介绍-待续" class="headerlink" title="Dashboard界面结构介绍(待续)"></a>Dashboard界面结构介绍(待续)</h3><h3 id="典型使用场景"><a href="#典型使用场景" class="headerlink" title="典型使用场景"></a>典型使用场景</h3><h4 id="部署Deployment"><a href="#部署Deployment" class="headerlink" title="部署Deployment"></a>部署Deployment</h4><h4 id="在线操作"><a href="#在线操作" class="headerlink" title="在线操作"></a>在线操作</h4><h4 id="查看资源详细信息"><a href="#查看资源详细信息" class="headerlink" title="查看资源详细信息"></a>查看资源详细信息</h4>
             </div>
             <hr/>
 
@@ -1005,54 +1008,36 @@ token:      eyJhbGciOiJSUzI1NiIsImtpZCI6IiJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2V
 <article id="prenext-posts" class="prev-next articles">
     <div class="row article-row">
         
-        <div class="article col s12 m6" data-aos="fade-up" data-aos="fade-up">
+        <div class="article col s12 m6" data-aos="fade-up">
             <div class="article-badge left-badge text-color">
-                <i class="far fa-dot-circle"></i>&nbsp;本篇
-            </div>
+                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
             <div class="card">
-                <a href="/2019/12/07/helm%E9%83%A8%E7%BD%B2dashboard/">
+                <a href="/2019/12/08/helm%E9%83%A8%E7%BD%B2metrics-server/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/20.jpg" class="responsive-img" alt="helm部署dashboard">
+                        <img src="/medias/featureimages/5.jpg" class="responsive-img" alt="helm部署metrics-server">
                         
-                        <span class="card-title">helm部署dashboard</span>
+                        <span class="card-title">helm部署metrics-server</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            使用 Helm 部署 dashboard之前我们对于kubernetes集群的所有操作都是通过命令行工具kubectl完成的。为了提供更丰富的用户体验，kubernetes还开发了一个基于Web 的Dashboard，用户可以用kubern
+                            
                         
                     </div>
                     <div class="publish-info">
-                            <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2019-12-07
-                            </span>
+                        <span class="publish-date">
+                            <i class="far fa-clock fa-fw icon-date"></i>2019-12-08
+                        </span>
                         <span class="publish-author">
                             
-                            <i class="fas fa-bookmark fa-fw icon-category"></i>
-                            
-                            <a href="/categories/%E5%AE%B9%E5%99%A8%E6%8A%80%E6%9C%AF/" class="post-category">
-                                    容器技术
-                                </a>
-                            
+                            <i class="fas fa-user fa-fw"></i>
+                            阿培
                             
                         </span>
                     </div>
-                </div>
-
-                
-                <div class="card-action article-tags">
-                    
-                    <a href="/tags/kuberntes/">
-                        <span class="chip bg-color">kuberntes</span>
-                    </a>
-                    
-                    <a href="/tags/dashboard/">
-                        <span class="chip bg-color">dashboard</span>
-                    </a>
-                    
                 </div>
                 
             </div>
