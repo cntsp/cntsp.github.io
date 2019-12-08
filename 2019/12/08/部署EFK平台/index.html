@@ -5,7 +5,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="keywords" content="部署EFK平台, 阿培">
-    <meta name="description" content="部署EFK平台 | 阿培">
+    <meta name="description" content="添加 Google incubator仓库helm repo add incubator http://storage.googleapis.com/kubernetes-charts-incubator
+部署 Elasticsearchk">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -425,12 +426,29 @@
             <div class="row tag-cate">
                 <div class="col s7">
                     
-                          <div class="article-tag">
-                            <span class="chip bg-color">无标签</span>
-                          </div>
+                    <div class="article-tag">
+                        
+                            <a href="/tags/kubernetes/">
+                                <span class="chip bg-color">kubernetes</span>
+                            </a>
+                        
+                            <a href="/tags/%E6%97%A5%E5%BF%97/">
+                                <span class="chip bg-color">日志</span>
+                            </a>
+                        
+                    </div>
                     
                 </div>
                 <div class="col s5 right-align">
+                    
+                    <div class="post-cate">
+                        <i class="fas fa-bookmark fa-fw icon-category"></i>
+                        
+                            <a href="/categories/%E5%AE%B9%E5%99%A8%E6%8A%80%E6%9C%AF/" class="post-category">
+                                容器技术
+                            </a>
+                        
+                    </div>
                     
                 </div>
             </div>
@@ -456,7 +474,19 @@
         <hr class="clearfix">
         <div class="card-content article-card-content">
             <div id="articleContent">
-                
+                <h2 id="添加-Google-incubator仓库"><a href="#添加-Google-incubator仓库" class="headerlink" title="添加 Google incubator仓库"></a>添加 Google incubator仓库</h2><pre class=" language-shell"><code class="language-shell">helm repo add incubator http://storage.googleapis.com/kubernetes-charts-incubator</code></pre>
+<h2 id="部署-Elasticsearch"><a href="#部署-Elasticsearch" class="headerlink" title="部署 Elasticsearch"></a>部署 Elasticsearch</h2><pre class=" language-shell"><code class="language-shell">kubectl create namespace efk
+helm fetch incubator/elasticserarch
+helm install --name els1 --namespace=efk -f values.yaml incubator/elasticsearch
+kubectl run cirror-$RANDOM --rm -it --image=cirros -- /bin/sh
+   curl Elasticsearch:Port/_cat/nodes</code></pre>
+<h2 id="部署-Fluentd"><a href="#部署-Fluentd" class="headerlink" title="部署 Fluentd"></a>部署 Fluentd</h2><pre class=" language-shell"><code class="language-shell">helm fetch stable/fluentd-elasticsearch
+vim values.yaml
+    # 更改其中 Elasticsearch 访问地址
+helm install --name flu1 --namespace=efk -f values.yaml stable/fluentd-elasticsearch</code></pre>
+<h2 id="部署-Kibana"><a href="#部署-Kibana" class="headerlink" title="部署 Kibana"></a>部署 Kibana</h2><pre class=" language-shell"><code class="language-shell">helm fetch stable/kibana --version 0.14.8
+helm install --name kib1 --namespace=efk -f values.yaml stable/kibana --version 0.14.8</code></pre>
+
             </div>
             <hr/>
 
@@ -518,7 +548,15 @@
                 <div class="post-meta__tag-list" style="display: inline-block;">
                     
                         <div class="article-tag">
-                            <span class="chip bg-color">无标签</span>
+                            
+                                <a href="/tags/kubernetes/">
+                                    <span class="chip bg-color">kubernetes</span>
+                                </a>
+                            
+                                <a href="/tags/%E6%97%A5%E5%BF%97/">
+                                    <span class="chip bg-color">日志</span>
+                                </a>
+                            
                         </div>
                     
                 </div>
@@ -699,7 +737,8 @@
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            
+                            添加 Google incubator仓库helm repo add incubator http://storage.googleapis.com/kubernetes-charts-incubator
+部署 Elasticsearchk
                         
                     </div>
                     <div class="publish-info">
@@ -708,13 +747,29 @@
                             </span>
                         <span class="publish-author">
                             
-                            <i class="fas fa-user fa-fw"></i>
-                            阿培
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/%E5%AE%B9%E5%99%A8%E6%8A%80%E6%9C%AF/" class="post-category">
+                                    容器技术
+                                </a>
+                            
                             
                         </span>
                     </div>
                 </div>
 
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/kubernetes/">
+                        <span class="chip bg-color">kubernetes</span>
+                    </a>
+                    
+                    <a href="/tags/%E6%97%A5%E5%BF%97/">
+                        <span class="chip bg-color">日志</span>
+                    </a>
+                    
+                </div>
                 
             </div>
         </div>

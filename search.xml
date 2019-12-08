@@ -8,9 +8,23 @@
       <link href="/2019/12/08/%E9%83%A8%E7%BD%B2EFK%E5%B9%B3%E5%8F%B0/"/>
       <url>/2019/12/08/%E9%83%A8%E7%BD%B2EFK%E5%B9%B3%E5%8F%B0/</url>
       
-        <content type="html"><![CDATA[]]></content>
+        <content type="html"><![CDATA[<h2 id="添加-Google-incubator仓库"><a href="#添加-Google-incubator仓库" class="headerlink" title="添加 Google incubator仓库"></a>添加 Google incubator仓库</h2><pre class=" language-shell"><code class="language-shell">helm repo add incubator http://storage.googleapis.com/kubernetes-charts-incubator</code></pre><h2 id="部署-Elasticsearch"><a href="#部署-Elasticsearch" class="headerlink" title="部署 Elasticsearch"></a>部署 Elasticsearch</h2><pre class=" language-shell"><code class="language-shell">kubectl create namespace efkhelm fetch incubator/elasticserarchhelm install --name els1 --namespace=efk -f values.yaml incubator/elasticsearchkubectl run cirror-$RANDOM --rm -it --image=cirros -- /bin/sh   curl Elasticsearch:Port/_cat/nodes</code></pre><h2 id="部署-Fluentd"><a href="#部署-Fluentd" class="headerlink" title="部署 Fluentd"></a>部署 Fluentd</h2><pre class=" language-shell"><code class="language-shell">helm fetch stable/fluentd-elasticsearchvim values.yaml    # 更改其中 Elasticsearch 访问地址helm install --name flu1 --namespace=efk -f values.yaml stable/fluentd-elasticsearch</code></pre><h2 id="部署-Kibana"><a href="#部署-Kibana" class="headerlink" title="部署 Kibana"></a>部署 Kibana</h2><pre class=" language-shell"><code class="language-shell">helm fetch stable/kibana --version 0.14.8helm install --name kib1 --namespace=efk -f values.yaml stable/kibana --version 0.14.8</code></pre>]]></content>
       
       
+      <categories>
+          
+          <category> 容器技术 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> kubernetes </tag>
+            
+            <tag> 日志 </tag>
+            
+        </tags>
       
     </entry>
     
