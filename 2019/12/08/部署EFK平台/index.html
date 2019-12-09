@@ -476,16 +476,347 @@
             <div id="articleContent">
                 <h2 id="添加-Google-incubator仓库"><a href="#添加-Google-incubator仓库" class="headerlink" title="添加 Google incubator仓库"></a>添加 Google incubator仓库</h2><pre class=" language-shell"><code class="language-shell">helm repo add incubator http://storage.googleapis.com/kubernetes-charts-incubator</code></pre>
 <h2 id="部署-Elasticsearch"><a href="#部署-Elasticsearch" class="headerlink" title="部署 Elasticsearch"></a>部署 Elasticsearch</h2><pre class=" language-shell"><code class="language-shell">kubectl create namespace efk
-helm fetch incubator/elasticserarch
-helm install --name els1 --namespace=efk -f values.yaml incubator/elasticsearch
+[root@k8s-master efk]# helm fetch incubator/elasticsearch
+[root@k8s-master efk]# tar -zxf elasticsearch-1.10.2.tgz && cd elasticsearch
+[root@k8s-master elasticsearch]# helm install --name els1 --namespace=efk -f values.yaml incubator/elasticsearch
+[root@k8s-master ~]# kubectl get svc -n efk
+NAME                           TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)    AGE
+els1-elasticsearch-client      ClusterIP   10.109.173.247   <none>        9200/TCP   40m
+els1-elasticsearch-discovery   ClusterIP   None             <none>        9300/TCP   40m
+
 kubectl run cirror-$RANDOM --rm -it --image=cirros -- /bin/sh
-   curl Elasticsearch:Port/_cat/nodes</code></pre>
-<h2 id="部署-Fluentd"><a href="#部署-Fluentd" class="headerlink" title="部署 Fluentd"></a>部署 Fluentd</h2><pre class=" language-shell"><code class="language-shell">helm fetch stable/fluentd-elasticsearch
-vim values.yaml
-    # 更改其中 Elasticsearch 访问地址
+   curl 10.109.173.247:9200/_cat/nodes</code></pre>
+<h2 id="部署-Fluentd"><a href="#部署-Fluentd" class="headerlink" title="部署 Fluentd"></a>部署 Fluentd</h2><pre class=" language-shell"><code class="language-shell">[root@k8s-master efk]# pwd
+/usr/local/install-k8s/efk
+[root@k8s-master efk]# helm fetch stable/fluentd-elasticsearch
+[root@k8s-master efk]# tar -zxf fluentd-elasticsearch-2.0.7.tgz
+[root@k8s-master efk]# cd fluentd-elasticsearch
+[root@k8s-master fluentd-elasticsearch]# cat values.yaml |grep host
+    host: 'elasticsearch-client'
+    # 修改为其中 Elasticsearch 访问地址 host: '10.109.173.247'
 helm install --name flu1 --namespace=efk -f values.yaml stable/fluentd-elasticsearch</code></pre>
 <h2 id="部署-Kibana"><a href="#部署-Kibana" class="headerlink" title="部署 Kibana"></a>部署 Kibana</h2><pre class=" language-shell"><code class="language-shell">helm fetch stable/kibana --version 0.14.8
 helm install --name kib1 --namespace=efk -f values.yaml stable/kibana --version 0.14.8</code></pre>
+<p>实验记录</p>
+<pre class=" language-shell"><code class="language-shell">[root@k8s-master elasticsearch]# helm list --namespace=efk
+NAME    REVISION    UPDATED                     STATUS      CHART                   APP VERSION    NAMESPACE
+els1    1           Mon Dec  9 15:35:52 2019    DEPLOYED    elasticsearch-1.10.2    6.4.2          efk      
+[root@k8s-master elasticsearch]# helm delete els1
+release "els1" deleted
+[root@k8s-master elasticsearch]# helm install --name els1 --namespace=efk -f values.yaml incubator/elasticsearch
+Error: a release named els1 already exists.
+Run: helm ls --all els1; to check the status of the release
+Or run: helm del --purge els1; to delete it
+[root@k8s-master elasticsearch]# helm ls --all els1
+NAME    REVISION    UPDATED                     STATUS     CHART                   APP VERSION    NAMESPACE
+els1    1           Mon Dec  9 15:35:52 2019    DELETED    elasticsearch-1.10.2    6.4.2          efk      
+[root@k8s-master elasticsearch]# helm del --purge els1
+release "els1" deleted
+[root@k8s-master elasticsearch]# helm install --name els1 --namespace=efk -f values.yaml incubator/elasticsearch
+NAME:   els1
+LAST DEPLOYED: Mon Dec  9 17:16:30 2019
+NAMESPACE: efk
+STATUS: DEPLOYED
+
+RESOURCES:
+==> v1/ConfigMap
+NAME                DATA  AGE
+els1-elasticsearch  4     0s
+
+==> v1/Pod(related)
+NAME                                        READY  STATUS    RESTARTS  AGE
+els1-elasticsearch-client-844687f9f8-w6jfj  0/1    Init:0/1  0         0s
+els1-elasticsearch-client-844687f9f8-xb29p  0/1    Pending   0         0s
+els1-elasticsearch-data-0                   0/1    Init:0/2  0         0s
+els1-elasticsearch-master-0                 0/1    Init:0/2  0         0s
+
+==> v1/Service
+NAME                          TYPE       CLUSTER-IP      EXTERNAL-IP  PORT(S)   AGE
+els1-elasticsearch-client     ClusterIP  10.109.173.247  <none>       9200/TCP  0s
+els1-elasticsearch-discovery  ClusterIP  None            <none>       9300/TCP  0s
+
+==> v1beta1/Deployment
+NAME                       READY  UP-TO-DATE  AVAILABLE  AGE
+els1-elasticsearch-client  0/2    2           0          0s
+
+==> v1beta1/StatefulSet
+NAME                       READY  AGE
+els1-elasticsearch-data    0/2    0s
+els1-elasticsearch-master  0/3    0s
+
+
+NOTES:
+The elasticsearch cluster has been installed.
+
+***
+Please note that this chart has been deprecated and moved to stable.
+Going forward please use the stable version of this chart.
+***
+
+Elasticsearch can be accessed:
+
+  * Within your cluster, at the following DNS name at port 9200:
+
+    els1-elasticsearch-client.efk.svc
+
+  * From outside the cluster, run these commands in the same shell:
+
+    export POD_NAME=$(kubectl get pods --namespace efk -l "app=elasticsearch,component=client,release=els1" -o jsonpath="{.items[0].metadata.name}")
+    echo "Visit http://127.0.0.1:9200 to use Elasticsearch"
+    kubectl port-forward --namespace efk $POD_NAME 9200:9200
+
+[root@k8s-master elasticsearch]# kubectl get pod -n efk
+NAME                                         READY   STATUS    RESTARTS   AGE
+els1-elasticsearch-client-844687f9f8-w6jfj   0/1     Running   0          66s
+els1-elasticsearch-client-844687f9f8-xb29p   0/1     Running   0          66s
+els1-elasticsearch-data-0                    0/1     Running   0          66s
+els1-elasticsearch-master-0                  0/1     Running   0          66s
+[root@k8s-master elasticsearch]# kubectl get pod -n efk
+NAME                                         READY   STATUS    RESTARTS   AGE
+els1-elasticsearch-client-844687f9f8-w6jfj   0/1     Running   0          2m29s
+els1-elasticsearch-client-844687f9f8-xb29p   0/1     Running   0          2m29s
+els1-elasticsearch-data-0                    1/1     Running   0          2m29s
+els1-elasticsearch-data-1                    0/1     Running   0          54s
+els1-elasticsearch-master-0                  1/1     Running   0          2m29s
+els1-elasticsearch-master-1                  0/1     Running   0          54s
+[root@k8s-master elasticsearch]# kubectl get pod -n efk
+NAME                                         READY   STATUS    RESTARTS   AGE
+els1-elasticsearch-client-844687f9f8-w6jfj   1/1     Running   0          28m
+els1-elasticsearch-client-844687f9f8-xb29p   1/1     Running   0          28m
+els1-elasticsearch-data-0                    1/1     Running   0          28m
+els1-elasticsearch-data-1                    1/1     Running   0          27m
+els1-elasticsearch-master-0                  1/1     Running   0          28m
+els1-elasticsearch-master-1                  1/1     Running   0          27m
+els1-elasticsearch-master-2                  1/1     Running   0          26m
+[root@k8s-master elasticsearch]# kubectl get pod -n efk -o wide
+NAME                                         READY   STATUS    RESTARTS   AGE   IP            NODE        NOMINATED NODE   READINESS GATES
+els1-elasticsearch-client-844687f9f8-w6jfj   1/1     Running   0          29m   10.244.3.60   k8s-node2   <none>           <none>
+els1-elasticsearch-client-844687f9f8-xb29p   1/1     Running   0          29m   10.244.1.70   k8s-node1   <none>           <none>
+els1-elasticsearch-data-0                    1/1     Running   0          29m   10.244.3.61   k8s-node2   <none>           <none>
+els1-elasticsearch-data-1                    1/1     Running   0          27m   10.244.1.71   k8s-node1   <none>           <none>
+els1-elasticsearch-master-0                  1/1     Running   0          29m   10.244.3.62   k8s-node2   <none>           <none>
+els1-elasticsearch-master-1                  1/1     Running   0          27m   10.244.1.72   k8s-node1   <none>           <none>
+els1-elasticsearch-master-2                  1/1     Running   0          26m   10.244.3.63   k8s-node2   <none>           <none>
+[root@k8s-master elasticsearch]# kubectl get svc -n efk
+NAME                           TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)    AGE
+els1-elasticsearch-client      ClusterIP   10.109.173.247   <none>        9200/TCP   32m
+els1-elasticsearch-discovery   ClusterIP   None             <none>        9300/TCP   32m
+[root@k8s-master elasticsearch]# kubectl run cirror-$RANDOM --rm -it --image=cirros -- /bin/sh
+kubectl run --generator=deployment/apps.v1 is DEPRECATED and will be removed in a future version. Use kubectl run --generator=run-pod/v1 or kubectl create instead.
+If you don't see a command prompt, try pressing enter.
+/ #  curl  10.109.173.247:9200/_cat/nodes
+10.244.1.71  8 87 1 0.27 0.27 0.37 di - els1-elasticsearch-data-1
+10.244.1.70 32 87 1 0.27 0.27 0.37 i  - els1-elasticsearch-client-844687f9f8-xb29p
+10.244.3.63 31 49 1 0.19 0.25 0.20 mi - els1-elasticsearch-master-2
+10.244.3.61  7 49 1 0.19 0.25 0.20 di - els1-elasticsearch-data-0
+10.244.3.62 33 49 1 0.19 0.25 0.20 mi - els1-elasticsearch-master-0
+10.244.3.60 32 49 1 0.19 0.25 0.20 i  - els1-elasticsearch-client-844687f9f8-w6jfj
+10.244.1.72 28 87 1 0.27 0.27 0.37 mi * els1-elasticsearch-master-1
+
+
+
+[root@k8s-master fluentd-elasticsearch]# cat values.yaml |grep host
+  host: '10.109.173.247'
+    # to the docker logs for pods in the /var/log/containers directory on the host.
+    # The Kubernetes kubelet makes a symbolic link to this file on the host machine
+    # The /var/log directory on the host is mapped to the /var/log directory in the container
+        host ${hostname}
+        host ${hostname}
+        host ${hostname}
+      host "#{ENV['OUTPUT_HOST']}"
+[root@k8s-master fluentd-elasticsearch]# pwd
+/usr/local/install-k8s/efk/fluentd-elasticsearch
+[root@k8s-master fluentd-elasticsearch]# cd ..
+[root@k8s-master efk]# ls
+elasticsearch  elasticsearch-1.10.2.tgz  fluentd-elasticsearch  fluentd-elasticsearch-2.0.7.tgz
+[root@k8s-master efk]# pwd
+/usr/local/install-k8s/efk
+[root@k8s-master efk]# cd fluentd-elasticsearch
+[root@k8s-master fluentd-elasticsearch]# ls
+Chart.yaml  OWNERS  README.md  templates  values.yaml
+[root@k8s-master fluentd-elasticsearch]# cat values.yaml |grep host
+  host: '10.109.173.247'
+    # to the docker logs for pods in the /var/log/containers directory on the host.
+    # The Kubernetes kubelet makes a symbolic link to this file on the host machine
+    # The /var/log directory on the host is mapped to the /var/log directory in the container
+        host ${hostname}
+        host ${hostname}
+        host ${hostname}
+      host "#{ENV['OUTPUT_HOST']}"
+[root@k8s-master fluentd-elasticsearch]# kubectl get pod -n efk -o wide
+NAME                                         READY   STATUS    RESTARTS   AGE    IP            NODE        NOMINATED NODE   READINESS GATES
+els1-elasticsearch-client-844687f9f8-w6jfj   1/1     Running   0          114m   10.244.3.60   k8s-node2   <none>           <none>
+els1-elasticsearch-client-844687f9f8-xb29p   1/1     Running   0          114m   10.244.1.70   k8s-node1   <none>           <none>
+els1-elasticsearch-data-0                    1/1     Running   0          114m   10.244.3.61   k8s-node2   <none>           <none>
+els1-elasticsearch-data-1                    1/1     Running   0          112m   10.244.1.71   k8s-node1   <none>           <none>
+els1-elasticsearch-master-0                  1/1     Running   0          114m   10.244.3.62   k8s-node2   <none>           <none>
+els1-elasticsearch-master-1                  1/1     Running   0          112m   10.244.1.72   k8s-node1   <none>           <none>
+els1-elasticsearch-master-2                  1/1     Running   0          111m   10.244.3.63   k8s-node2   <none>           <none>
+[root@k8s-master fluentd-elasticsearch]# ls
+Chart.yaml  OWNERS  README.md  templates  values.yaml
+[root@k8s-master fluentd-elasticsearch]# helm install --name flu1 --namespace=efk -f values.yaml stable/fluentd-elasticsearch
+NAME:   flu1
+LAST DEPLOYED: Mon Dec  9 19:11:27 2019
+NAMESPACE: efk
+STATUS: DEPLOYED
+
+RESOURCES:
+==> v1/ClusterRole
+NAME                        AGE
+flu1-fluentd-elasticsearch  0s
+
+==> v1/ClusterRoleBinding
+NAME                        AGE
+flu1-fluentd-elasticsearch  0s
+
+==> v1/ConfigMap
+NAME                        DATA  AGE
+flu1-fluentd-elasticsearch  6     0s
+
+==> v1/DaemonSet
+NAME                        DESIRED  CURRENT  READY  UP-TO-DATE  AVAILABLE  NODE SELECTOR  AGE
+flu1-fluentd-elasticsearch  2        2        0      2           0          <none>         0s
+
+==> v1/Pod(related)
+NAME                              READY  STATUS             RESTARTS  AGE
+flu1-fluentd-elasticsearch-7gl5c  0/1    ContainerCreating  0         0s
+flu1-fluentd-elasticsearch-ffzqx  0/1    ContainerCreating  0         0s
+
+==> v1/ServiceAccount
+NAME                        SECRETS  AGE
+flu1-fluentd-elasticsearch  1        0s
+
+
+NOTES:
+1. To verify that Fluentd has started, run:
+
+  kubectl --namespace=efk get pods -l "app.kubernetes.io/name=fluentd-elasticsearch,app.kubernetes.io/instance=flu1"
+
+THIS APPLICATION CAPTURES ALL CONSOLE OUTPUT AND FORWARDS IT TO elasticsearch . Anything that might be identifying,
+including things like IP addresses, container images, and object names will NOT be anonymized.
+
+[root@k8s-master fluentd-elasticsearch]# kubectl get pod -n efk -o wide
+NAME                                         READY   STATUS              RESTARTS   AGE    IP            NODE        NOMINATED NODE   READINESS GATES
+els1-elasticsearch-client-844687f9f8-w6jfj   1/1     Running             0          115m   10.244.3.60   k8s-node2   <none>           <none>
+els1-elasticsearch-client-844687f9f8-xb29p   1/1     Running             0          115m   10.244.1.70   k8s-node1   <none>           <none>
+els1-elasticsearch-data-0                    1/1     Running             0          115m   10.244.3.61   k8s-node2   <none>           <none>
+els1-elasticsearch-data-1                    1/1     Running             0          113m   10.244.1.71   k8s-node1   <none>           <none>
+els1-elasticsearch-master-0                  1/1     Running             0          115m   10.244.3.62   k8s-node2   <none>           <none>
+els1-elasticsearch-master-1                  1/1     Running             0          113m   10.244.1.72   k8s-node1   <none>           <none>
+els1-elasticsearch-master-2                  1/1     Running             0          112m   10.244.3.63   k8s-node2   <none>           <none>
+flu1-fluentd-elasticsearch-7gl5c             0/1     ContainerCreating   0          6s     <none>        k8s-node1   <none>           <none>
+flu1-fluentd-elasticsearch-ffzqx             0/1     ContainerCreating   0          6s     <none>        k8s-node2   <none>           <none>
+[root@k8s-master fluentd-elasticsearch]# kubectl get pod -n efk -o wide
+NAME                                         READY   STATUS              RESTARTS   AGE    IP            NODE        NOMINATED NODE   READINESS GATES
+els1-elasticsearch-client-844687f9f8-w6jfj   1/1     Running             0          115m   10.244.3.60   k8s-node2   <none>           <none>
+els1-elasticsearch-client-844687f9f8-xb29p   1/1     Running             0          115m   10.244.1.70   k8s-node1   <none>           <none>
+els1-elasticsearch-data-0                    1/1     Running             0          115m   10.244.3.61   k8s-node2   <none>           <none>
+els1-elasticsearch-data-1                    1/1     Running             0          113m   10.244.1.71   k8s-node1   <none>           <none>
+els1-elasticsearch-master-0                  1/1     Running             0          115m   10.244.3.62   k8s-node2   <none>           <none>
+els1-elasticsearch-master-1                  1/1     Running             0          113m   10.244.1.72   k8s-node1   <none>           <none>
+els1-elasticsearch-master-2                  1/1     Running             0          112m   10.244.3.63   k8s-node2   <none>           <none>
+flu1-fluentd-elasticsearch-7gl5c             0/1     ContainerCreating   0          12s    <none>        k8s-node1   <none>           <none>
+flu1-fluentd-elasticsearch-ffzqx             0/1     ContainerCreating   0          12s    <none>        k8s-node2   <none>           <none>
+[root@k8s-master fluentd-elasticsearch]# kubectl get pod -n efk -w
+NAME                                         READY   STATUS              RESTARTS   AGE
+els1-elasticsearch-client-844687f9f8-w6jfj   1/1     Running             0          115m
+els1-elasticsearch-client-844687f9f8-xb29p   1/1     Running             0          115m
+els1-elasticsearch-data-0                    1/1     Running             0          115m
+els1-elasticsearch-data-1                    1/1     Running             0          113m
+els1-elasticsearch-master-0                  1/1     Running             0          115m
+els1-elasticsearch-master-1                  1/1     Running             0          113m
+els1-elasticsearch-master-2                  1/1     Running             0          112m
+flu1-fluentd-elasticsearch-7gl5c             1/1     Running             0          26s
+flu1-fluentd-elasticsearch-ffzqx             0/1     ContainerCreating   0          26s
+flu1-fluentd-elasticsearch-ffzqx             1/1     Running             0          28s
+
+[root@k8s-master fluentd-elasticsearch]# 
+[root@k8s-master fluentd-elasticsearch]# 
+[root@k8s-master fluentd-elasticsearch]# ls
+Chart.yaml  OWNERS  README.md  templates  values.yaml
+[root@k8s-master fluentd-elasticsearch]# cd ..
+[root@k8s-master efk]# ls
+elasticsearch  elasticsearch-1.10.2.tgz  fluentd-elasticsearch  fluentd-elasticsearch-2.0.7.tgz
+[root@k8s-master efk]# helm fetch stable/kibana --version 0.14.8
+[root@k8s-master efk]# ls
+elasticsearch  elasticsearch-1.10.2.tgz  fluentd-elasticsearch  fluentd-elasticsearch-2.0.7.tgz  kibana-0.14.8.tgz
+[root@k8s-master efk]# tar -zxf kibana-0.14.8.tgz 
+tar: kibana/Chart.yaml：不可信的旧时间戳 1970-01-01 08:00:00
+tar: kibana/values.yaml：不可信的旧时间戳 1970-01-01 08:00:00
+tar: kibana/templates/NOTES.txt：不可信的旧时间戳 1970-01-01 08:00:00
+tar: kibana/templates/_helpers.tpl：不可信的旧时间戳 1970-01-01 08:00:00
+tar: kibana/templates/configmap-dashboardimport.yaml：不可信的旧时间戳 1970-01-01 08:00:00
+tar: kibana/templates/configmap.yaml：不可信的旧时间戳 1970-01-01 08:00:00
+tar: kibana/templates/deployment.yaml：不可信的旧时间戳 1970-01-01 08:00:00
+tar: kibana/templates/ingress.yaml：不可信的旧时间戳 1970-01-01 08:00:00
+tar: kibana/templates/service.yaml：不可信的旧时间戳 1970-01-01 08:00:00
+tar: kibana/.helmignore：不可信的旧时间戳 1970-01-01 08:00:00
+tar: kibana/OWNERS：不可信的旧时间戳 1970-01-01 08:00:00
+tar: kibana/README.md：不可信的旧时间戳 1970-01-01 08:00:00
+[root@k8s-master efk]# ls
+elasticsearch  elasticsearch-1.10.2.tgz  fluentd-elasticsearch  fluentd-elasticsearch-2.0.7.tgz  kibana  kibana-0.14.8.tgz
+[root@k8s-master efk]# cd kibana
+[root@k8s-master kibana]# ls
+Chart.yaml  OWNERS  README.md  templates  values.yaml
+[root@k8s-master kibana]# cat values.yaml |grep tag
+  tag: "6.4.2"
+[root@k8s-master kibana]# cat values.yaml |grep elasticsearch.url
+    elasticsearch.url: http://elasticsearch:9200
+[root@k8s-master ~]# kubectl get svc -n efk
+NAME                           TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)    AGE
+els1-elasticsearch-client      ClusterIP   10.109.173.247   <none>        9200/TCP   40m
+els1-elasticsearch-discovery   ClusterIP   None             <none>        9300/TCP   40m
+
+## 把kibana中values.yaml链接elasticsearch的地址修改为： http://10.109.173.247:9200
+
+[root@k8s-master kibana]# cat values.yaml |grep repository
+  repository: "docker.elastic.co/kibana/kibana-oss"
+[root@k8s-master kibana]# cat values.yaml |grep tag
+  tag: "6.4.2"
+
+[root@k8s-master kibana]# helm install --name kib1 --namespace=efk -f values.yaml stable/kibana --version 0.14.8
+NAME:   kib1
+LAST DEPLOYED: Mon Dec  9 19:24:10 2019
+NAMESPACE: efk
+STATUS: DEPLOYED
+
+RESOURCES:
+==> v1/ConfigMap
+NAME         DATA  AGE
+kib1-kibana  1     0s
+
+==> v1/Pod(related)
+NAME                         READY  STATUS             RESTARTS  AGE
+kib1-kibana-6c49f68cf-q5b9r  0/1    ContainerCreating  0         0s
+
+==> v1/Service
+NAME         TYPE       CLUSTER-IP     EXTERNAL-IP  PORT(S)  AGE
+kib1-kibana  ClusterIP  10.99.129.252  <none>       443/TCP  0s
+
+==> v1beta1/Deployment
+NAME         READY  UP-TO-DATE  AVAILABLE  AGE
+kib1-kibana  0/1    1           0          0s
+
+
+NOTES:
+To verify that kib1-kibana has started, run:
+
+  kubectl --namespace=efk get pods -l "app=kibana"
+
+Kibana can be accessed:
+
+  * From outside the cluster, run these commands in the same shell:
+
+    export POD_NAME=$(kubectl get pods --namespace efk -l "app=kibana,release=kib1" -o jsonpath="{.items[0].metadata.name}")
+    echo "Visit http://127.0.0.1:5601 to use Kibana"
+    kubectl port-forward --namespace efk $POD_NAME 5601:5601
+
+[root@k8s-master kibana]# kubectl get svc -n efk
+NAME                           TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)    AGE
+els1-elasticsearch-client      ClusterIP   10.109.173.247   <none>        9200/TCP   128m
+els1-elasticsearch-discovery   ClusterIP   None             <none>        9300/TCP   128m
+kib1-kibana                    ClusterIP   10.99.129.252    <none>        443/TCP    33s
+</code></pre>
 
             </div>
             <hr/>
@@ -720,31 +1051,32 @@ helm install --name kib1 --namespace=efk -f values.yaml stable/kibana --version 
 <article id="prenext-posts" class="prev-next articles">
     <div class="row article-row">
         
-        <div class="article col s12 m6" data-aos="fade-up" data-aos="fade-up">
+        <div class="article col s12 m6" data-aos="fade-up">
             <div class="article-badge left-badge text-color">
-                <i class="far fa-dot-circle"></i>&nbsp;本篇
-            </div>
+                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
             <div class="card">
-                <a href="/2019/12/08/%E9%83%A8%E7%BD%B2EFK%E5%B9%B3%E5%8F%B0/">
+                <a href="/2019/12/09/%E9%9B%86%E7%BE%A4%E4%B8%AD%E8%AF%81%E4%B9%A6%E6%97%B6%E9%97%B4/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/19.jpg" class="responsive-img" alt="部署EFK平台">
+                        <img src="/medias/featureimages/2.jpg" class="responsive-img" alt="集群中证书时间">
                         
-                        <span class="card-title">部署EFK平台</span>
+                        <span class="card-title">集群中证书时间</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            添加 Google incubator仓库helm repo add incubator http://storage.googleapis.com/kubernetes-charts-incubator
-部署 Elasticsearchk
+                            证书时间查看过程
+[root@k8s-master kibana]# cd /etc/kubernetes/pki/
+[root@k8s-master pki]# ls
+apiserver.crt              apiserve
                         
                     </div>
                     <div class="publish-info">
-                            <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2019-12-08
-                            </span>
+                        <span class="publish-date">
+                            <i class="far fa-clock fa-fw icon-date"></i>2019-12-09
+                        </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
@@ -757,7 +1089,6 @@ helm install --name kib1 --namespace=efk -f values.yaml stable/kibana --version 
                         </span>
                     </div>
                 </div>
-
                 
                 <div class="card-action article-tags">
                     
@@ -765,8 +1096,8 @@ helm install --name kib1 --namespace=efk -f values.yaml stable/kibana --version 
                         <span class="chip bg-color">kubernetes</span>
                     </a>
                     
-                    <a href="/tags/%E6%97%A5%E5%BF%97/">
-                        <span class="chip bg-color">日志</span>
+                    <a href="/tags/certificate/">
+                        <span class="chip bg-color">certificate</span>
                     </a>
                     
                 </div>
