@@ -575,7 +575,7 @@ api  AUTHORS  bin  CONTRIBUTING.md  CONTRIBUTORS  doc  favicon.ico  lib  LICENSE
     export PATH=$PATH:/usr/local/go/bin
 [root@k8s-master profile.d]# source go.sh 
 [root@k8s-master profile.d]# go version
-go version go1.13.5 linux/amd64</code></pre>
+go version go1.12.5 linux/amd64</code></pre>
 <p><strong>2、下载源码</strong></p>
 <pre class=" language-shell"><code class="language-shell">cd /data && git clone https://github.com/kubernetes/kubernetes.git
 git checkout -b remotes/origin/release-1.15.1 v1.15.1</code></pre>
@@ -898,57 +898,37 @@ certificate embedded in the kubeconfig file for the scheduler manager to use ren
 <article id="prenext-posts" class="prev-next articles">
     <div class="row article-row">
         
-        <div class="article col s12 m6" data-aos="fade-up" data-aos="fade-up">
+        <div class="article col s12 m6" data-aos="fade-up">
             <div class="article-badge left-badge text-color">
-                <i class="far fa-dot-circle"></i>&nbsp;本篇
-            </div>
+                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
             <div class="card">
-                <a href="/2019/12/09/%E9%9B%86%E7%BE%A4%E4%B8%AD%E8%AF%81%E4%B9%A6%E6%97%B6%E9%97%B4/">
+                <a href="/2019/12/11/java%E8%BF%9E%E6%8E%A5%E5%99%A8%E4%B8%8EMySql%E7%89%88%E6%9C%AC%E5%AF%B9%E5%BA%94%E9%97%AE%E9%A2%98/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/2.jpg" class="responsive-img" alt="集群中证书时间">
+                        <img src="/medias/featureimages/12.jpg" class="responsive-img" alt="java连接器与MySql版本对应问题">
                         
-                        <span class="card-title">集群中证书时间</span>
+                        <span class="card-title">java连接器与MySql版本对应问题</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            证书时间查看过程
-[root@k8s-master kibana]# cd /etc/kubernetes/pki/
-[root@k8s-master pki]# ls
-apiserver.crt              apiserve
+                            两种版本的MySQL Connector / J
+Connector / J 5.1是Type 4纯Java JDBC驱动程序，符合JDBC 3.0、4.0、4.1和4.2规范。 它与MySQL的所有功能（包括5.6、5.7和8.0）兼容。
                         
                     </div>
                     <div class="publish-info">
-                            <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2019-12-09
-                            </span>
+                        <span class="publish-date">
+                            <i class="far fa-clock fa-fw icon-date"></i>2019-12-11
+                        </span>
                         <span class="publish-author">
                             
-                            <i class="fas fa-bookmark fa-fw icon-category"></i>
-                            
-                            <a href="/categories/%E5%AE%B9%E5%99%A8%E6%8A%80%E6%9C%AF/" class="post-category">
-                                    容器技术
-                                </a>
-                            
+                            <i class="fas fa-user fa-fw"></i>
+                            阿培
                             
                         </span>
                     </div>
-                </div>
-
-                
-                <div class="card-action article-tags">
-                    
-                    <a href="/tags/kubernetes/">
-                        <span class="chip bg-color">kubernetes</span>
-                    </a>
-                    
-                    <a href="/tags/certificate/">
-                        <span class="chip bg-color">certificate</span>
-                    </a>
-                    
                 </div>
                 
             </div>

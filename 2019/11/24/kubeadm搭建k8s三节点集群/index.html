@@ -554,6 +554,8 @@ yum --enablerepo<span class="token operator">=</span>elrepo-kernel <span class="
 
 <span class="token comment" spellcheck="true"># 设置开机从新内核启动</span>
 grub2-set-default <span class="token string">"CentOS Linux (4.4.202-1.el7.elrepo.x86_64) 7 (Core)"</span>
+<span class="token comment" spellcheck="true"># 重启后安装内核源文件</span>
+yum --enablerepo<span class="token operator">=</span>elrepo-kernel <span class="token function">install</span> kernel-lt-devel-<span class="token variable"><span class="token variable">$(</span><span class="token function">uname</span> -r<span class="token variable">)</span></span> kernel-lt-headers-<span class="token variable"><span class="token variable">$(</span><span class="token function">uname</span> -r<span class="token variable">)</span></span>
 ----<span class="token operator">></span></code></pre>
 <p>kube-proxy(主要解决SVC与POD之间的调度关系)开启ipvs(负载均衡能力更强)的前置条件<br>为了使用ipvs，而不是iptables来进行路由规则的创建,需要安装一些ipvs的依赖<br>三节点都执行</p>
 <pre class=" language-bash"><code class="language-bash">yum -y <span class="token function">install</span> ipset ipvsadm</code></pre>
