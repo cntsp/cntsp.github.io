@@ -4,7 +4,7 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="keywords" content="kubernetes之阿里云部署, 阿培">
+    <meta name="keywords" content="阿里云部署多主master高可用k8s集群, 阿培">
     <meta name="description" content="阿里云K8S高可用部署(我们需要准备六台阿里云的ECS,选择有公网IP的)
 二进制搭建k8s多master集群之第一篇(集群环境和各个组件功能介绍)规划如下：
 master01:172.24.150.85(内网)  kube-apiserv">
@@ -15,7 +15,7 @@ master01:172.24.150.85(内网)  kube-apiserv">
     <meta name="format-detection" content="telephone=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>kubernetes之阿里云部署 | 阿培</title>
+    <title>阿里云部署多主master高可用k8s集群 | 阿培</title>
     <link rel="icon" type="image/x-icon, image/vnd.microsoft.icon" href="/favicon.ico">
 
     <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
@@ -305,13 +305,13 @@ master01:172.24.150.85(内网)  kube-apiserv">
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/15.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/4.jpg')">
     <div class="container" style="right: 0px;left: 0px;">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
                     <div class="description center-align post-title">
-                        kubernetes之阿里云部署
+                        阿里云部署多主master高可用k8s集群
                     </div>
                 </div>
             </div>
@@ -483,33 +483,65 @@ master03:172.24.150.87<span class="token punctuation">(</span>内网<span class=
 node01:172.24.150.88<span class="token punctuation">(</span>内网<span class="token punctuation">)</span>    kube-proxy  kubelet        flannel     docker
 node02:172.24.150.89<span class="token punctuation">(</span>内网<span class="token punctuation">)</span>    kube-proxy  kubelet        flannel     docker
 haproxyharbor:172.24.150.90<span class="token punctuation">(</span>内网<span class="token punctuation">)</span>        haproxy harbor</code></pre>
-<h1 id="一-组件版本"><a href="#一-组件版本" class="headerlink" title="一     组件版本"></a>一     组件版本</h1><blockquote>
-<ul>
+<h1 id="一-组件版本"><a href="#一-组件版本" class="headerlink" title="一     组件版本"></a>一     组件版本</h1><ul>
 <li>kubernetes 1.12.3</li>
 <li>Docker 18.06.1-ce</li>
-<li>Etcd 3.3.10<ul>
+<li>Etcd 3.3.10</li>
 <li>Flanneld 0.10.0</li>
-</ul>
-</li>
 <li>插件<ul>
-<li>CoreDNS</li>
+<li>CoreDNS    </li>
 <li>Dashboard</li>
 <li>Heapster(influxdb,grafana)</li>
 <li>Metrics-Server</li>
-<li>EFK(elasticsearch,fluentd,kibana)<ul>
+<li>EFK(elasticsearch,fluentd,kibana)</li>
 <li>镜像仓库</li>
-</ul>
-</li>
 <li>docker registry</li>
 <li>harbor</li>
 </ul>
 </li>
 </ul>
-</blockquote>
-<h1 id="二-主要配置策略"><a href="#二-主要配置策略" class="headerlink" title="二    主要配置策略"></a>二    主要配置策略</h1><p>kube-apiserver:<br>    &gt;    * 使用keepalived和haproxy实现3节点高可用;<br>    &gt;    * 关闭非安全端口8080和匿名访问;<br>    &gt;    * 在安全端口6443接收https请求；<br>    &gt;     * 严格的认证和授权策略(x509,token,RBAC)<br>    &gt;    * 开启bootstrap token认证，支持kubelet TLS bootstrapping;<br>    &gt;    * 使用https访问kubelet,etcd,加密通信；<br>kube-scheduler:<br>    &gt;    * 3节点高可用;<br>    &gt;    * 使用kubeconfig访问apiserver的安全端口;</p>
-<p>kubelet:<br>    &gt;    * 使用kubeadm动态创建bootstrap token，而不是在apiserver中静态配置;<br>    &gt;    * 使用TLS bootstrap机制自动生成client和server证书，过期后自动轮转;<br>    &gt;    * 在KubeletConfiguration类型的JSON文件配置主要参数;<br>    &gt;    * 关闭只读端口，在安全端口10250接收https请求，对请求进行认证和授权，拒绝匿名访问和非授权访问;<br>    &gt;    * 使用kubeconfig访问apiserver的安全端口;<br>kube-proxy:<br>    &gt;    * 使用kubeconfig访问apiserver的安全端口;<br>    &gt;    * 在kubeProxyConfiguration类型的JSON文件配置主要参数;<br>    &gt;    * IPVS代理模式;<br>集群插件:<br>    &gt;    * DNS：使用功能、性能更好的coredns;<br>    &gt;    * Dashboard:支持登录认证<br>    &gt;    * Metric:heapster,metrics-server,使用https访问kubelet安全端口;<br>    &gt;    * Log:Elasticsearch,Fluend,Kibana;<br>    &gt;    * Registry镜像库：docker-registry,harbor;</p>
-<h1 id="三-系统初始化"><a href="#三-系统初始化" class="headerlink" title="三    系统初始化"></a>三    系统初始化</h1><h2 id="1-主机名修改-5个节点都操作"><a href="#1-主机名修改-5个节点都操作" class="headerlink" title="1    主机名修改(5个节点都操作)"></a>1    主机名修改(5个节点都操作)</h2><p>例如：master01<br>hostnamectl set-hostname master01</p>
-<h2 id="2-本地hosts解析-5个节点都操作-至于我为啥多加了etcd01-etcd02-etcd03，为啥etcd三节点集群中的命名而已"><a href="#2-本地hosts解析-5个节点都操作-至于我为啥多加了etcd01-etcd02-etcd03，为啥etcd三节点集群中的命名而已" class="headerlink" title="2    本地hosts解析(5个节点都操作)(至于我为啥多加了etcd01,etcd02,etcd03，为啥etcd三节点集群中的命名而已)"></a>2    本地hosts解析(5个节点都操作)(至于我为啥多加了etcd01,etcd02,etcd03，为啥etcd三节点集群中的命名而已)</h2><pre class=" language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@master01 ~<span class="token punctuation">]</span> <span class="token function">cat</span> <span class="token operator">>></span>/etc/hosts <span class="token operator">&lt;&lt;</span><span class="token string">EOF
+<h1 id="二-主要配置策略"><a href="#二-主要配置策略" class="headerlink" title="二    主要配置策略"></a>二    主要配置策略</h1><ul>
+<li>kube-apiserver:</li>
+<li>使用keepalived和haproxy实现3节点高可用;</li>
+<li>关闭非安全端口8080和匿名访问;</li>
+<li>在安全端口6443接收https请求；</li>
+<li>严格的认证和授权策略(x509,token,RBAC)</li>
+<li>开启bootstrap token认证，支持kubelet TLS bootstrapping;</li>
+<li>使用https访问kubelet,etcd,加密通信；<br>kube-scheduler:</li>
+<li>3节点高可用;</li>
+<li>使用kubeconfig访问apiserver的安全端口;</li>
+</ul>
+<p>kubelet:</p>
+<ul>
+<li><p>使用kubeadm动态创建bootstrap token，而不是在apiserver中静态配置</p>
+</li>
+<li><p>使用TLS bootstrap机制自动生成client和server证书，过期后自动轮转;</p>
+</li>
+<li><p>在KubeletConfiguration类型的JSON文件配置主要参数;</p>
+</li>
+<li><p>关闭只读端口，在安全端口10250接收https请求，对请求进行认证和授权，拒绝匿名访问和非授权访问;</p>
+</li>
+<li><p>使用kubeconfig访问apiserver的安全端口;</p>
+</li>
+<li><p>kube-proxy:使用kubeconfig访问apiserver的安全端口;</p>
+</li>
+<li><p>在kubeProxyConfiguration类型的JSON文件配置主要参数;</p>
+</li>
+<li><p>IPVS代理模式</p>
+</li>
+<li><p>集群插件:</p>
+<ul>
+<li>DNS：使用功能、性能更好的coredns;</li>
+<li>Dashboard:支持登录认证</li>
+<li>Metric:heapster,metrics-server,使用https访问kubelet安全端口;</li>
+<li>Log:Elasticsearch,Fluend,Kibana;</li>
+<li>Registry镜像库：docker-registry,harbor;</li>
+</ul>
+<p>​    </p>
+</li>
+</ul>
+<h1 id="三-系统初始化"><a href="#三-系统初始化" class="headerlink" title="三    系统初始化"></a>三    系统初始化</h1><h2 id="1-主机名修改-6个节点都操作"><a href="#1-主机名修改-6个节点都操作" class="headerlink" title="1    主机名修改(6个节点都操作)"></a>1    主机名修改(6个节点都操作)</h2><p>例如：master01<br>hostnamectl set-hostname master01</p>
+<h2 id="2-本地hosts解析-6个节点都操作-至于我为啥多加了etcd01-etcd02-etcd03，为啥etcd三节点集群中的命名而已"><a href="#2-本地hosts解析-6个节点都操作-至于我为啥多加了etcd01-etcd02-etcd03，为啥etcd三节点集群中的命名而已" class="headerlink" title="2    本地hosts解析(6个节点都操作)(至于我为啥多加了etcd01,etcd02,etcd03，为啥etcd三节点集群中的命名而已)"></a>2    本地hosts解析(6个节点都操作)(至于我为啥多加了etcd01,etcd02,etcd03，为啥etcd三节点集群中的命名而已)</h2><pre class=" language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@master01 ~<span class="token punctuation">]</span> <span class="token function">cat</span> <span class="token operator">>></span>/etc/hosts <span class="token operator">&lt;&lt;</span><span class="token string">EOF
 172.24.150.85  master01 etcd01
 172.24.150.86  master02 etcd02
 172.24.150.87  master03 etcd03
@@ -524,7 +556,7 @@ EOF</span></code></pre>
 <span class="token punctuation">[</span>root@master01 ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># ssh-copy-id root@master03    #分发公钥到master03上，这里需要输入一次master03的密码</span>
 <span class="token punctuation">[</span>root@master01 ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># ssh-copy-id root@node01        #分发公钥到node01上，这里需要输入一次node01的密码</span>
 <span class="token punctuation">[</span>root@master01 ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># ssh-copy-id root@node02        #分发公钥到node02上，这里需要输入一次node02的密码</span></code></pre>
-<h2 id="4-关闭防火墙firewall-5个节点都操作"><a href="#4-关闭防火墙firewall-5个节点都操作" class="headerlink" title="4    关闭防火墙firewall(5个节点都操作)"></a>4    关闭防火墙firewall(5个节点都操作)</h2><pre class=" language-bash"><code class="language-bash">    systemctl stop firewalld          （root权限）
+<h2 id="4-关闭防火墙firewall-6个节点都操作"><a href="#4-关闭防火墙firewall-6个节点都操作" class="headerlink" title="4    关闭防火墙firewall(6个节点都操作)"></a>4    关闭防火墙firewall(6个节点都操作)</h2><pre class=" language-bash"><code class="language-bash">    systemctl stop firewalld          （root权限）
     systemctl disable firewalld         <span class="token punctuation">(</span>设置开启未启动模式 <span class="token punctuation">)</span>
     iptables -P FORWARD ACCEPT         <span class="token punctuation">(</span>设置FORWARD链为接收模式,要对4表5链有了解哦！<span class="token punctuation">)</span></code></pre>
 <h2 id="5-关闭swap分区"><a href="#5-关闭swap分区" class="headerlink" title="5    关闭swap分区"></a>5    关闭swap分区</h2><pre class=" language-bash"><code class="language-bash">swapoff -a 
@@ -553,7 +585,7 @@ sysctl -p /etc/sysctl.d/kubernetes.conf</code></pre>
 <p>tcp_tw_recycle和Kubernetes的NAT冲突，必须关闭,<br>关闭不适用的IPV6协议栈，防止触发docker BUG;</p>
 <h2 id="9-检查系统内核和模块适不适合运行docker-centos系统"><a href="#9-检查系统内核和模块适不适合运行docker-centos系统" class="headerlink" title="9    检查系统内核和模块适不适合运行docker(centos系统)"></a>9    检查系统内核和模块适不适合运行docker(centos系统)</h2><pre class=" language-bash"><code class="language-bash">curl https://raw.githubusercontent.com/docker/docker/master/contrib/check-config.sh <span class="token operator">></span> check-config.sh
 ./check-config.sh</code></pre>
-<h1 id="四-环境介绍"><a href="#四-环境介绍" class="headerlink" title="四    环境介绍"></a>四    环境介绍</h1><p>##############################<br>##############################<br>二进制搭建k8s多master集群之第二篇(使用TLS证书搭建etcd三节点高可用集群)<br>下面本文etcd集群才用三台centos7.5搭建完成。<br>etcd01(master01):     172.24.150.85<br>etcd02(master02):    172.24.150.86<br>etcd03(master03):     172.24.150.87</p>
+<h1 id="四-环境介绍"><a href="#四-环境介绍" class="headerlink" title="四    环境介绍"></a>四    环境介绍</h1><p>二进制搭建k8s多master集群之第二篇(使用TLS证书搭建etcd三节点高可用集群)<br>下面本文etcd集群才用三台centos7.5搭建完成。<br>etcd01(master01):     172.24.150.85<br>etcd02(master02):    172.24.150.86<br>etcd03(master03):     172.24.150.87</p>
 <h2 id="一-创建CA证书和密钥"><a href="#一-创建CA证书和密钥" class="headerlink" title="一 创建CA证书和密钥"></a>一 创建CA证书和密钥</h2><p>k8s系统各组件间需要使用TLS证书对通信进行加密，本文档使用CloudFlare的PKI工具集<strong>cfssl</strong>来生成Certificate Authority(CA)证书和密钥文件，CA是自签名证书，用来签名后续创建的其它TLS证书。由于第一篇我们做了master01(etcd01)到master02(etcd02),master03(etcd03)的免密验证，因此下面步骤中我们只需要在master01上操作，然后把证书和工具命令拷贝到其它节点上就可以了，有些需要其它节点必须登录操作的，我会红色标记提醒的</p>
 <h3 id="1-安装CFSSL-master01操作"><a href="#1-安装CFSSL-master01操作" class="headerlink" title="1 安装CFSSL(master01操作)"></a>1 安装CFSSL(master01操作)</h3><pre class=" language-bash"><code class="language-bash">curl -o /usr/local/bin/cfssl https://pkg.cfssl.org/R1.2/cfssl_linux-amd64
 curl -o /usr/local/bin/cfssljson https://pkg.cfssl.org/R1.2/cfssljson_linux-amd64
@@ -655,7 +687,7 @@ EOF</span>
 <span class="token punctuation">[</span>root@master01 cert<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># scp *.pem master03:/etc/kubernetes/cert               </span>
 <span class="token punctuation">[</span>root@master01 cert<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># scp ca.pem root@node01:/etc/kubernetes/cert </span>
 <span class="token punctuation">[</span>root@master01 cert<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># scp ca.pem root@node02:/etc/kubernetes/cert </span></code></pre>
-<p>etcd使用证书组件为：<br>    &gt;    * ca.pem<br>    &gt;    * etcd-key.pem<br>    &gt;    * etcd.pem    </p>
+<p>etcd使用证书组件为：<br>​    &gt;    * ca.pem<br>​    &gt;    * etcd-key.pem<br>​    &gt;    * etcd.pem    </p>
 <h2 id="二-部署etcd三节点集群"><a href="#二-部署etcd三节点集群" class="headerlink" title="二 部署etcd三节点集群"></a>二 部署etcd三节点集群</h2><p>三个etcd节点都要安装etcd软件包(即：master01、master02、master03)</p>
 <h3 id="1-三节点下载软件包"><a href="#1-三节点下载软件包" class="headerlink" title="1 三节点下载软件包"></a>1 三节点下载软件包</h3><pre class=" language-bash"><code class="language-bash"><span class="token function">wget</span> https://github.com/etcd-io/etcd/releases/download/v3.3.10/etcd-v3.3.10-linux-amd64.tar.gz
 <span class="token function">tar</span> zxf etcd-v3.3.10-linux-amd64.tar.gz
@@ -1983,7 +2015,7 @@ CN：指定该证书的 User 为 system:kube-proxy；
 <p>文件格式问题，注意参考格式见下<br>[root@kmaster01 kubernetes]# cat /etc/kubernetes/kube-proxy.config.yaml<br>apiVersion: kubeproxy.config.k8s.io/v1alpha1<br>bindAddress: 172.24.150.88<br>clientConnection:<br>  kubeconfig: /etc/kubernetes/kube-proxy.kubeconfig<br>clusterCIDR: 172.30.0.0/16<br>healthzBindAddress: 172.24.150.88:10256<br>hostnameOverride: k8s-master1<br>kind: KubeProxyConfiguration<br>metricsBindAddress: 172.24.150.88:10249<br>mode: “ipvs”<br>[root@k8s-master1 kubernetes]#<br>kubeconfig: /etc/kubernetes/kube-proxy.kubeconfig     ## 注意这个前面的空格，没有就会报下面的错误：</p>
 <p>Jul 06 00:35:13 node01 kube-proxy[25540]: I0706 00:35:13.307740   25540 server.go:412] Neither kubeconfig file nor master URL was specified. Falling back to in-cluster config.<br>Jul 06 00:35:13 node01 kube-proxy[25540]: F0706 00:35:13.307780   25540 server.go:360] unable to load in-cluster configuration, KUBERNETES_SERVICE_HOST and KUBERNETES_SERVICE_PORT must be defined</p>
 <pre><code>为各节点创建和分发 kube-proxy 配置文件：
-```bash
+​```bash
 [root@master01 cert]# scp kube-proxy.config.yaml root@node01:/etc/kubernetes/cert/
 [root@master01 cert]# scp kube-proxy.config.yaml root@node02:/etc/kubernetes/cert/</code></pre><h3 id="4-在node01和node02上分别创建-kube-proxy-systemd-unit文件"><a href="#4-在node01和node02上分别创建-kube-proxy-systemd-unit文件" class="headerlink" title="4    在node01和node02上分别创建 kube-proxy systemd unit文件"></a>4    在node01和node02上分别创建 kube-proxy systemd unit文件</h3><pre class=" language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@node01 cert<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># cat >/etc/systemd/system/kube-proxy.service &lt;&lt;EOF</span>
 <span class="token punctuation">[</span>Unit<span class="token punctuation">]</span>
