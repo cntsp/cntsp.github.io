@@ -816,7 +816,17 @@ NAME                           TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S
 els1-elasticsearch-client      ClusterIP   10.109.173.247   <none>        9200/TCP   128m
 els1-elasticsearch-discovery   ClusterIP   None             <none>        9300/TCP   128m
 kib1-kibana                    ClusterIP   10.99.129.252    <none>        443/TCP    33s
+
+# 修改kib1-kibana的sVC类型为NodePort
+
+[root@k8s-master ~]# kubectl get svc -n efk
+NAME                           TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)         AGE
+els1-elasticsearch-client      ClusterIP   10.109.173.247   <none>        9200/TCP        3d16h
+els1-elasticsearch-discovery   ClusterIP   None             <none>        9300/TCP        3d16h
+kib1-kibana                    NodePort    10.99.129.252    <none>        443:32515/TCP   3d14h
 </code></pre>
+<p><strong>浏览器访问<a href="http://k8s-master:32515端口" target="_blank" rel="noopener">http://k8s-master:32515端口</a></strong></p>
+<p><img src="https://cntsp.github.io/medias/contents/65.png" alt=""></p>
 
             </div>
             <hr/>

@@ -497,7 +497,7 @@ sysctl -p /etc/sysctl.d/k8s.conf</code></pre>
 <p>4 安装Docker</p>
 <pre class=" language-bash"><code class="language-bash">yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
 <span class="token comment" spellcheck="true"># 如果没有yum-config-manager命令的话，请安装，步骤如下</span>
---------------------------------------------------- start -----------------------------------------------------------
+-------------------------------------- start -------------------------
 <span class="token punctuation">[</span>root@rancherserver ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># yum search yum-config-manager</span>
 已加载插件：fastestmirror
 Loading mirror speeds from cached hostfile
@@ -510,7 +510,7 @@ Loading mirror speeds from cached hostfile
 yum-utils.noarch <span class="token keyword">:</span> Utilities based around the yum package manager
 
 yum -y <span class="token function">install</span> yum-utils <span class="token comment" spellcheck="true"># 安装yum-config-manager的依赖包就可以了</span>
----------------------------------------------------- end --------------------------------------------------------------
+------------------------------------ end ------------------------------
 
 yum list docker-ce --showduplicates <span class="token operator">|</span> <span class="token function">sort</span> -r
 yum <span class="token function">install</span> docker-ce-18.06.0.ce-3.el7 -y
@@ -822,7 +822,7 @@ https://192.168.1.118:2379,https://192.168.1.63:2379"</span> \
 </ul>
 </blockquote>
 <p>下载安装flannel软件</p>
-<pre class=" language-bash"><code class="language-bash"><span class="token function">cd</span> /usr/local/src/ <span class="token operator">&amp;&amp;</span> <span class="token function">wget</span> http://down.cdn1688.net/k8s1.13/flannel-v0.10.0-linux-amd64.tar.gz
+<pre class=" language-bash"><code class="language-bash"><span class="token function">cd</span> /usr/local/src/ <span class="token operator">&amp;&amp;</span> <span class="token function">wget</span> http://down.52zbz.com/k8s/flannel-v0.10.0-linux-amd64.tar.gz
 <span class="token function">tar</span> -xvf flannel-v0.10.0-linux-amd64.tar.gz
 <span class="token function">mv</span> flannel mk-docker-opts.sh /home/k8s/kubernetes/bin/
 创建Flannel配置文件
