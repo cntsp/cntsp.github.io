@@ -4,11 +4,11 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="keywords" content="Centos7-yum安装lnmp环境, 阿培">
-    <meta name="description" content="yum安装nginx\php\mysql，搭建lnmp环境yum升级
-yum update
-yum安装nginx最新源
-yum localinstall http://nginx.org/packages/centos/7/noarch/R">
+    <meta name="keywords" content="centos7生成环境部署docker-ce, 阿培">
+    <meta name="description" content="centos7系统生成环境docker-ce部署第一步：安装依赖包
+yum install -y yum-utils device-mapper-persistent-data lvm2
+第二步：添加Docker软件包源
+yum-confi">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -16,7 +16,7 @@ yum localinstall http://nginx.org/packages/centos/7/noarch/R">
     <meta name="format-detection" content="telephone=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Centos7-yum安装lnmp环境 | 阿培</title>
+    <title>centos7生成环境部署docker-ce | 阿培</title>
     <link rel="icon" type="image/x-icon, image/vnd.microsoft.icon" href="/favicon.ico">
 
     <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
@@ -306,13 +306,13 @@ yum localinstall http://nginx.org/packages/centos/7/noarch/R">
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/4.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/11.jpg')">
     <div class="container" style="right: 0px;left: 0px;">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
                     <div class="description center-align post-title">
-                        Centos7-yum安装lnmp环境
+                        centos7生成环境部署docker-ce
                     </div>
                 </div>
             </div>
@@ -430,12 +430,12 @@ yum localinstall http://nginx.org/packages/centos/7/noarch/R">
                     
                     <div class="article-tag">
                         
-                            <a href="/tags/linux/">
-                                <span class="chip bg-color">linux</span>
+                            <a href="/tags/docker/">
+                                <span class="chip bg-color">docker</span>
                             </a>
                         
-                            <a href="/tags/lnmp/">
-                                <span class="chip bg-color">lnmp</span>
+                            <a href="/tags/centos7/">
+                                <span class="chip bg-color">centos7</span>
                             </a>
                         
                     </div>
@@ -446,8 +446,8 @@ yum localinstall http://nginx.org/packages/centos/7/noarch/R">
                     <div class="post-cate">
                         <i class="fas fa-bookmark fa-fw icon-category"></i>
                         
-                            <a href="/categories/lnmp/" class="post-category">
-                                lnmp
+                            <a href="/categories/%E5%AE%B9%E5%99%A8%E6%8A%80%E6%9C%AF/" class="post-category">
+                                容器技术
                             </a>
                         
                     </div>
@@ -476,98 +476,49 @@ yum localinstall http://nginx.org/packages/centos/7/noarch/R">
         <hr class="clearfix">
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h1 id="yum安装nginx-php-mysql，搭建lnmp环境"><a href="#yum安装nginx-php-mysql，搭建lnmp环境" class="headerlink" title="yum安装nginx\php\mysql，搭建lnmp环境"></a>yum安装nginx\php\mysql，搭建lnmp环境</h1><p>yum升级</p>
-<pre class=" language-bash"><code class="language-bash">yum update</code></pre>
-<p>yum安装nginx最新源</p>
-<pre class=" language-basj"><code class="language-basj">yum localinstall http://nginx.org/packages/centos/7/noarch/RPMS/nginx-release-centos-7-0.el7.ngx.noarch.rpm
-yum repolist enabled | grep "nginx*" </code></pre>
-<p>安装nginx</p>
-<pre class=" language-bash"><code class="language-bash">yum -y <span class="token function">install</span> nginx</code></pre>
-<p>启动nginx</p>
-<pre class=" language-bash"><code class="language-bash">systemctl  start  nginx</code></pre>
-<p>检查开机自动是否设置成功</p>
-<pre class=" language-bash"><code class="language-bash">systemctl list-dependencies <span class="token operator">|</span> <span class="token function">grep</span> nginx</code></pre>
-<p>浏览器中输入公网ip,检测是否安装成功<br><a href="http://xxx.yyy.com" target="_blank" rel="noopener">http://xxx.yyy.com</a></p>
-<h1 id="使用yum安装mysql5-7"><a href="#使用yum安装mysql5-7" class="headerlink" title="使用yum安装mysql5.7"></a>使用yum安装mysql5.7</h1><p>安装mysql源</p>
-<pre class=" language-bash"><code class="language-bash">yum -y localinstall  http://dev.mysql.com/get/mysql57-community-release-el7-7.noarch.rpm
-yum repolist enabled <span class="token operator">|</span> <span class="token function">grep</span> <span class="token string">"mysql.*-community.*"</span></code></pre>
-<p>安装mysql</p>
-<pre class=" language-bash"><code class="language-bash">yum -y <span class="token function">install</span> mysql-community-server <span class="token function">install</span> mysql-community-devel</code></pre>
-<p>启动mysql</p>
-<pre class=" language-bash"><code class="language-bash"><span class="token function">service</span> mysqld start</code></pre>
-<p>检查mysql启动是否正常</p>
-<pre class=" language-bash"><code class="language-bash"><span class="token function">service</span> mysqld status 或者 <span class="token function">ps</span> -ef <span class="token operator">|</span> <span class="token function">grep</span> mysql</code></pre>
-<p>设置mysqld服务开机自启动</p>
-<pre class=" language-bash"><code class="language-bash">systemctl <span class="token function">enable</span> mysqld.service</code></pre>
-<p>检查mysqld开机自启动是否设置成功</p>
-<pre class=" language-bash"><code class="language-bash">systemctl list-dependencies <span class="token operator">|</span> <span class="token function">grep</span> mysqld</code></pre>
-<p>mysql5.7以后的争强了安全机制, 所以使用yum安装,启动会系统会自动生成一个随机的密码,修改mysql密码<br>查看mysql的随机密码</p>
-<pre class=" language-bash"><code class="language-bash"><span class="token function">grep</span> <span class="token string">'temporary password'</span> /var/log/mysqld.log</code></pre>
-<p>使用查询得到的随机密码在终端登录</p>
-<pre class=" language-bash"><code class="language-bash">mysql -u root -p    更改密码<span class="token punctuation">(</span>mysql文档规定,密码必须包括大小写字母数字加特殊符号<span class="token operator">></span>8位<span class="token punctuation">)</span>
-ALTER USER <span class="token string">'root'</span>@<span class="token string">'localhost'</span> IDENTIFIED BY <span class="token string">'Yourpassword'</span><span class="token punctuation">;</span>
-退出mysql客户端,用刚才修改的密码登录确保密码修改成功
-<span class="token keyword">exit</span><span class="token punctuation">;</span>
-mysql -u root -p  </code></pre>
-<h1 id="安装php7-1"><a href="#安装php7-1" class="headerlink" title="安装php7.1"></a>安装php7.1</h1><p>安装php源</p>
-<pre class=" language-bash"><code class="language-bash">rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm 
-rpm -Uvh https://mirror.webtatic.com/yum/el7/webtatic-release.rpm</code></pre>
-<p>检查源是否安装成功</p>
-<pre class=" language-bash"><code class="language-bash">yum repolist enabled <span class="token operator">|</span> <span class="token function">grep</span> <span class="token string">"webtatic*"</span></code></pre>
-<p>安装php扩展源 </p>
-<pre class=" language-bash"><code class="language-bash">yum -y <span class="token function">install</span> php71w php71w-fpm
-yum -y <span class="token function">install</span> php71w-mbstring php71w-common php71w-gd php71w-mcrypt
-yum -y <span class="token function">install</span> php71w-mysql php71w-xml php71w-cli php71w-devel
-yum -y <span class="token function">install</span> php71w-pecl-memcached php71w-pecl-redis php71w-opcache</code></pre>
-<p>验证php7.1.x和扩展是否安装成功<br>验证php是否安装成功</p>
-<pre class=" language-bash"><code class="language-bash">php -v</code></pre>
-<p>验证对应的扩展是否安装成功</p>
-<pre class=" language-bash"><code class="language-bash">php -m</code></pre>
-<p>设置php-fpm并检测php-fpm的运行状态<br>启动php-fpm</p>
-<pre class=" language-bash"><code class="language-bash"><span class="token function">service</span> php-fpm start</code></pre>
-<p>检查启动是否成功<br>service php-fpm status<br>设置开机自启动<br>systemctl enable php-fpm.service<br>检查开机自启动是否设置成功</p>
-<pre class=" language-bash"><code class="language-bash">systemctl list-dependencies <span class="token operator">|</span> <span class="token function">grep</span> php-fpm
-<span class="token function">ps</span> -ef <span class="token operator">|</span> <span class="token function">grep</span> php-fpm</code></pre>
-<p>nginx配置如下：</p>
-<pre class=" language-bash"><code class="language-bash">server<span class="token punctuation">{</span>
-    listen       80<span class="token punctuation">;</span>
-    server_name  youserver<span class="token punctuation">;</span>
-    index index.html index.php<span class="token punctuation">;</span>
-    root /home/public<span class="token punctuation">;</span>
-    <span class="token comment" spellcheck="true">#charset koi8-r;</span>
-    <span class="token comment" spellcheck="true">#access_log  logs/host.access.log  main;</span>
-    location / <span class="token punctuation">{</span>
-        index  index.html index.htm index.php<span class="token punctuation">;</span>
-        try_files <span class="token variable">$uri</span> <span class="token variable">$uri</span>/ /index.php?<span class="token variable">$query_string</span><span class="token punctuation">;</span>
-     <span class="token punctuation">}</span>
-    error_page  404              /404.html<span class="token punctuation">;</span>
-    <span class="token comment" spellcheck="true"># redirect server error pages to the static page /50x.html</span>
-    <span class="token comment" spellcheck="true">#</span>
-    error_page   500 502 503 504  /50x.html<span class="token punctuation">;</span>
-    location <span class="token operator">=</span> /50x.html <span class="token punctuation">{</span>
-        root   html<span class="token punctuation">;</span>
-    <span class="token punctuation">}</span>
-    <span class="token comment" spellcheck="true"># proxy the PHP scripts to Apache listening on 127.0.0.1:80</span>
-    <span class="token comment" spellcheck="true">#</span>
-    <span class="token comment" spellcheck="true">#location ~ .php$ {</span>
-    <span class="token comment" spellcheck="true">#    proxy_pass   http://127.0.0.1;</span>
-    <span class="token comment" spellcheck="true">#}</span>
-    <span class="token comment" spellcheck="true"># pass the PHP scripts to FastCGI server listening on 127.0.0.1:9000</span>
-    <span class="token comment" spellcheck="true">#</span>
-    location ~ .php$ <span class="token punctuation">{</span>
-        root           /home/public<span class="token punctuation">;</span>
-        fastcgi_pass   127.0.0.1:9000<span class="token punctuation">;</span>
-        fastcgi_index  index.php<span class="token punctuation">;</span>
-        fastcgi_param  SCRIPT_FILENAME  /home/public<span class="token variable">$fastcgi_script_name</span><span class="token punctuation">;</span>
-        include        fastcgi_params<span class="token punctuation">;</span>
-<span class="token punctuation">}</span>
-    <span class="token comment" spellcheck="true"># deny access to .htaccess files, if Apache's document root</span>
-    <span class="token comment" spellcheck="true"># concurs with nginx's one</span>
-    <span class="token comment" spellcheck="true">#</span>
-    location ~ /.ht <span class="token punctuation">{</span>
-        deny  all<span class="token punctuation">;</span>
-    <span class="token punctuation">}</span>
-<span class="token punctuation">}</span></code></pre>
+                <h1 id="centos7系统生成环境docker-ce部署"><a href="#centos7系统生成环境docker-ce部署" class="headerlink" title="centos7系统生成环境docker-ce部署"></a>centos7系统生成环境docker-ce部署</h1><p>第一步：安装依赖包</p>
+<pre class=" language-bash"><code class="language-bash">yum <span class="token function">install</span> -y yum-utils device-mapper-persistent-data lvm2</code></pre>
+<p>第二步：添加Docker软件包源</p>
+<pre class=" language-bash"><code class="language-bash">yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo</code></pre>
+<p>第三步：关闭测试版list(只显示稳定版本)</p>
+<pre class=" language-bash"><code class="language-bash"><span class="token function">sudo</span> yum-config-manager  --disable docker-ce-test  <span class="token comment" spellcheck="true"># 不显示测试版本</span>
+<span class="token function">sudo</span> yum-config-manager  --enable docker-ce-edge   <span class="token comment" spellcheck="true"># 启用稳定版</span></code></pre>
+<p>第四步：更新yum包索引</p>
+<pre class=" language-bash"><code class="language-bash">yum makecache fast</code></pre>
+<p>第五步：安装指定版本</p>
+<pre class=" language-bash"><code class="language-bash">yum list docker-ce --showduplicates<span class="token operator">|</span><span class="token function">sort</span> -r
+yum <span class="token function">install</span> docker-ce-17.03.0.ce -y</code></pre>
+<p>启动docker</p>
+<pre class=" language-bash"><code class="language-bash">systemctl <span class="token function">enable</span> docker.service <span class="token operator">&amp;&amp;</span> systemctl start docker.service</code></pre>
+<p>踩坑指南：<br>如果在执行安装docker指定版本的时候报如下错误：</p>
+<pre class=" language-bash"><code class="language-bash">yum <span class="token function">install</span> docker-ce-17.03.0.ce -y
+会出现如下的报错：
+--<span class="token operator">></span> Finished Dependency Resolution
+Error: Package: docker-ce-17.03.0.ce-1.el7.centos.x86_64 <span class="token punctuation">(</span>docker-ce-stable<span class="token punctuation">)</span>
+           Requires: docker-ce-selinux <span class="token operator">>=</span> 17.03.0.ce-1.el7.centos
+           Available: docker-ce-selinux-17.03.0.ce-1.el7.centos.noarch <span class="token punctuation">(</span>docker-ce-stable<span class="token punctuation">)</span>
+               docker-ce-selinux <span class="token operator">=</span> 17.03.0.ce-1.el7.centos
+           Available: docker-ce-selinux-17.03.1.ce-1.el7.centos.noarch <span class="token punctuation">(</span>docker-ce-stable<span class="token punctuation">)</span>
+               docker-ce-selinux <span class="token operator">=</span> 17.03.1.ce-1.el7.centos
+           Available: docker-ce-selinux-17.03.2.ce-1.el7.centos.noarch <span class="token punctuation">(</span>docker-ce-stable<span class="token punctuation">)</span>
+               docker-ce-selinux <span class="token operator">=</span> 17.03.2.ce-1.el7.centos
+ You could try using --skip-broken to work around the problem
+ You could try running: rpm -Va --nofiles --nodigest</code></pre>
+<p>解决这个问题，需要执行以下命令：<br>要先安装docker-ce-selinux并且<code>docker-ce-selinux &gt;= 17.03.0.ce-1.el7.centos</code>，否则安装docker-ce会报错</p>
+<pre class=" language-bash"><code class="language-bash">yum <span class="token function">install</span> https://download.docker.com/linux/centos/7/x86_64/stable/Packages/docker-ce-selinux-17.03.2.ce-1.el7.centos.noarch.rpm </code></pre>
+<p>然后再安装 docker-ce-17.03.2.ce，就能正常安装</p>
+<pre class=" language-bash"><code class="language-bash">yum <span class="token function">install</span> docker-ce-17.03.0.ce  -y</code></pre>
+<p>扩展：</p>
+<pre class=" language-bash"><code class="language-bash">查看已启动的服务
+systemctl list-units --type<span class="token operator">=</span>service
+查看docker是否设置开机启动
+systemctl list-unit-files <span class="token operator">|</span> <span class="token function">grep</span> docker.service
+
+批量停止容器
+docker <span class="token function">ps</span> -a <span class="token operator">|</span><span class="token function">grep</span> -v <span class="token string">'CONTAINER'</span> <span class="token operator">|</span><span class="token function">awk</span> <span class="token string">'{print <span class="token variable">$1</span>}'</span> <span class="token operator">|</span><span class="token function">xargs</span> docker stop
+批量删除容器
+docker <span class="token function">ps</span> -a <span class="token operator">|</span><span class="token function">grep</span> -v <span class="token string">'CONTAINER'</span> <span class="token operator">|</span><span class="token function">awk</span> <span class="token string">'{print <span class="token variable">$1</span>}'</span><span class="token operator">|</span><span class="token function">xargs</span> docker <span class="token function">rm</span>
+</code></pre>
 
             </div>
             <hr/>
@@ -622,12 +573,12 @@ yum -y <span class="token function">install</span> php71w-pecl-memcached php71w-
                     
                         <div class="article-tag">
                             
-                                <a href="/tags/linux/">
-                                    <span class="chip bg-color">linux</span>
+                                <a href="/tags/docker/">
+                                    <span class="chip bg-color">docker</span>
                                 </a>
                             
-                                <a href="/tags/lnmp/">
-                                    <span class="chip bg-color">lnmp</span>
+                                <a href="/tags/centos7/">
+                                    <span class="chip bg-color">centos7</span>
                                 </a>
                             
                         </div>
@@ -797,31 +748,34 @@ yum -y <span class="token function">install</span> php71w-pecl-memcached php71w-
             <div class="article-badge left-badge text-color">
                 <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
             <div class="card">
-                <a href="/2019/11/24/kubeadm%E6%90%AD%E5%BB%BAk8s%E4%B8%89%E8%8A%82%E7%82%B9%E9%9B%86%E7%BE%A4/">
+                <a href="/2019/11/14/yum%E5%AE%89%E8%A3%85lnmp%E7%8E%AF%E5%A2%83/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/22.jpg" class="responsive-img" alt="kubeadm搭建k8s三节点集群">
+                        <img src="/medias/featureimages/4.jpg" class="responsive-img" alt="Centos7-yum安装lnmp环境">
                         
-                        <span class="card-title">kubeadm搭建k8s三节点集群</span>
+                        <span class="card-title">Centos7-yum安装lnmp环境</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            Kubeadm 部署3节点kubernetes 1.15(墙外环境)国内环境请参考：(k8s第一步：)[https://www.cnblogs.com/fanqisoft/p/11498049.html](k8s第二步：)[https://
+                            yum安装nginx\php\mysql，搭建lnmp环境yum升级
+yum update
+yum安装nginx最新源
+yum localinstall http://nginx.org/packages/centos/7/noarch/R
                         
                     </div>
                     <div class="publish-info">
                         <span class="publish-date">
-                            <i class="far fa-clock fa-fw icon-date"></i>2019-11-24
+                            <i class="far fa-clock fa-fw icon-date"></i>2019-11-14
                         </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/%E5%AE%B9%E5%99%A8%E6%8A%80%E6%9C%AF/" class="post-category">
-                                    容器技术
+                            <a href="/categories/lnmp/" class="post-category">
+                                    lnmp
                                 </a>
                             
                             
@@ -831,16 +785,12 @@ yum -y <span class="token function">install</span> php71w-pecl-memcached php71w-
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/k8s/">
-                        <span class="chip bg-color">k8s</span>
+                    <a href="/tags/linux/">
+                        <span class="chip bg-color">linux</span>
                     </a>
                     
-                    <a href="/tags/docker/">
-                        <span class="chip bg-color">docker</span>
-                    </a>
-                    
-                    <a href="/tags/kubeadm/">
-                        <span class="chip bg-color">kubeadm</span>
+                    <a href="/tags/lnmp/">
+                        <span class="chip bg-color">lnmp</span>
                     </a>
                     
                 </div>
@@ -854,27 +804,26 @@ yum -y <span class="token function">install</span> php71w-pecl-memcached php71w-
                 下一篇&nbsp;<i class="fas fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/2019/11/14/centos7%E7%94%9F%E6%88%90%E7%8E%AF%E5%A2%83%E9%83%A8%E7%BD%B2docker-ce/">
+                <a href="/2019/07/10/kubernetes%E4%B9%8B%E9%98%BF%E9%87%8C%E4%BA%91%E9%83%A8%E7%BD%B2/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/11.jpg" class="responsive-img" alt="centos7生成环境部署docker-ce">
+                        <img src="/medias/featureimages/4.jpg" class="responsive-img" alt="阿里云部署多主master高可用k8s集群">
                         
-                        <span class="card-title">centos7生成环境部署docker-ce</span>
+                        <span class="card-title">阿里云部署多主master高可用k8s集群</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            centos7系统生成环境docker-ce部署第一步：安装依赖包
-yum install -y yum-utils device-mapper-persistent-data lvm2
-第二步：添加Docker软件包源
-yum-confi
+                            阿里云K8S高可用部署(我们需要准备六台阿里云的ECS,选择有公网IP的)
+二进制搭建k8s多master集群之第一篇(集群环境和各个组件功能介绍)规划如下：
+master01:172.24.150.85(内网)  kube-apiserv
                         
                     </div>
                     <div class="publish-info">
                             <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2019-11-14
+                                <i class="far fa-clock fa-fw icon-date"></i>2019-07-10
                             </span>
                         <span class="publish-author">
                             
@@ -891,12 +840,12 @@ yum-confi
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/docker/">
-                        <span class="chip bg-color">docker</span>
+                    <a href="/tags/kubernetes/">
+                        <span class="chip bg-color">kubernetes</span>
                     </a>
                     
-                    <a href="/tags/centos7/">
-                        <span class="chip bg-color">centos7</span>
+                    <a href="/tags/%E9%98%BF%E9%87%8C%E4%BA%91/">
+                        <span class="chip bg-color">阿里云</span>
                     </a>
                     
                 </div>
