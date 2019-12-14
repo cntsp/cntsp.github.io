@@ -478,7 +478,8 @@ Ingress-Nginx 官方网站：https://kubernetes.github.io/ingre">
 <p><strong>Ingress-Nginx 官方网站：</strong><a href="https://kubernetes.github.io/ingress-nginx" target="_blank" rel="noopener">https://kubernetes.github.io/ingress-nginx</a></p>
 <p><img src="https://cntsp.github.io/medias/contents/22.png" alt=""></p>
 <p><img src="https://cntsp.github.io/medias/contents/21.png" alt=""></p>
-<h2 id="部署-Ingress-Nginx"><a href="#部署-Ingress-Nginx" class="headerlink" title="部署 Ingress-Nginx"></a>部署 Ingress-Nginx</h2><pre class=" language-bash"><code class="language-bash">kubectl apply -f mandatory.yaml
+<h2 id="部署-Ingress-Nginx"><a href="#部署-Ingress-Nginx" class="headerlink" title="部署 Ingress-Nginx"></a>部署 Ingress-Nginx</h2><pre class=" language-bash"><code class="language-bash"><span class="token comment" spellcheck="true">## 这两个文件在官网上</span>
+kubectl apply -f mandatory.yaml
 kubectl apply -f service-nodeport.yaml</code></pre>
 <h2 id="Ingress-HTTP-代理访问"><a href="#Ingress-HTTP-代理访问" class="headerlink" title="Ingress HTTP 代理访问"></a>Ingress HTTP 代理访问</h2><p><strong>deployment、Service、Ingress Yaml文件</strong></p>
 <pre class=" language-bash"><code class="language-bash">apiVersion: extensions/v1beta1

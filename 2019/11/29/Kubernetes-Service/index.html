@@ -491,7 +491,7 @@ Se">
 <p><img src="https://cntsp.github.io/medias/contents/15.png" alt=""></p>
 <h2 id="VIP-和-Service-代理"><a href="#VIP-和-Service-代理" class="headerlink" title="VIP 和 Service 代理"></a>VIP 和 Service 代理</h2><p><strong>在 Kubernetes 集群中，每个 Node 运行一个 <code>kube-proxy</code>进程。<code>kube-proxy</code> 负责为 <code>Service</code>实现了一种VIP（虚拟IP）的形式，而不是 <code>ExternalName</code>的形式。在 Kubernetes v1.0 版本，代理完全在userspace。在Kubernetes v1.1版本，新增了 iptables 代理，但并不是默认的运行模式。从Kubernetes v1.2起，默认就是iptables代理。在Kubernetes v1.8.0-beta.0中，添加了ipvs代理</strong></p>
 <p><strong>在kubernetes 1.14版本中开始默认使用 ipvs 代理</strong></p>
-<p><strong>在 kubernetes v1.0 版本， <code>Service</code>是”4层”（TCP/UDP over IP）概念。在kubernetes v1.1版本，新增了 <code>Ingress</code> API(beta版)，用来表示“7层”(HTTP)服务</strong></p>
+<p><strong>在 kubernetes v1.0 版本， <code>Service</code>是”4层”（TCP/UDP over IP）概念。在kubernetes v1.11版本，新增了 <code>Ingress</code> API(beta版)，用来表示“7层”(HTTP)服务</strong></p>
 <p><strong>！为何不使用 round-robin DNS?</strong>（DNS缓存问题）</p>
 <h2 id="代理模式的分类"><a href="#代理模式的分类" class="headerlink" title="代理模式的分类"></a>代理模式的分类</h2><p><img src="https://cntsp.github.io/medias/contents/16.png" alt=""></p>
 <p><img src="https://cntsp.github.io/medias/contents/17.png" alt=""></p>
@@ -540,7 +540,7 @@ spec:
     spec:
       containers:
       - name: myapp
-        image: ikubernetes/myapp:v2
+        image: harbor.bwingame8.com/library/myapp:v2
         imagePullPolicy: ifNotPresent
         ports:
         - name: http
