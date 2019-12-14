@@ -500,10 +500,10 @@
 </ul>
 </blockquote>
 <p>upstream backend{</p>
-<p>​    <strong>server 192.168.1.80:8080 max_fails=3 fail_timeout=30s;</strong></p>
-<p>​    <strong>server 192.168.1.81:8080 max_fails=3 fail_timeout=30s;</strong></p>
+<p>​    <strong>server 192.168.1.80:8080 max_fails=3 fail_timeout=3s;</strong></p>
+<p>​    <strong>server 192.168.1.81:8080 max_fails=3 fail_timeout=3s;</strong></p>
 <p>}</p>
-<p>上面配置的意思是：如果对backend 192.168.1.80:8080 在30s内连续产生3次请求失败，那么该后端1.80，在之后的30s内被认为是无效（down）状态，关键是我们运维人员有不知这个后端出现问题，即使知道出现了问题，也不可能在30s内搞定问题啊，那么30s之后，会再次对这个1.80发起重试max_fails次。这肯定会对客户端的访问造成服务不可达的问题，最坑爹的是我们从Nginx上压根不知到底是哪个后端节点的出现了状况，不知道哪台机宕机了或者服务假死了等原因，不能判断后端节点的状况是Nginx免费版一大弊病。这里先排出后端服务自己做的健康检测。</p>
+<p>上面配置的意思是：如果对<code>backend 192.168.1.80:8080</code> 在3s内连续产生3次请求失败，那么该后端1.80，在之后的3s内被认为是无效（down）状态，关键是我们运维人员有不知这个后端出现问题，即使知道出现了问题，也不可能在3s内搞定问题啊，那么3s之后，会再次对这个1.80发起重试<code>max_fails</code>次。这肯定会对客户端的访问造成服务不可达的问题，最坑爹的是我们从Nginx上压根不知到底是哪个后端节点的出现了状况，不知道哪台机宕机了或者服务假死了等原因，不能判断后端节点的状况是Nginx免费版一大弊病。这里先排出后端服务自己做的健康检测。</p>
 <p>另一个就是nginx的链接状态和流量的统计功能，这个也适用于检查后端健康情况和当前并发链接数，这个功能社区版默认还是没有，需要在编译时加入一个官方支持的模块</p>
 <pre class=" language-shell"><code class="language-shell">--with-http_stub_status_module</code></pre>
 <p>然后还需要在配置文件中，http块下面的某个server开启这个功能，并指定访问url</p>
@@ -520,7 +520,7 @@
 <p><img src="https://cntsp.github.io/medias/contents/74png.png" alt=""></p>
 <p><img src="https://cntsp.github.io/medias/contents/75.png" alt=""></p>
 <p>显示的内容和HAProxy差不多，但是是不是感觉更高大上了。</p>
-<p>那么我们应该怎么办呢？要么用成熟稳定且免费开源的HAProxy做反向代理的负载均衡，要么缴纳2500美元一年购买商业版的NGINX plus。或者使用阿里巴巴为淘宝修改过的Nginx——tengine。不过tengine几乎一年才更新一次，好在一个月以前刚刚发布了2017版，支持了Nginx-1.8.1的全部特性。可是1.9之后的重要功能，比如TCP和UDP的负载均衡就没有了。</p>
+<p>那么我们应该怎么办呢？要么用成熟稳定且免费开源的HAProxy做反向代理的负载均衡，要么缴纳2500美元一年购买商业版的NGINX plus。或者使用阿里巴巴为淘宝修改过的Nginx——tengine。不过tengine几乎一年才更新一次，好在一个月以前刚刚发布了2017版，支持了<code>Nginx-1.8.1</code>的全部特性。可是<code>1.9</code>之后的重要功能，比如TCP和UDP的负载均衡就没有了。</p>
 <p>下面来看看tengine的后台监控页面</p>
 <p><img src="https://cntsp.github.io/medias/contents/76.png" alt=""></p>
 <p>在配置文件中添加该功能的写法是：在http下面的某个server下添加</p>
@@ -528,7 +528,7 @@
      check_status;
      access_log   off;
 }</code></pre>
-<p>在这上面起码能看到哪个后端服务器宕机了，但是相对于HAProxy和Nginx plus，这个还是无法观测每台服务器的连接数和流量，不能观测负载。</p>
+<p>在这上面起码能看到哪个后端服务器宕机了，但是相对于<code>HAProxy</code>和<code>Nginx plus</code>，这个还是无法观测每台服务器的连接数和流量，不能观测负载。</p>
 <p>那么我们运维如何选择负载均衡器呢：</p>
 <ul>
 <li>基于Cookie的会话保持</li>
@@ -539,10 +539,10 @@
 <p>对于Tengine来说，上面三点也可以支持，但是1，3不能同时支持。也就是说如果使用了Cookie作为会话保持策略，那就不能再以最少连接数作为分发策略，只能使用轮询(round_robin)，这样的话很容出现某个服务器占用超级高，然后其它服务器几乎没有负载的糟糕情况，且后台监控页面比较简陋，看不到具体每个节点的负载情况。</p>
 <p>对于硬件负载均衡器F5或A10来说，上面3点全面支持。</p>
 <p>但是如果公司里出现了脑残项目经理，非要使用NGINX社区版怎么办？</p>
-<p>对于第一点，Cookie和HEAD的回话保持，我的上一篇博客NGINX基于Cookie和Header的负载均衡会话保持 里介绍了如何添加Tengine开源的nginx-sticky-module-ng实现回话保持功能，但是可惜的一点是如果使用了该回话保持方案，就不能使用最少连接数(least_conn)的分发策略，只能使用轮训（round_robin）分发策略，这样对于服务器的均衡是很不利的</p>
-<p>对于第二点，Tengine同样开源了一个模块nginx_upstream_check_module，可以把这个模块安装到Nginx社区版进行使用。</p>
-<p>对于第三点，社区版支持least_conn，只不过不能和cookie回话保持共用。<br>下面就介绍一下如何把Tengine的nginx_upstream_check_module移植到Nginx 1.12.1版本上，并添加nginx-sticky-module-ng模块实现cookie的回话保持功能。</p>
-<p>下面就介绍一下如何把Tengine的nginx_upstream_check_module移植到Nginx 1.12.1版本上，并添加nginx-sticky-module-ng模块实现cookie的回话保持功能。大概分为如下几个步骤：</p>
+<p>对于第一点，<code>Cookie</code>和<code>HEAD</code>的回话保持，我的上一篇博客NGINX基于<code>Cookie</code>和<code>Header</code>的负载均衡会话保持 里介绍了如何添加Tengine开源的<code>nginx-sticky-module-ng</code>实现回话保持功能，但是可惜的一点是如果使用了该回话保持方案，就不能使用最少连接数<code>(least_conn)</code>的分发策略，只能使用轮训<code>（round_robin）</code>分发策略，这样对于服务器的均衡是很不利的</p>
+<p>对于第二点，Tengine同样开源了一个模块<code>nginx_upstream_check_module</code>，可以把这个模块安装到Nginx社区版进行使用。</p>
+<p>对于第三点，社区版支持<code>least_conn</code>，只不过不能和<code>cookie</code>回话保持共用。<br>下面就介绍一下如何把<code>Tengine</code>的<code>nginx_upstream_check_module</code>移植到Nginx 1.12.1版本上，并添加<code>nginx-sticky-module-ng</code>模块实现<code>cookie</code>的回话保持功能。</p>
+<p>下面就介绍一下如何把<code>Tengine</code>的<code>nginx_upstream_check_module</code>移植到Nginx 1.12.1版本上，并添加nginx-sticky-module-ng模块实现cookie的回话保持功能。大概分为如下几个步骤：</p>
 <blockquote>
 <ul>
 <li>下载nginx_upstream_check_module源码，并对NGINX源码打补丁包</li>
@@ -556,9 +556,9 @@
 <blockquote>
 <p> *在configue中添加上面的两个model进行编译。</p>
 </blockquote>
-<p>首先需要下载nginx_upstream_check_module的源码，地址：<a href="https://github.com/yaoweibin/nginx_upstream_check_module" target="_blank" rel="noopener">https://github.com/yaoweibin/nginx_upstream_check_module</a> 已经添加了Nginx 1.12.1的补丁包</p>
+<p>首先需要下载<code>nginx_upstream_check_module</code>的源码，地址：<a href="https://github.com/yaoweibin/nginx_upstream_check_module" target="_blank" rel="noopener">https://github.com/yaoweibin/nginx_upstream_check_module</a> 已经添加了Nginx 1.12.1的补丁包</p>
 <p>直接克隆这个项目到本地Nginx1.12.1源码目录下</p>
-<p>然后下载nginx-sticky-module-ng的源码，地址：<a href="https://bitbucket.org/nginx-goodies/nginx-sticky-module-ng/downloads/" target="_blank" rel="noopener">https://bitbucket.org/nginx-goodies/nginx-sticky-module-ng/downloads/</a></p>
+<p>然后下载<code>nginx-sticky-module-ng</code>的源码，地址：<a href="https://bitbucket.org/nginx-goodies/nginx-sticky-module-ng/downloads/" target="_blank" rel="noopener">https://bitbucket.org/nginx-goodies/nginx-sticky-module-ng/downloads/</a></p>
 <p>然后解压到Nginx1.12.1源码目录下，之后Nginx的源码目录结构如下:</p>
 <pre class=" language-shell"><code class="language-shell">[root@oa-app nginx-1.12.1]# ls -alt
 总用量 760
@@ -581,8 +581,8 @@ drwxr-xr-x   6 root root   4096 8月   3 19:50 nginx_upstream_check_module-maste
 -rwxr-xr-x.  1 alex alex   2481 7月  11 21:24 configure
 -rw-r--r--.  1 alex alex   1397 7月  11 21:24 LICENSE
 -rw-r--r--.  1 alex alex     49 7月  11 21:24 README</code></pre>
-<p>下面要做的就是给Nginx和sticky模块打上upstream check的补丁包。</p>
-<p>在Nginx源码目录下，执行</p>
+<p>下面要做的就是给<code>Nginx</code>和<code>sticky</code>模块打上<code>upstream check</code>的补丁包。</p>
+<p>在<code>Nginx</code>源码目录下，执行</p>
 <pre class=" language-shell"><code class="language-shell">patch -p1 < ./nginx_upstream_check_module-master/check_1.12.1+.patch
 
 patching file src/http/modules/ngx_http_upstream_hash_module.c
@@ -590,7 +590,7 @@ patching file src/http/modules/ngx_http_upstream_ip_hash_module.c
 patching file src/http/modules/ngx_http_upstream_least_conn_module.c
 patching file src/http/ngx_http_upstream_round_robin.c
 patching file src/http/ngx_http_upstream_round_robin.h</code></pre>
-<p>然后cd到nginx-sticky-module-ng源码目录下，再执行</p>
+<p>然后<code>cd</code>到<code>nginx-sticky-module-ng</code>源码目录下，再执行</p>
 <pre class=" language-shell"><code class="language-shell">patch -p0 < ../nginx-sticky-module.patch 
 
 patching file ngx_http_sticky_module.c
@@ -598,8 +598,8 @@ Hunk #1 succeeded at 15 with fuzz 2 (offset 5 lines).
 Hunk #2 succeeded at 304 (offset 12 lines).
 Hunk #3 succeeded at 330 (offset 12 lines).
 Hunk #4 succeeded at 352 (offset 12 lines).</code></pre>
-<p>最后就可以使用 make &amp;&amp; make install  编译了</p>
-<p>下面介绍tengine和打了tengin upstream_check补丁的社区版Nginx对于后端的健康监测有多种方式，主要用的就是TCP和HTTP方式。</p>
+<p>最后就可以使用 <code>make</code> &amp;&amp; <code>make install</code>  编译了</p>
+<p>下面介绍<code>tengine</code>和打了<code>tengin upstream_check</code>补丁的社区版<code>Nginx</code>对于后端的健康监测有多种方式，主要用的就是<code>TCP</code>和<code>HTTP</code>方式。</p>
 <p>默认为TCP方式，配置为</p>
 <pre class=" language-shell"><code class="language-shell">upstream emobile {
     sticky;
@@ -607,9 +607,9 @@ Hunk #4 succeeded at 352 (offset 12 lines).</code></pre>
     server 127.0.0.1:8088;
     check interval=3000 rise=2 fall=5 timeout=1000
 }</code></pre>
-<p>这个upstream同时配置了基于cookie的回话保持和TCP的健康检测。<br>这个检测每3秒执行一次，如果5次都没有成功就认定这个服务器不可达，超时时间为1秒。设定为不可达之后，请求就不会再向这个服务器发送了，但是仍然每隔3秒检测一下这个服务器的健康度，如果两次连续检查都成功就设定这个服务器为健康，然后再重新把后面的请求向这个服务器发送，实现和HAProxy一样的功能，语法也类似。</p>
-<p>但是TCP检测有一个不好处，就是只要这个端口可以telnet通就认定为可用，如上面我把SSH的22端口和tomcat的8088端口放在一起，nginx认为两个服务器都是健康的，于是平均的向他们发送请求，所以这样总有一半的用户请求到的是404。</p>
-<p>那么如何避免这种问题呢，可以使用HTTP模式，让NGINX主动去GET请求一个页面，如果请求的返回码为2XX，3XX就认定服务器是好用的，如下:</p>
+<p>这个upstream同时配置了基于cookie的回话保持和TCP的健康检测。<br>这个检测每<code>3秒</code>执行一次，如果<code>5次</code>都没有成功就认定这个服务器不可达，超时时间为<code>1</code>秒。设定为不可达之后，请求就不会再向这个服务器发送了，但是仍然每隔<code>3</code>秒检测一下这个服务器的健康度，如果两次连续检查都成功就设定这个服务器为健康，然后再重新把后面的请求向这个服务器发送，实现和<code>HAProxy</code>一样的功能，语法也类似。</p>
+<p>但是<code>TCP</code>检测有一个不好处，就是只要这个端口可以<code>telnet</code>通就认定为可用，如上面我把<code>SSH</code>的<code>22</code>端口和<code>tomcat</code>的<code>8088</code>端口放在一起，<code>nginx</code>认为两个服务器都是健康的，于是平均的向他们发送请求，所以这样总有一半的用户请求到的是<code>404</code>。</p>
+<p>那么如何避免这种问题呢，可以使用<code>HTTP</code>模式，让<code>NGINX</code>主动去<code>GET</code>请求一个页面，如果请求的返回码为<code>2XX</code>，<code>3XX</code>就认定服务器是好用的，如下:</p>
 <pre class=" language-shell"><code class="language-shell">upstream emobile {
     sticky;
         server 127.0.0.1:22;
@@ -618,7 +618,7 @@ Hunk #4 succeeded at 352 (offset 12 lines).</code></pre>
         check_http_send "GET /index.html HTTP/1.0\r\n\r\n";
         check_http_expect_alive http_2xx http_3xx;
     }</code></pre>
-<p>上面的配置Nginx会每3秒钟请求一次127.0.0.1:8088/login.do这个页面，并判断HTTP状态码。因为SSH 22端口请求结果肯定是404，所以Nginx就会认为这个不可达，这样就可以避免TCP模式的缺陷。<br>这个check_http_send后面可以接好多种url，最常用的就是GET，还有POST和HEAD，如果你想检测特定某个页面，可以访问一下该页面然后查找access log，查看相应的请求，如下面这段log就可以拷贝出来，检测特定页面是不是通畅。</p>
+<p>上面的配置Nginx会每3秒钟请求一次<code>127.0.0.1:8088/index.html</code>这个页面，并判断HTTP状态码。因为<code>SSH 22</code>端口请求结果肯定是<code>404</code>，所以<code>Nginx</code>就会认为这个不可达，这样就可以避免<code>TCP</code>模式的缺陷。<br>这个<code>check_http_send</code>后面可以接好多种<code>url</code>，最常用的就是<code>GET</code>，还有<code>POST</code>和<code>HEAD</code>，如果你想检测特定某个页面，可以访问一下该页面然后查找<code>access log</code>，查看相应的请求。</p>
 <p>原文链接：<a href="https://blog.csdn.net/lvshaorong/article/details/78336848" target="_blank" rel="noopener">https://blog.csdn.net/lvshaorong/article/details/78336848</a></p>
 
             </div>
