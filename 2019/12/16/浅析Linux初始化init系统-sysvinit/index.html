@@ -1,0 +1,1279 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+
+
+<head>
+    <meta charset="utf-8">
+    <meta name="keywords" content="浅析Linux初始化init系统-sysvinit, 阿培">
+    <meta name="description" content="什么是Init(initial:原始，初始，开始)系统，init系统的历史和现状Linux操作系统的启动首先从BIOS开始，接下来进入boot loader，由boot loader载入系统内核，进行内核的初始化。内核初始化的最后一步就是启">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="renderer" content="webkit|ie-stand|ie-comp">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>浅析Linux初始化init系统-sysvinit | 阿培</title>
+    <link rel="icon" type="image/x-icon, image/vnd.microsoft.icon" href="/favicon.ico">
+
+    <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
+    <link rel="stylesheet" type="text/css" href="/libs/materialize/materialize.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/aos/aos.css">
+    <link rel="stylesheet" type="text/css" href="/libs/animate/animate.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/lightGallery/css/lightgallery.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/matery.css">
+    <link rel="stylesheet" type="text/css" href="/css/my.css">
+    
+    <script src="/libs/jquery/jquery.min.js"></script>
+    
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+
+<body>
+    <header class="navbar-fixed">
+    <nav id="headNav" class="bg-color nav-transparent">
+        <div id="navContainer" class="nav-wrapper head-container">
+            <div class="brand-logo">
+                <a href="/" class="waves-effect waves-light">
+                    
+                    <img src="/medias/logo.png" class="logo-img" alt="LOGO">
+                    
+                    <span class="logo-span">阿培</span>
+                </a>
+            </div>
+            
+
+<a href="#" data-target="mobile-nav" class="sidenav-trigger button-collapse"><i class="fas fa-bars"></i></a>
+<ul class="right nav-menu">
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/" class="waves-effect waves-light">
+      
+      <i class="fas fa-home" style="zoom: 0.6;"></i>
+      
+      <span>首页</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/tags" class="waves-effect waves-light">
+      
+      <i class="fas fa-tags" style="zoom: 0.6;"></i>
+      
+      <span>标签</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/categories" class="waves-effect waves-light">
+      
+      <i class="fas fa-bookmark" style="zoom: 0.6;"></i>
+      
+      <span>分类</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/archives" class="waves-effect waves-light">
+      
+      <i class="fas fa-archive" style="zoom: 0.6;"></i>
+      
+      <span>归档</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/about" class="waves-effect waves-light">
+      
+      <i class="fas fa-user-circle" style="zoom: 0.6;"></i>
+      
+      <span>关于</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/contact" class="waves-effect waves-light">
+      
+      <i class="fas fa-comments" style="zoom: 0.6;"></i>
+      
+      <span>留言板</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/friends" class="waves-effect waves-light">
+      
+      <i class="fas fa-address-book" style="zoom: 0.6;"></i>
+      
+      <span>友情链接</span>
+    </a>
+    
+  </li>
+  
+  <li>
+    <a href="#searchModal" class="modal-trigger waves-effect waves-light">
+      <i id="searchIcon" class="fas fa-search" title="搜索" style="zoom: 0.85;"></i>
+    </a>
+  </li>
+</ul>
+
+<div id="mobile-nav" class="side-nav sidenav">
+
+    <div class="mobile-head bg-color">
+        
+        <img src="/medias/logo.png" class="logo-img circle responsive-img">
+        
+        <div class="logo-name">阿培</div>
+        <div class="logo-desc">
+            
+            Never really desperate, only the lost of the soul.
+            
+        </div>
+    </div>
+
+    
+
+    <ul class="menu-list mobile-menu-list">
+        
+        <li class="m-nav-item">
+	  
+		<a href="/" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-home"></i>
+			
+			首页
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/tags" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-tags"></i>
+			
+			标签
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/categories" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-bookmark"></i>
+			
+			分类
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/archives" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-archive"></i>
+			
+			归档
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/about" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-user-circle"></i>
+			
+			关于
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/contact" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-comments"></i>
+			
+			Contact
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/friends" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-address-book"></i>
+			
+			友情链接
+		</a>
+          
+        </li>
+        
+        
+        <li><div class="divider"></div></li>
+        <li>
+            <a href="https://github.com/blinkfox/hexo-theme-matery" class="waves-effect waves-light" target="_blank">
+                <i class="fab fa-github-square fa-fw"></i>Fork Me
+            </a>
+        </li>
+        
+    </ul>
+</div>
+
+        </div>
+
+        
+            <style>
+    .nav-transparent .github-corner {
+        display: none !important;
+    }
+
+    .github-corner {
+        position: absolute;
+        z-index: 10;
+        top: 0;
+        right: 0;
+        border: 0;
+        transform: scale(1.1);
+    }
+
+    .github-corner svg {
+        color: #0f9d58;
+        fill: #fff;
+        height: 64px;
+        width: 64px;
+    }
+
+    .github-corner:hover .octo-arm {
+        animation: a 0.56s ease-in-out;
+    }
+
+    .github-corner .octo-arm {
+        animation: none;
+    }
+
+    @keyframes a {
+        0%,
+        to {
+            transform: rotate(0);
+        }
+        20%,
+        60% {
+            transform: rotate(-25deg);
+        }
+        40%,
+        80% {
+            transform: rotate(10deg);
+        }
+    }
+</style>
+
+<a href="https://github.com/blinkfox/hexo-theme-matery" class="github-corner tooltipped hide-on-med-and-down" target="_blank"
+   data-tooltip="Fork Me" data-position="left" data-delay="50">
+    <svg viewBox="0 0 250 250" aria-hidden="true">
+        <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
+        <path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2"
+              fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path>
+        <path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z"
+              fill="currentColor" class="octo-body"></path>
+    </svg>
+</a>
+        
+    </nav>
+
+</header>
+
+    
+
+
+
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/21.jpg')">
+    <div class="container" style="right: 0px;left: 0px;">
+        <div class="row">
+            <div class="col s12 m12 l12">
+                <div class="brand">
+                    <div class="description center-align post-title">
+                        浅析Linux初始化init系统-sysvinit
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<main class="post-container content">
+
+    
+    <link rel="stylesheet" href="/libs/tocbot/tocbot.css">
+<style>
+    #articleContent h1::before,
+    #articleContent h2::before,
+    #articleContent h3::before,
+    #articleContent h4::before,
+    #articleContent h5::before,
+    #articleContent h6::before {
+        display: block;
+        content: " ";
+        height: 100px;
+        margin-top: -100px;
+        visibility: hidden;
+    }
+
+    #articleContent :focus {
+        outline: none;
+    }
+
+    .toc-fixed {
+        position: fixed;
+        top: 64px;
+    }
+
+    .toc-widget {
+        width: 345px;
+        padding-left: 20px;
+    }
+
+    .toc-widget .toc-title {
+        margin: 35px 0 15px 0;
+        padding-left: 17px;
+        font-size: 1.5rem;
+        font-weight: bold;
+        line-height: 1.5rem;
+    }
+
+    .toc-widget ol {
+        padding: 0;
+        list-style: none;
+    }
+
+    #toc-content {
+        height: calc(100vh - 250px);
+        overflow: auto;
+    }
+
+    #toc-content ol {
+        padding-left: 10px;
+    }
+
+    #toc-content ol li {
+        padding-left: 10px;
+    }
+
+    #toc-content .toc-link:hover {
+        color: #42b983;
+        font-weight: 700;
+        text-decoration: underline;
+    }
+
+    #toc-content .toc-link::before {
+        background-color: transparent;
+        max-height: 25px;
+    }
+
+    #toc-content .is-active-link {
+        color: #42b983;
+    }
+
+    #toc-content .is-active-link::before {
+        background-color: #42b983;
+    }
+
+    #floating-toc-btn {
+        position: fixed;
+        right: 15px;
+        bottom: 76px;
+        padding-top: 15px;
+        margin-bottom: 0;
+        z-index: 998;
+    }
+
+    #floating-toc-btn .btn-floating {
+        width: 48px;
+        height: 48px;
+    }
+
+    #floating-toc-btn .btn-floating i {
+        line-height: 48px;
+        font-size: 1.4rem;
+    }
+</style>
+<div class="row">
+    <div id="main-content" class="col s12 m12 l9">
+        <!-- 文章内容详情 -->
+<div id="artDetail">
+    <div class="card">
+        <div class="card-content article-info">
+            <div class="row tag-cate">
+                <div class="col s7">
+                    
+                    <div class="article-tag">
+                        
+                            <a href="/tags/linux/">
+                                <span class="chip bg-color">linux</span>
+                            </a>
+                        
+                            <a href="/tags/Init/">
+                                <span class="chip bg-color">Init</span>
+                            </a>
+                        
+                            <a href="/tags/sysvinit/">
+                                <span class="chip bg-color">sysvinit</span>
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+                <div class="col s5 right-align">
+                    
+                    <div class="post-cate">
+                        <i class="fas fa-bookmark fa-fw icon-category"></i>
+                        
+                            <a href="/categories/linux%E7%B3%BB%E7%BB%9F/" class="post-category">
+                                linux系统
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+            </div>
+
+            <div class="post-info">
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
+                    2019-12-16
+                </div>
+                
+
+                
+
+                
+
+                
+				
+                
+            </div>
+            
+        </div>
+        <hr class="clearfix">
+        <div class="card-content article-card-content">
+            <div id="articleContent">
+                <h2 id="什么是Init-initial-原始，初始，开始-系统，init系统的历史和现状"><a href="#什么是Init-initial-原始，初始，开始-系统，init系统的历史和现状" class="headerlink" title="什么是Init(initial:原始，初始，开始)系统，init系统的历史和现状"></a>什么是Init(initial:原始，初始，开始)系统，init系统的历史和现状</h2><p>Linux操作系统的启动首先从<code>BIOS</code>开始，接下来进入<code>boot loader</code>，由<code>boot loader</code>载入系统内核，进行内核的初始化。内核初始化的最后一步就是启动<code>pid</code>为1 的<code>init</code>进程。这个进程是系统的第一个进程，它负责产生其它所有用户进程。</p>
+<p><code>init</code>进程以守护进程方式存在，是所有其它进程的祖先，<code>init</code>进程非常独特，能够完成其它进程无法完成的任务。<code>Init</code>系统能够定义、管理和控制<code>init</code>进程的行为，它负载组织和运行许多独立的或相关的初始化工作(因此被称为init系统)，从而让计算机系统进入某种用户预定的运行模式。</p>
+<p>仅仅将内核运行起来是毫无实际用途的，必须由init系统将系统带入可以操作状态。比如启动壳shell之后，便有了人机交互的可能，这样就可以让计算机执行一些预定程序完成有实际意义的任务，或者启动X图形系统以便提供更佳的人机界面，更加高效的完成任务，这里字符界面的shell 或者 X系统都是一种预设的运行模式。</p>
+<p>大多数<code>Linux</code>发行版的<code>init</code>系统是和<code>System V</code>相兼容的，被称为<code>sysvinit</code>。这是人们最熟悉的init系统。一些发行版如<code>Slackware</code>采用的是<code>BSD</code>风格的<code>Init</code>系统,这种风格使用较少，本文不涉及，其它的发行版如果Gentoo是自己定制的。<code>Ubuntu</code> 和 <code>RHEL</code> 采用<code>upstart</code>替代了传统的<code>sysvinit</code>。而<code>Fedora</code>从版本15开始使用了一个被称为<code>systemd</code>的新<code>init</code>系统.</p>
+<p>可以看到不同的发行版采用了不同的init实现，本系列文章打算讲述三个主要的Init系统： sysvinit、UpStart、systemd。了解他们各自的涉及特定，并简要介绍它们的使用。</p>
+<h2 id="Sysvinit-概况"><a href="#Sysvinit-概况" class="headerlink" title="Sysvinit 概况"></a>Sysvinit 概况</h2><p>sysvinit 就是system V风格的init系统，顾名思义，它源于System V系列UNIX。它提供了比BSD风格init系统更搞高的灵活性，是已经风行了几十年的UNIX init系统，一直被各类Linux发行版所采用。</p>
+<p><strong>运行级别</strong></p>
+<p>Sysvinit 用术语 runlevel 来定义“预定的运行模式”。Sysvinit 检查<code>/etc/inittab</code> 文件中是否含有<code>initdefault</code>项。这告诉init系统是否有一个默认运行模式。如果没有默认的运行模式，那么用户将进入系统控制台，手动决定进入何种运行模式。sysvinit中运行模式描述了系统各种预定的运行模式，通常会有8中运行模式，即运行模式0到6和S或者 s。</p>
+<p>每种Linux发行版对运行模式的定义都不太一样，但是 0，1，6却得到了大家的一直赞同：</p>
+<ul>
+<li>0 关机</li>
+<li>1 单用户模式</li>
+<li>6 重启</li>
+</ul>
+<p>通常在/etc/inittab文件中定义了各种运行模式的工作范围。比如RedHat定义了runlevel 3和5。运行模式3 将系统初始化为字符界面的shell模式；运行模式5将系统初始化为GUI模式。无论是命令行界面还是GUI，运行模式3和5相对于其它运行模式而言都是完整的正式的运行状态，计算机可以完成用户需要的任务。而模式1，S等往往用于系统故障之后的排错和恢复。</p>
+<p>很显然，这些不同的运行模式下系统需要初始化运行的进程和需要进行的初始化准备都是不同的。比如运行模式3 不需要启动X系统。用户只需要指定需要进入哪中模式，sysvinit将负责执行所有该模式所必须的初始化工作。</p>
+<p><strong>sysvinit运行顺序</strong></p>
+<p>Sysvinit 巧妙的用脚本，文件命名规则和软连接来实现不同的runlevel。首先，sysvinit需要读取/etc/inittab文件。分析这个文件的内容，它获得一下一些配置信息：</p>
+<ul>
+<li>系统需要进入的runlevel</li>
+<li>捕获组合键的定义</li>
+<li>定义电源 fail/restore脚本</li>
+<li>启动getty和虚拟控制台</li>
+</ul>
+<p>得到配置信息后，sysvinit顺序执行一下这些步骤，从而将系统初始化为预定的runlevel X。</p>
+<ul>
+<li>/etc/rc.d/rc.sysinit</li>
+<li>/etc/rc.d/rc和/etc/rc.d/rcX.d (X 代表运行级别0-6)</li>
+<li>/etc/rc.d/rc.local</li>
+<li>X Display Manger(如果需要的话)</li>
+</ul>
+<p>首先，运行rc.sysinit 以便执行一些重要的系统初始任务。在RedHat公司的RHEL5中(RHEL6 已经开始使用upstart了)，rc.sysinit主要完成一下这些工作。</p>
+<ul>
+<li>激活udev和selinux</li>
+<li>设置定义在/etc/sysctl.conf中的内核参数</li>
+<li>设置系统时钟</li>
+<li>加载keymaps</li>
+<li>使能交换分区</li>
+<li>设置主机名(hostname)</li>
+<li>根分区检查和remount</li>
+<li>激活RAID和LVM设备</li>
+<li>开启磁盘配额</li>
+<li>检查并挂载所有文件系统</li>
+<li>清楚过期的locks和PID文件</li>
+</ul>
+<p>完成以上这些工作之后，sysvinit开始运行/etc/rc.d/rc脚本。根据不同的runlevel，rc脚本将打开对应该runlevel的rcX.d目录(X 就是runlevel),找到并运行存放在该目录下的所有启动脚本。每个runlevel X都有一个这样的目录，目录名为/etc/rc.d/rcX.d。</p>
+<p>这些目录下存放着很多不同的脚本。文件名以S开头的脚本就是启动时应该运行的脚本，S后面跟的数字定义了这些脚本的执行顺序。在/etc/rc.d/rcX.d 目录下的脚本其实就是一些软链接文件，真实的脚本文件存放在/etc/init.d目录下。如下所示:</p>
+<pre class=" language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@li1556-65 rc.d<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># ls</span>
+init.d  rc  rc0.d  rc1.d  rc2.d  rc3.d  rc4.d  rc5.d  rc6.d  rc.local  rc.sysinit
+<span class="token punctuation">[</span>root@li1556-65 rc.d<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># cd rc3.d/</span>
+<span class="token punctuation">[</span>root@li1556-65 rc3.d<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># ls</span>
+K10saslauthd   K75ntpdate      K89rdisc     S08ip6tables  S11auditd   S25netfs      S55sshd  S80sendmail  S99local
+K50netconsole  K87restorecond  K92iptables  S10network    S12rsyslog  S26udev-post  S58ntpd  S90crond
+<span class="token punctuation">[</span>root@li1556-65 rc3.d<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># ll</span>
+total 0
+lrwxrwxrwx 1 root root 19 Mar  9  2014 K10saslauthd -<span class="token operator">></span> <span class="token punctuation">..</span>/init.d/saslauthd
+lrwxrwxrwx 1 root root 20 Mar  9  2014 K50netconsole -<span class="token operator">></span> <span class="token punctuation">..</span>/init.d/netconsole
+lrwxrwxrwx 1 root root 17 Apr 14  2017 K75ntpdate -<span class="token operator">></span> <span class="token punctuation">..</span>/init.d/ntpdate
+lrwxrwxrwx 1 root root 21 Mar  9  2014 K87restorecond -<span class="token operator">></span> <span class="token punctuation">..</span>/init.d/restorecond
+lrwxrwxrwx 1 root root 15 Mar  9  2014 K89rdisc -<span class="token operator">></span> <span class="token punctuation">..</span>/init.d/rdisc
+lrwxrwxrwx 1 root root 18 Dec  9  2016 K92iptables -<span class="token operator">></span> <span class="token punctuation">..</span>/init.d/iptables
+lrwxrwxrwx 1 root root 19 Mar  9  2014 S08ip6tables -<span class="token operator">></span> <span class="token punctuation">..</span>/init.d/ip6tables
+lrwxrwxrwx 1 root root 17 Mar  9  2014 S10network -<span class="token operator">></span> <span class="token punctuation">..</span>/init.d/network
+lrwxrwxrwx 1 root root 16 Mar  9  2014 S11auditd -<span class="token operator">></span> <span class="token punctuation">..</span>/init.d/auditd
+lrwxrwxrwx 1 root root 17 Mar  9  2014 S12rsyslog -<span class="token operator">></span> <span class="token punctuation">..</span>/init.d/rsyslog
+lrwxrwxrwx 1 root root 15 Mar  9  2014 S25netfs -<span class="token operator">></span> <span class="token punctuation">..</span>/init.d/netfs
+lrwxrwxrwx 1 root root 19 Mar  9  2014 S26udev-post -<span class="token operator">></span> <span class="token punctuation">..</span>/init.d/udev-post
+lrwxrwxrwx 1 root root 14 Mar  9  2014 S55sshd -<span class="token operator">></span> <span class="token punctuation">..</span>/init.d/sshd
+lrwxrwxrwx 1 root root 14 Apr 14  2017 S58ntpd -<span class="token operator">></span> <span class="token punctuation">..</span>/init.d/ntpd
+lrwxrwxrwx 1 root root 18 Apr 14  2017 S80sendmail -<span class="token operator">></span> <span class="token punctuation">..</span>/init.d/sendmail
+lrwxrwxrwx 1 root root 15 Mar  9  2014 S90crond -<span class="token operator">></span> <span class="token punctuation">..</span>/init.d/crond
+lrwxrwxrwx 1 root root 11 Mar  9  2014 S99local -<span class="token operator">></span> <span class="token punctuation">..</span>/rc.local</code></pre>
+<p>当所有的初始化脚本执行完毕，Sysvinit运行/etc/rc.d/rc.local脚本。</p>
+<p>rc.local是Linux留给用户进行个性化设置的地方。您可以把你自己想设置和启动的东西放到这里来，一台Linux server的用户一般不止一个，所以才有这样的考虑。</p>
+<p><strong>Sysvinit 和系统关闭</strong></p>
+<p>Sysvinit 不仅需要负载初始化系统，还需要负责关闭系统，在系统关闭时，为了保证数据的一致性，需要小心地按照顺序进行结束和清理工作。</p>
+<p>比如应该先停止对文件系统有读写操作的服务，然后再umonut文件系统，否则数据就会丢失。</p>
+<p>这种顺序的控制也是依靠/etc/rc.d/rcX.d/目录下所有脚本的命名规则来控制的，在该目录下所有以K开头的脚本都将在关闭系统时调用，字母K之后的数字定义了它们的执行顺序。</p>
+<p>这些脚本负责安全地停止服务或者其它的关闭工作。</p>
+<p><strong>Sysvinit 的管理和控制功能</strong></p>
+<p>此外，在系统启动之后，管理员还需要对已经启动的进程进行管理和控制。原始的sysvinit软件包含了一系列的控制启动，运行和关闭所有其它程序的工具。</p>
+<blockquote>
+<ul>
+<li>halt:<ul>
+<li>停止系统</li>
+</ul>
+</li>
+<li>init<ul>
+<li>这个就是sysvinit本身的init进程实体，以PID1身份运行，是所有用户进程的父进程。最主要的作用是在启动过程中使用/etc/inittab文件创建进程。</li>
+</ul>
+</li>
+<li>killall5<ul>
+<li>就是 SystemV 的killall 命令，向除自己的会话(session)进程之外的其它进程发出信号，所以不能杀死当前使用的shell</li>
+</ul>
+</li>
+<li>last<ul>
+<li>回溯/var/log/wtmp 文件（或者-f 选项指定的文件），显示自从这个文件建立以来，所有用户的登录情况。</li>
+</ul>
+</li>
+<li>lastb<ul>
+<li>作用和last差不多，默认情况下使用/var/log/btmp文件，显示所有失败登录企图。</li>
+</ul>
+</li>
+<li>mesg<ul>
+<li>控制其它用户对用户终端的访问</li>
+</ul>
+</li>
+<li>pidof<ul>
+<li>找出程序的进程识别号(pid)，输出到标准输出设备</li>
+</ul>
+</li>
+<li>poweroff<ul>
+<li>等于shutdown -h -p ,或者telinit 0.关闭系统并切断电源</li>
+</ul>
+</li>
+<li>reboot<ul>
+<li>等于shutdown -r 或者 telinit 6。重启系统。</li>
+</ul>
+</li>
+<li>runlevel<ul>
+<li>读取系统的登录文件（一般是/var/run/utmp）把以前和当前的系统运行级输出到标准输出设备。</li>
+</ul>
+</li>
+<li>shutdown<ul>
+<li>以一种安全的方式终止系统，所有正在登录的用户都会收到系统将要终止通知，并且不准新的登录</li>
+</ul>
+</li>
+<li>sulogin<ul>
+<li>当系统进入单用户模式时，被init调用。当接收到启动加载程序传递的-b选项时，init也会调用sulogin。</li>
+</ul>
+</li>
+<li>telinit<ul>
+<li>实际是init的一个连接，用来向init传递单字符参数和信号</li>
+</ul>
+</li>
+<li>utmpdump<ul>
+<li>以一种用户友好的格式想标准输出设备显示/var/run/utmp文件的内容。</li>
+</ul>
+</li>
+<li>wall<ul>
+<li>向所有有信息权限的登录用户发送消息</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<p>不同的Linux发行版在这些sysvinit的基本工具基础上又开发了一些辅助工具用来简化init系统的管理工作。比如RedHat的RHEL在sysvinit的基础上开发了initscripts软件包，包含了大量的启动脚本（如：rc.sysinit），还提供了service,checonfig等命令行工具，甚至一套图形化界面来管理init系统。其它的Linux发行版也各有各自的initscripts或其他名字的init软件包来简化sysvinit管理。</p>
+<p>只要您理解了sysvinit机制，在一个最简的仅有sysvinit的系统下，您也可以直接调用脚本启动和停止服务，手动创建inittab和创建软连接来完成这些任务，因此理解sysvinit的基本原理和命令是最重要的。您甚至可以开发一套自己的管理工具。</p>
+<p><strong>Sysvinit的小结</strong></p>
+<p>Sysvinit 的优点是概念简单。Service 开发人员只需要编写启动和停止脚本，概念非常清楚；将 service 添加/删除到某个 runlevel 时，只需要执行一些创建/删除软连接文件的基本操作；这些都不需要学习额外的知识或特殊的定义语法(UpStart 和 Systemd 都需要用户学习新的定义系统初始化行为的语言)。</p>
+<p>其次，sysvinit 的另一个重要优点是确定的执行顺序：脚本严格按照启动数字的大小顺序执行，一个执行完毕再执行下一个，这非常有益于错误排查。UpStart 和 systemd 支持并发启动，导致没有人可以确定地了解具体的启动顺序，排错不易。</p>
+<p>但是串行地执行脚本导致 sysvinit 运行效率较慢，在新的 IT 环境下，启动快慢成为一个重要问题。此外动态设备加载等 Linux 新特性也暴露出 sysvinit 设计的一些问题。针对这些问题，人们开始想办法改进 sysvinit，以便加快启动时间，并解决 sysvinit 自身的设计问题。</p>
+<p>Upstart 是第一个被广泛应用的新一代 init 系统。我们在接下来的第二部分介绍 UpStart。</p>
+
+            </div>
+            <hr/>
+
+            
+
+    <div class="reprint" id="reprint-statement">
+        
+            <div class="reprint__author">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-user">
+                        文章作者:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="https://cntsp.github.io" rel="external nofollow noreferrer">阿培</a>
+                </span>
+            </div>
+
+            <div class="reprint__notice">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-copyright">
+                        版权声明:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    本博客所有文章除特別声明外，均采用
+                    <a href="https://creativecommons.org/licenses/by/4.0/deed.zh" rel="external nofollow noreferrer" target="_blank">CC BY 4.0</a>
+                    许可协议。转载请注明来源
+                    <a href="https://cntsp.github.io" target="_blank">阿培</a>
+                    !
+                </span>
+            </div>
+        
+    </div>
+
+    <script async defer>
+      document.addEventListener("copy", function (e) {
+        let toastHTML = '<span>复制成功，请遵循本文的转载规则</span><button class="btn-flat toast-action" onclick="navToReprintStatement()" style="font-size: smaller">查看</a>';
+        M.toast({html: toastHTML})
+      });
+
+      function navToReprintStatement() {
+        $("html, body").animate({scrollTop: $("#reprint-statement").offset().top - 80}, 800);
+      }
+    </script>
+
+
+
+            <div class="tag_share" style="display: block;">
+                <div class="post-meta__tag-list" style="display: inline-block;">
+                    
+                        <div class="article-tag">
+                            
+                                <a href="/tags/linux/">
+                                    <span class="chip bg-color">linux</span>
+                                </a>
+                            
+                                <a href="/tags/Init/">
+                                    <span class="chip bg-color">Init</span>
+                                </a>
+                            
+                                <a href="/tags/sysvinit/">
+                                    <span class="chip bg-color">sysvinit</span>
+                                </a>
+                            
+                        </div>
+                    
+                </div>
+                <div class="post_share" style="zoom: 80%; width: fit-content; display: inline-block; float: right; margin: -0.15rem 0;">
+                    <link rel="stylesheet" type="text/css" href="/libs/share/css/share.min.css">
+
+<div id="article-share">
+    
+    
+    <div class="social-share" data-sites="twitter,facebook,google,qq,qzone,wechat,weibo,douban,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
+    <script src="/libs/share/js/social-share.min.js"></script>
+    
+
+    
+
+</div>
+
+                </div>
+            </div>
+            
+                <style>
+    #reward {
+        margin: 40px 0;
+        text-align: center;
+    }
+
+    #reward .reward-link {
+        font-size: 1.4rem;
+        line-height: 38px;
+    }
+
+    #reward .btn-floating:hover {
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2), 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    #rewardModal {
+        width: 320px;
+        height: 350px;
+    }
+
+    #rewardModal .reward-title {
+        margin: 15px auto;
+        padding-bottom: 5px;
+    }
+
+    #rewardModal .modal-content {
+        padding: 10px;
+    }
+
+    #rewardModal .close {
+        position: absolute;
+        right: 15px;
+        top: 15px;
+        color: rgba(0, 0, 0, 0.5);
+        font-size: 1.3rem;
+        line-height: 20px;
+        cursor: pointer;
+    }
+
+    #rewardModal .close:hover {
+        color: #ef5350;
+        transform: scale(1.3);
+        -moz-transform:scale(1.3);
+        -webkit-transform:scale(1.3);
+        -o-transform:scale(1.3);
+    }
+
+    #rewardModal .reward-tabs {
+        margin: 0 auto;
+        width: 210px;
+    }
+
+    .reward-tabs .tabs {
+        height: 38px;
+        margin: 10px auto;
+        padding-left: 0;
+    }
+
+    .reward-content ul {
+        padding-left: 0 !important;
+    }
+
+    .reward-tabs .tabs .tab {
+        height: 38px;
+        line-height: 38px;
+    }
+
+    .reward-tabs .tab a {
+        color: #fff;
+        background-color: #ccc;
+    }
+
+    .reward-tabs .tab a:hover {
+        background-color: #ccc;
+        color: #fff;
+    }
+
+    .reward-tabs .wechat-tab .active {
+        color: #fff !important;
+        background-color: #22AB38 !important;
+    }
+
+    .reward-tabs .alipay-tab .active {
+        color: #fff !important;
+        background-color: #019FE8 !important;
+    }
+
+    .reward-tabs .reward-img {
+        width: 210px;
+        height: 210px;
+    }
+</style>
+
+<div id="reward">
+    <a href="#rewardModal" class="reward-link modal-trigger btn-floating btn-medium waves-effect waves-light red">赏</a>
+
+    <!-- Modal Structure -->
+    <div id="rewardModal" class="modal">
+        <div class="modal-content">
+            <a class="close modal-close"><i class="fas fa-times"></i></a>
+            <h4 class="reward-title">你的赏识是我前进的动力</h4>
+            <div class="reward-content">
+                <div class="reward-tabs">
+                    <ul class="tabs row">
+                        <li class="tab col s6 alipay-tab waves-effect waves-light"><a href="#alipay">支付宝</a></li>
+                        <li class="tab col s6 wechat-tab waves-effect waves-light"><a href="#wechat">微 信</a></li>
+                    </ul>
+                    <div id="alipay">
+                        <img src="/medias/reward/alipay.jpg" class="reward-img" alt="支付宝打赏二维码">
+                    </div>
+                    <div id="wechat">
+                        <img src="/medias/reward/wechat.png" class="reward-img" alt="微信打赏二维码">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $('.tabs').tabs();
+    });
+</script>
+            
+        </div>
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+<article id="prenext-posts" class="prev-next articles">
+    <div class="row article-row">
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge left-badge text-color">
+                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
+            <div class="card">
+                <a href="/2019/12/16/%E6%B5%85%E6%9E%90Linux%E5%88%9D%E5%A7%8B%E5%8C%96init%E7%B3%BB%E7%BB%9F-UpStart/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/13.jpg" class="responsive-img" alt="浅析Linux初始化init系统-UpStart">
+                        
+                        <span class="card-title">浅析Linux初始化init系统-UpStart</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            Upstart简介假如您使用的 Linux 发行版是 Ubuntu，很可能会发现在您的计算机上找不到/etc/inittab 文件了，这是因为 Ubuntu 使用了一种被称为 upstart 的新型 init 系统。
+开发Upstart的缘
+                        
+                    </div>
+                    <div class="publish-info">
+                        <span class="publish-date">
+                            <i class="far fa-clock fa-fw icon-date"></i>2019-12-16
+                        </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/linux%E7%B3%BB%E7%BB%9F/" class="post-category">
+                                    linux系统
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/linux/">
+                        <span class="chip bg-color">linux</span>
+                    </a>
+                    
+                    <a href="/tags/Init/">
+                        <span class="chip bg-color">Init</span>
+                    </a>
+                    
+                    <a href="/tags/UpStart/">
+                        <span class="chip bg-color">UpStart</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
+            </div>
+            <div class="card">
+                <a href="/2019/12/16/centos7-x%E7%B3%BB%E7%BB%9F%E7%AE%A1%E7%90%86%E4%B9%8BSystemd%E4%B8%80/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/23.jpg" class="responsive-img" alt="centos7-x系统管理之Systemd一">
+                        
+                        <span class="card-title">centos7-x系统管理之Systemd一</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            title: centos7.x系统管理之Systemd一date: 2019-12-16 10:21:55tags: [Centos7,Systemd]categories: centos
+本文内容包括一下几个方面：
+
+centos7启动
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2019-12-16
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-user fa-fw"></i>
+                            阿培
+                            
+                        </span>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+        
+    </div>
+</article>
+
+</div>
+
+
+
+<!-- 代码块功能依赖 -->
+<script type="text/javascript" src="/libs/codeBlock/codeBlockFuction.js"></script>
+
+<!-- 代码语言 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeLang.js"></script>
+
+    
+<!-- 代码块复制 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeCopy.js"></script>
+
+
+<!-- 代码块收缩 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeShrink.js"></script>
+
+
+<!-- 代码块折行 -->
+
+<style type="text/css">
+code[class*="language-"], pre[class*="language-"] { white-space: pre !important; }
+</style>
+
+    </div>
+    <div id="toc-aside" class="expanded col l3 hide-on-med-and-down">
+        <div class="toc-widget">
+            <div class="toc-title"><i class="far fa-list-alt"></i>&nbsp;&nbsp;目录</div>
+            <div id="toc-content"></div>
+        </div>
+    </div>
+</div>
+
+<!-- TOC 悬浮按钮. -->
+
+<div id="floating-toc-btn" class="hide-on-med-and-down">
+    <a class="btn-floating btn-large bg-color">
+        <i class="fas fa-list-ul"></i>
+    </a>
+</div>
+
+
+<script src="/libs/tocbot/tocbot.min.js"></script>
+<script>
+    $(function () {
+        tocbot.init({
+            tocSelector: '#toc-content',
+            contentSelector: '#articleContent',
+            headingsOffset: -($(window).height() * 0.4 - 45),
+            collapseDepth: Number('0'),
+            headingSelector: 'h2, h3, h4'
+        });
+
+        // modify the toc link href to support Chinese.
+        let i = 0;
+        let tocHeading = 'toc-heading-';
+        $('#toc-content a').each(function () {
+            $(this).attr('href', '#' + tocHeading + (++i));
+        });
+
+        // modify the heading title id to support Chinese.
+        i = 0;
+        $('#articleContent').children('h2, h3, h4').each(function () {
+            $(this).attr('id', tocHeading + (++i));
+        });
+
+        // Set scroll toc fixed.
+        let tocHeight = parseInt($(window).height() * 0.4 - 64);
+        let $tocWidget = $('.toc-widget');
+        $(window).scroll(function () {
+            let scroll = $(window).scrollTop();
+            /* add post toc fixed. */
+            if (scroll > tocHeight) {
+                $tocWidget.addClass('toc-fixed');
+            } else {
+                $tocWidget.removeClass('toc-fixed');
+            }
+        });
+
+        
+        /* 修复文章卡片 div 的宽度. */
+        let fixPostCardWidth = function (srcId, targetId) {
+            let srcDiv = $('#' + srcId);
+            if (srcDiv.length === 0) {
+                return;
+            }
+
+            let w = srcDiv.width();
+            if (w >= 450) {
+                w = w + 21;
+            } else if (w >= 350 && w < 450) {
+                w = w + 18;
+            } else if (w >= 300 && w < 350) {
+                w = w + 16;
+            } else {
+                w = w + 14;
+            }
+            $('#' + targetId).width(w);
+        };
+
+        // 切换TOC目录展开收缩的相关操作.
+        const expandedClass = 'expanded';
+        let $tocAside = $('#toc-aside');
+        let $mainContent = $('#main-content');
+        $('#floating-toc-btn .btn-floating').click(function () {
+            if ($tocAside.hasClass(expandedClass)) {
+                $tocAside.removeClass(expandedClass).hide();
+                $mainContent.removeClass('l9');
+            } else {
+                $tocAside.addClass(expandedClass).show();
+                $mainContent.addClass('l9');
+            }
+            fixPostCardWidth('artDetail', 'prenext-posts');
+        });
+        
+    });
+</script>
+
+    
+
+</main>
+
+
+
+    <footer class="page-footer bg-color">
+    <div class="container row center-align">
+        <div class="col s12 m8 l8 copy-right">
+            Copyright&nbsp;&copy;
+            <span id="year">年份</span>
+            <a href="https://cntsp.github.io" target="_blank">阿培</a>
+            |&nbsp;Powered by&nbsp;<a href="https://hexo.io/" target="_blank">Hexo</a>
+            |&nbsp;Theme&nbsp;<a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
+            <br>
+            
+            
+            
+            
+            
+            
+            <span id="busuanzi_container_site_pv">
+                |&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;<span id="busuanzi_value_site_pv"
+                    class="white-color"></span>&nbsp;次
+            </span>
+            
+            
+            <span id="busuanzi_container_site_uv">
+                |&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;<span id="busuanzi_value_site_uv"
+                    class="white-color"></span>&nbsp;人
+            </span>
+            
+            <br>
+            
+            <span id="sitetime">载入运行时间...</span>
+            <script>
+                function siteTime() {
+                    window.setTimeout("siteTime()", 1000);
+                    var seconds = 1000;
+                    var minutes = seconds * 60;
+                    var hours = minutes * 60;
+                    var days = hours * 24;
+                    var years = days * 365;
+                    var today = new Date();
+                    var startYear = "2019";
+                    var startMonth = "6";
+                    var startDate = "28";
+                    var startHour = "0";
+                    var startMinute = "0";
+                    var startSecond = "0";
+                    var todayYear = today.getFullYear();
+                    var todayMonth = today.getMonth() + 1;
+                    var todayDate = today.getDate();
+                    var todayHour = today.getHours();
+                    var todayMinute = today.getMinutes();
+                    var todaySecond = today.getSeconds();
+                    var t1 = Date.UTC(startYear, startMonth, startDate, startHour, startMinute, startSecond);
+                    var t2 = Date.UTC(todayYear, todayMonth, todayDate, todayHour, todayMinute, todaySecond);
+                    var diff = t2 - t1;
+                    var diffYears = Math.floor(diff / years);
+                    var diffDays = Math.floor((diff / days) - diffYears * 365);
+                    var diffHours = Math.floor((diff - (diffYears * 365 + diffDays) * days) / hours);
+                    var diffMinutes = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours) /
+                        minutes);
+                    var diffSeconds = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours -
+                        diffMinutes * minutes) / seconds);
+                    if (startYear == todayYear) {
+                        document.getElementById("year").innerHTML = todayYear;
+                        document.getElementById("sitetime").innerHTML = "本站已安全运行 " + diffDays + " 天 " + diffHours +
+                            " 小时 " + diffMinutes + " 分钟 " + diffSeconds + " 秒";
+                    } else {
+                        document.getElementById("year").innerHTML = startYear + " - " + todayYear;
+                        document.getElementById("sitetime").innerHTML = "本站已安全运行 " + diffYears + " 年 " + diffDays +
+                            " 天 " + diffHours + " 小时 " + diffMinutes + " 分钟 " + diffSeconds + " 秒";
+                    }
+                }
+                setInterval(siteTime, 1000);
+            </script>
+            
+            <br>
+            
+        </div>
+        <div class="col s12 m4 l4 social-link social-statis">
+    <a href="https://github.com/cntsp" class="tooltipped" target="_blank" data-tooltip="访问我的GitHub" data-position="top" data-delay="50">
+        <i class="fab fa-github"></i>
+    </a>
+
+
+
+    <a href="mailto:1909873483@qq.com" class="tooltipped" target="_blank" data-tooltip="邮件联系我" data-position="top" data-delay="50">
+        <i class="fas fa-envelope-open"></i>
+    </a>
+
+
+
+
+
+
+
+    <a href="tencent://AddContact/?fromId=50&fromSubId=1&subcmd=all&uin=1909873483" class="tooltipped" target="_blank" data-tooltip="QQ联系我: 1909873483" data-position="top" data-delay="50">
+        <i class="fab fa-qq"></i>
+    </a>
+
+
+
+
+
+
+
+    <a href="/atom.xml" class="tooltipped" target="_blank" data-tooltip="RSS 订阅" data-position="top" data-delay="50">
+        <i class="fas fa-rss"></i>
+    </a>
+
+</div>
+    </div>
+</footer>
+
+<div class="progress-bar"></div>
+
+
+    <!-- 搜索遮罩框 -->
+<div id="searchModal" class="modal">
+    <div class="modal-content">
+        <div class="search-header">
+            <span class="title"><i class="fas fa-search"></i>&nbsp;&nbsp;搜索</span>
+            <input type="search" id="searchInput" name="s" placeholder="请输入搜索的关键字"
+                   class="search-input">
+        </div>
+        <div id="searchResult"></div>
+    </div>
+</div>
+
+<script src="/js/search.js"></script>
+<script type="text/javascript">
+$(function () {
+    searchFunc("/" + "search.xml", 'searchInput', 'searchResult');
+});
+</script>
+    <!-- 回到顶部按钮 -->
+<div id="backTop" class="top-scroll">
+    <a class="btn-floating btn-large waves-effect waves-light" href="#!">
+        <i class="fas fa-arrow-up"></i>
+    </a>
+</div>
+
+
+    <script src="/libs/materialize/materialize.min.js"></script>
+    <script src="/libs/masonry/masonry.pkgd.min.js"></script>
+    <script src="/libs/aos/aos.js"></script>
+    <script src="/libs/scrollprogress/scrollProgress.min.js"></script>
+    <script src="/libs/lightGallery/js/lightgallery-all.min.js"></script>
+    <script src="/js/matery.js"></script>
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    <script src="/libs/others/clicklove.js" async="async"></script>
+    
+    
+    <script async src="/libs/others/busuanzi.pure.mini.js"></script>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    
+    
+    <script src="/libs/instantpage/instantpage.js" type="module"></script>
+    
+
+</body>
+
+</html>

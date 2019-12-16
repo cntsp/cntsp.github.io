@@ -5,8 +5,11 @@
 <head>
     <meta charset="utf-8">
     <meta name="keywords" content="kubernetes-Ingress, 阿培">
-    <meta name="description" content="Ingress-Nginx github 地址https://github.com/kubernetes/ingress-nginx
-Ingress-Nginx 官方网站：https://kubernetes.github.io/ingre">
+    <meta name="description" content="开始本节学习前，我们需要对kubernetes中的Service、Ingress与Ingress Controller的作用与关系做一下讲解:
+
+
+通俗来讲：
+Service  是后端具体Pod服务的一个抽象，一个Service可以代表多个">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -474,7 +477,28 @@ Ingress-Nginx 官方网站：https://kubernetes.github.io/ingre">
         <hr class="clearfix">
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <p><strong>Ingress-Nginx github 地址</strong><a href="https://github.com/kubernetes/ingress-nginx" target="_blank" rel="noopener">https://github.com/kubernetes/ingress-nginx</a></p>
+                <p><strong>开始本节学习前，我们需要对kubernetes中的Service、Ingress与Ingress Controller的作用与关系做一下讲解:</strong></p>
+<blockquote>
+<ul>
+<li>通俗来讲：<ul>
+<li>Service  是后端具体Pod服务的一个抽象，一个Service可以代表多个相同后端容器服务</li>
+<li>Ingress  是反向代理规则，用来规定http/https （7层的协议）请求应该被转发哪个Service上，原生kubernetes中Service不支持7层代理转发的，由于Service的类型就是ClusterIP、NodePort、LoadBalaner，这些都是4层的代理转发。Ingress相当于在Service的前面又加了一层抽象，支持不同的域名和URL路径的请求，进而请求落地不同的Service上。</li>
+<li>Ingress Controller 就是一个反向代理程序，它负载解析Ingress 的反向代理规则，如果Ingress有增删改的变动，所有的 Ingress Controller 都会更新自己相应的转发规则，当Ingress Controller 收到请求后就会根据这些规则将请求转发到对应的Service。</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<p>Kubernetes 并没有自带 Ingress Controller，它只是一种标准，具体实现有多种，需要自己单独安装，常用的是 Nginx Ingress Controller 和 Traefik Ingress Controller。 所以 Ingress 是一种转发规则的抽象，Ingress Controller 才是实现这些转发规则的核心， Ingress Controller 根据这些 Ingress 规则来将请求转发到对应的 Service，我画了个图方便大家理解：</p>
+<p><img src="https://cntsp.github.io/medias/contents/77.png" alt=""></p>
+<p>有同学可能会问，既然 Ingress Controller 要接受外面的请求，而 Ingress Controller 是部署在集群中的，怎么让 Ingress Controller 本身能够被外面访问到呢，有几种方式：</p>
+<ul>
+<li>Ingress Controller 用 Deployment 方式部署，给它添加一个 Service，类型为 LoadBalancer，这样会自动生成一个 IP 地址，通过这个 IP 就能访问到了，并且一般这个 IP 是高可用的（前提是集群支持 LoadBalancer，通常云服务提供商才支持，自建集群一般没有）</li>
+<li>使用集群内部的某个或某些节点作为边缘节点，给 node 添加 label 来标识，Ingress Controller 用 DaemonSet 方式部署，使用 nodeSelector 绑定到边缘节点，保证每个边缘节点启动一个 Ingress Controller 实例，用 hostPort 直接在这些边缘节点<a href="https://cloud.tencent.com/product/cdh?from=10680" target="_blank" rel="noopener">宿主机</a>暴露端口，然后我们可以访问边缘节点中 Ingress Controller 暴露的端口，这样外部就可以访问到 Ingress Controller 了</li>
+<li>Ingress Controller 用 Deployment 方式部署，给它添加一个 Service，类型为 NodePort，部署完成后查看会给出一个端口，通过 <code>kubectl get svc</code> 我们可以查看到这个端口，这个端口在集群的每个节点都可以访问，通过访问集群节点的这个端口就可以访问 Ingress Controller 了。但是集群节点这么多，而且端口又不是 80和443，太不爽了，一般我们会在前面自己搭个<a href="https://cloud.tencent.com/product/clb?from=10680" target="_blank" rel="noopener">负载均衡</a>器，比如用 Nginx，将请求转发到集群各个节点的那个端口上，这样我们访问 Nginx 就相当于访问到 Ingress Controller 了</li>
+</ul>
+<p>一般比较推荐的是前面两种方式。</p>
+<p><strong>然而我们下面做的这个实验确实选择了第三种方式：</strong></p>
+<p><strong>Ingress-Nginx github 地址</strong><a href="https://github.com/kubernetes/ingress-nginx" target="_blank" rel="noopener">https://github.com/kubernetes/ingress-nginx</a></p>
 <p><strong>Ingress-Nginx 官方网站：</strong><a href="https://kubernetes.github.io/ingress-nginx" target="_blank" rel="noopener">https://kubernetes.github.io/ingress-nginx</a></p>
 <p><img src="https://cntsp.github.io/medias/contents/22.png" alt=""></p>
 <p><img src="https://cntsp.github.io/medias/contents/21.png" alt=""></p>
