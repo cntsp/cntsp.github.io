@@ -708,13 +708,13 @@ systemd执行graphical需要的服务</code></pre>
 </ul>
 <p>[Service]：定义与特定类型相关的专用选项；此处为Service类型</p>
 <ul>
-<li>Type=notify 用来定义影响execstart及相关参数的功能的unit进程启动类型<ul>
+<li>Type  用来定义影响execstart及相关参数的功能的unit进程启动类型<ul>
 <li>simple: 默认值，表示有execstart启动的进程是主进程</li>
 <li>forking: 表示由execstart指明的程序所启动的进程生成的一个子进程为主进程，启动完成后，父进程会退出</li>
 <li>oneshot：类似于simple，后续的unit仅在主进程得到dbus之后，才能启动</li>
 <li>dbus: 类似与simple，表示互相的unit仅在通过dbus之后，才能启动；</li>
 <li>notify：类似与simple，表示后续的unit进在通过sdbotify函数发送通知以后，然后才能运行这个命令</li>
-<li>Idle：与simple类似，要执行这个daemon必须要所有的工作顺序执行完毕后才会执行。这类的daemon通常是开机到最后才执行即可的服务</li>
+<li>idle：与simple类似，要执行这个daemon必须要所有的工作顺序执行完毕后才会执行。这类的daemon通常是开机到最后才执行即可的服务</li>
 </ul>
 </li>
 <li>EnvironmentFile=/etc/sysconfig/httpd 指定启动unit时要用到的环境配置文件，从这个文件中调用变量</li>
