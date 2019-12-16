@@ -570,7 +570,8 @@ modprobe -- ip_vs_sh
 modprobe -- nf_conntrack_ipv4
 EOF</span>
 <span class="token function">chmod</span> 755 /etc/sysconfig/modules/ipvs.modules <span class="token operator">&amp;&amp;</span> <span class="token function">bash</span> /etc/sysconfig/modules/ipvs.modules <span class="token operator">&amp;&amp;</span> lsmod <span class="token operator">|</span> <span class="token function">grep</span> -e ip_vs -e nf_conntrack_ipv4</code></pre>
-<p>上面脚本创建了的/etc/sysconfig/modules/ipvs.modules文件，保证在节点重启后能自动加载所需模块。 使用lsmod | grep -e ip_vs -e nf_conntrack_ipv4命令查看是否已经正确加载所需的内核模块。<br>要确保各个节点上已经安装了ipset软件包 yum -y install ipset ,为了便于查看ipvs的代理规则，最好还要确认是否安装了管理工具ipvsadm, yum -y install ipvsadm。<br>如果以上前提条件如果不满足，则即使kube-proxy的配置开启了ipvs模式，也会退回到iptables模式。<br>三节点都安装Docker<br>Kubernetes从1.6开始使用CRI(Container Runtime Interface)容器运行时接口。默认的容器运行时仍然是Docker，使用的是kubelet中内置dockershim CRI实现<br>三节点都执行</p>
+<p>上面脚本创建了的/etc/sysconfig/modules/ipvs.modules文件，保证在节点重启后能自动加载所需模块。 使用<code>lsmod | grep -e ip_vs -e nf_conntrack_ipv4</code>命令查看是否已经正确加载所需的内核模块。<br>要确保各个节点上已经安装了ipset软件包 yum -y install ipset ,为了便于查看ipvs的代理规则，最好还要确认是否安装了管理工具ipvsadm,<code>yum -y install ipvsadm ipset</code>。<br>如果以上前提条件如果不满足，则即使kube-proxy的配置开启了ipvs模式，也会退回到iptables模式。</p>
+<p>三节点都安装Docker<br>Kubernetes从1.6开始使用CRI(Container Runtime Interface)容器运行时接口。默认的容器运行时仍然是Docker，使用的是kubelet中内置dockershim CRI实现<br>三节点都执行</p>
 <pre class=" language-bash"><code class="language-bash">yum <span class="token function">install</span> -y yum-utils device-mapper-persistent-data lvm2
 yum-config-manager \
     --add-repo \
@@ -582,6 +583,7 @@ yum-config-manager \
 yum <span class="token function">install</span> -y --setopt<span class="token operator">=</span>obsoletes<span class="token operator">=</span>0 \
   docker-ce-18.09.7-3.el7 
 
+<span class="token comment" spellcheck="true"># 启动docker，同时设置开机自启动</span>
 systemctl start docker <span class="token operator">&amp;&amp;</span> systemctl <span class="token function">enable</span> docker</code></pre>
 <p>确认一下iptables filter表中FOWARD链的默认策略(pllicy)为ACCEPT。<br>三节点都执行(以k8s-node1为例：)</p>
 <pre class=" language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@k8s-node1 ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># iptables -nvL</span>
@@ -606,7 +608,8 @@ EOF</span>
 <pre class=" language-bash"><code class="language-bash">systemctl daemon-reload <span class="token operator">&amp;&amp;</span> systemctl restart docker <span class="token operator">&amp;&amp;</span> systemctl <span class="token function">enable</span> docker</code></pre>
 <p>可以查看docker安装信息,以k8s-node1为例：</p>
 <pre class=" language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@k8s-node1 ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># docker info</span></code></pre>
-<h2 id="第二步kubeadm安装部署K8S"><a href="#第二步kubeadm安装部署K8S" class="headerlink" title="第二步kubeadm安装部署K8S"></a>第二步kubeadm安装部署K8S</h2><p>使用Kubeadm部署Kubernetes<br>安装kubeadm和kubelet<br>三节点上都安装kubeadm 和kubelet,由于墙外环境，不需要修改官方K8S的yum源，就是用GOOGLE k8s.gcr源。墙内环境，需要用阿里云的yum源，或者指定自己搭建的企业级DOCKER Registry仓库harbor(要保证仓库中你已经上传这些组件的镜像哦)，在初始化的时候kubeadm init需要加入–image参数，或者在配置文件kubeadmin-config.yaml指定需要安装组件阿里云镜像的来源地址。</p>
+<h2 id="第二步kubeadm安装部署K8S"><a href="#第二步kubeadm安装部署K8S" class="headerlink" title="第二步kubeadm安装部署K8S"></a>第二步kubeadm安装部署K8S</h2><p>使用Kubeadm部署Kubernetes<br>安装kubeadm和kubelet<br>三节点上都安装kubeadm 和kubelet,由于墙外环境，不需要修改官方K8S的yum源，就是用google k8s.gcr源。墙内环境，需要用阿里云的yum源，或者指定自己搭建的企业级DOCKER Registry仓库harbor(要保证仓库中你已经上传这些组件的镜像哦)，在初始化的时候kubeadm init需要加入–image参数，或者在配置文件<code>kubeadmin-config.yaml</code>指定阿里云镜像仓库地址。默认是谷歌的：<code>imageRepository: k8s.gcr.io</code></p>
+<p><strong>下面是添加k8s的yum源</strong></p>
 <pre class=" language-bash"><code class="language-bash"> <span class="token function">cat</span> <span class="token operator">&lt;&lt;</span>EOF <span class="token operator">></span> /etc/yum.repos.d/kubernetes.repo
 <span class="token punctuation">[</span>kubernetes<span class="token punctuation">]</span>
 name<span class="token operator">=</span>Kubernetes
@@ -622,7 +625,7 @@ EOF</code></pre>
 <p>三节点都安装kubelet-1.15.1、kubeadm-1.15.1、kubectl-1.15.1</p>
 <pre class=" language-bash"><code class="language-bash">yum makecache fast
 yum <span class="token function">install</span> -y kubelet-1.15.1 kubeadm-1.15.1 kubectl-1.15.1</code></pre>
-<p>从安装结果可以看出还安装了cri-tools, kubernetes-cni, socat三个依赖：</p>
+<p>从安装结果可以看出还安装了 cri-tools, kubernetes-cni, socat 三个依赖：</p>
 <blockquote>
 <ul>
 <li>官方从Kubernetes 1.14开始将cni依赖升级到了0.7.5版本</li>
@@ -674,12 +677,11 @@ networking:
   podSubnet: <span class="token string">"10.244.0.0/16"</span>      <span class="token comment" spellcheck="true"># 新增pod的网段,默认的配置文件是没有这个pod子网的，我们新增它，如果不新增，需要在初始化指定pod的子网段</span>
   serviceSubnet: 10.96.0.0/12               <span class="token comment" spellcheck="true"># SVC的子网</span>
 scheduler: <span class="token punctuation">{</span><span class="token punctuation">}</span>
----                                              <span class="token comment" spellcheck="true">#以下为新增修改为ipvs模式</span>
-apiVersion: kubeproxy.config.k8s.io/v1alpha1
-kind: kubeProxyConfiguration
-featureGates:
-  SupportIPVSProxyMode: <span class="token boolean">true</span>
-mode: ipvs</code></pre>
+kubeProxy:
+  config:
+    featureGates:
+      SupportIPVSProxyMode: <span class="token boolean">true</span>
+    mode: ipvs</code></pre>
 <p>k8s-master1上执行，生成kubeadm初始化配置文件kubeadm-config.yaml</p>
 <pre class=" language-bash"><code class="language-bash">kubeadm config print init-defaults <span class="token operator">></span> kubeadm-config.yaml</code></pre>
 <p>使用上面生成配置文件在master节点上进行初始化，这个kubeadm-init.log日志记录着node节点加入集群中的方式，不过也可以通过命令找到这个加入集群方式的</p>
@@ -705,7 +707,7 @@ mode: ipvs</code></pre>
 <li>addons：安装附加组件 CoreDNS 和 kube-proxy</li>
 </ul>
 </blockquote>
-<p>初始化完成后需要的工作，还是k8s-master1节点上<br>在当前的用户(我用的root)的Home目录下创建.kube目录(这个目录中保存我们的连接配置，kubectl和kubeApi进行https通讯，所以有一些缓存需要保存以及一些认证文件)</p>
+<p>初始化完成后需要的工作，还是k8s-master1节点上<br>在当前的用户(我用的root)的Home目录下创建.kube目录(这个目录中保存我们的连接配置，kubectl和kube-Api进行https通讯，所以有一些缓存需要保存以及一些认证文件)</p>
 <pre class=" language-bash"><code class="language-bash"><span class="token function">mkdir</span> -p <span class="token variable">$HOME</span>/.kube  </code></pre>
 <p>拷贝集群管理员的配置文件到这个目录下</p>
 <pre class=" language-bash"><code class="language-bash"><span class="token function">sudo</span> <span class="token function">cp</span> -i /etc/kubernetes/admin.conf <span class="token variable">$HOME</span>/.kube/config  </code></pre>
