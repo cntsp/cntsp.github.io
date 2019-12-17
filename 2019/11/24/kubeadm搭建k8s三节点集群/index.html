@@ -608,7 +608,7 @@ EOF</span>
 <pre class=" language-bash"><code class="language-bash">systemctl daemon-reload <span class="token operator">&amp;&amp;</span> systemctl restart docker <span class="token operator">&amp;&amp;</span> systemctl <span class="token function">enable</span> docker</code></pre>
 <p>可以查看docker安装信息,以k8s-node1为例：</p>
 <pre class=" language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@k8s-node1 ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># docker info</span></code></pre>
-<h2 id="第二步kubeadm安装部署K8S"><a href="#第二步kubeadm安装部署K8S" class="headerlink" title="第二步kubeadm安装部署K8S"></a>第二步kubeadm安装部署K8S</h2><p>使用Kubeadm部署Kubernetes<br>安装kubeadm和kubelet<br>三节点上都安装kubeadm 和kubelet,由于墙外环境，不需要修改官方K8S的yum源，就是用google k8s.gcr源。墙内环境，需要用阿里云的yum源，或者指定自己搭建的企业级DOCKER Registry仓库harbor(要保证仓库中你已经上传这些组件的镜像哦)，在初始化的时候kubeadm init需要加入–image参数，或者在配置文件<code>kubeadmin-config.yaml</code>指定阿里云镜像仓库地址。默认是谷歌的：<code>imageRepository: k8s.gcr.io</code></p>
+<h2 id="第二步kubeadm安装部署K8S"><a href="#第二步kubeadm安装部署K8S" class="headerlink" title="第二步kubeadm安装部署K8S"></a>第二步kubeadm安装部署K8S</h2><p>使用Kubeadm部署Kubernetes<br>安装kubeadm和kubelet<br>三节点上都安装kubeadm 和kubelet,由于墙外环境，不需要修改官方K8S的yum源，就是用google k8s.gcr源。墙内环境，需要用阿里云的yum源，或者指定自己搭建的企业级DOCKER Registry仓库harbor(要保证仓库中你已经上传这些组件的镜像哦)，在初始化的时候kubeadm init需要加入–image参数，或者在配置文件<code>kubeadmin-config.yaml</code>指定阿里云镜像仓库地址<code>registry.aliyuncs.com/google_containers</code>。默认是谷歌的：<code>imageRepository: k8s.gcr.io</code></p>
 <p><strong>下面是添加k8s的yum源</strong></p>
 <pre class=" language-bash"><code class="language-bash"> <span class="token function">cat</span> <span class="token operator">&lt;&lt;</span>EOF <span class="token operator">></span> /etc/yum.repos.d/kubernetes.repo
 <span class="token punctuation">[</span>kubernetes<span class="token punctuation">]</span>
@@ -620,7 +620,7 @@ repo_gpgcheck<span class="token operator">=</span>1
 gpgkey<span class="token operator">=</span>https://packages.cloud.google.com/yum/doc/yum-key.gpg
         https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
 EOF</code></pre>
-<p>测试地址<a href="https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64是否可用，如果不可用需要科学上网。" target="_blank" rel="noopener">https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64是否可用，如果不可用需要科学上网。</a><br>由于我们墙外环境，所以就不存在科学上网了，哈哈哈<br>(我们省略这部，测试也没关系，会访问网页内容滴)</p>
+<p>测试地址<a href="https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64是否可用，如果不可用需要科学上网。" target="_blank" rel="noopener">https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64是否可用，如果不可用需要科学上网。</a><br>由于我们墙外环境，所以就不存在科学上网了这一说法，哈哈哈<br>(我们省略这部，测试也没关系，会访问网页内容滴)</p>
 <pre class=" language-bash"><code class="language-bash">curl https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64</code></pre>
 <p>三节点都安装kubelet-1.15.1、kubeadm-1.15.1、kubectl-1.15.1</p>
 <pre class=" language-bash"><code class="language-bash">yum makecache fast
@@ -635,7 +635,7 @@ yum <span class="token function">install</span> -y kubelet-1.15.1 kubeadm-1.15.1
 </blockquote>
 <p>由于kubelet需要和容器接口交互，启动我们的容器，而我们的k8s通过kubeadm安装出来以后都是以Pod的方式存在，也就是底层以容器的方式运行，所以kubelet一定要开机自启的，否则重启后我们k8s集群可能起不来。<br>三节点都执行</p>
 <pre class=" language-bash"><code class="language-bash">systemctl <span class="token function">enable</span> kubelet.service</code></pre>
-<p>初始化主节点k8s-master<br>使用 kubeadm config print init-defaults 可以打印集群初始化默认的使用的配置看一下：</p>
+<p>初始化主节点k8s-master<br>使用<code>kubeadm config print init-defaults</code> 可以打印集群初始化默认需要使用的配置文件，对配置文件部分修改之后我们<code>kubeadm init</code> 初始化集群时需要用到这个配置文件：</p>
 <pre class=" language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@k8s-master root<span class="token punctuation">]</span> <span class="token function">cd</span> /usr/local/install-k8s/core
 <span class="token punctuation">[</span>root@k8s-master core<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># kubeadm config print init-defaults</span>
 apiVersion: kubeadm.k8s.io/v1beta2
@@ -682,12 +682,22 @@ kubeProxy:
     featureGates:
       SupportIPVSProxyMode: <span class="token boolean">true</span>
     mode: ipvs</code></pre>
-<p>k8s-master1上执行，生成kubeadm初始化配置文件kubeadm-config.yaml</p>
+<p>k8s-master1上执行，生成kubeadm初始化配置文件kubeadm-config.yaml,根据上面进行部分修改。</p>
 <pre class=" language-bash"><code class="language-bash">kubeadm config print init-defaults <span class="token operator">></span> kubeadm-config.yaml</code></pre>
-<p>使用上面生成配置文件在master节点上进行初始化，这个kubeadm-init.log日志记录着node节点加入集群中的方式，不过也可以通过命令找到这个加入集群方式的</p>
+<p>在进行初始化之前，我们可以先查看一下kubeadm部署k8s1.15.1需要哪些镜像。</p>
+<pre class=" language-shell"><code class="language-shell">[root@k8s-master ~]# kubeadm config images list --kubernetes-version=1.15.1
+k8s.gcr.io/kube-apiserver:v1.15.1
+k8s.gcr.io/kube-controller-manager:v1.15.1
+k8s.gcr.io/kube-scheduler:v1.15.1
+k8s.gcr.io/kube-proxy:v1.15.1
+k8s.gcr.io/pause:3.1
+k8s.gcr.io/etcd:3.3.10
+k8s.gcr.io/coredns:1.3.1
+# 如果你是科学上网或者墙外环境，你可以先把这些镜像pull到master节点上，这样在进行初始化的时候就比较快了，本地有镜像了，就不需要去远程仓库拉取了</code></pre>
+<p>使用上面生成配置文件在master节点上进行初始化，这个kubeadm-init.log日志记录着node节点加入集群中的方式，不过也可以通过命令<code>kubeadm token create --print-join-command</code>找到这个加入集群方式的</p>
 <pre class=" language-bash"><code class="language-bash">kubeadm init --config<span class="token operator">=</span>kubeadm-config.yaml --experimental-upload-certs <span class="token operator">|</span> <span class="token function">tee</span> kubeadm-init.log</code></pre>
 <p>使用指定的yaml文件进行初始化安装，自动颁发证书(v1.13后支持)把所有的信息都写入到 kubeadm-init.log中，其中<strong style="color: red">–experimental-upload-certs </strong>这个参数在最新版中已经被弃用了，官方推荐使用 <strong>–upload-certs </strong>替代，<a href="https://v1-15.docs.kubernetes.io/docs/setup/release/notes/" target="_blank" rel="noopener">官方公告：</a>。</p>
-<p>上面记录了完成的初始化输出的内容，根据输出的内容基本上可以看出手动初始化安装一个Kubernetes集群所需要的关键步骤。 其中有以下关键内容：</p>
+<p><code>kubeadm-init.log</code>中记录了完成的初始化输出的内容，根据输出的内容基本上可以看出手动初始化安装一个Kubernetes集群所需要的关键步骤。 其中有以下关键内容：</p>
 <blockquote>
 <ul>
 <li>init：指定版本进行初始化操作</li>
@@ -734,7 +744,7 @@ NAME                 STATUS    MESSAGE             ERROR
 controller-manager   Healthy   ok                  
 scheduler            Healthy   ok                  
 etcd-0               Healthy   <span class="token punctuation">{</span><span class="token string">"health"</span><span class="token keyword">:</span><span class="token string">"true"</span><span class="token punctuation">}</span>   </code></pre>
-<p>获得 join命令参数方式有两种：<br>​    1 在我们上面kubeadm init初始化的那个kubeadm-init.log日志中也可以找到。</p>
+<p>获得<code>kubeadm join</code>命令参数方式有两种：<br>​    1 在我们上面<code>kubeadm init</code>初始化的那个kubeadm-init.log日志中也可以找到。</p>
 <p>​    2 k8s-master 节点上执行下面命令。</p>
 <pre class=" language-bash"><code class="language-bash">kubeadm token create --print-join-command</code></pre>
 <p>在k8s-node1和k8s-node2上分别执行加入节点的命令：</p>
