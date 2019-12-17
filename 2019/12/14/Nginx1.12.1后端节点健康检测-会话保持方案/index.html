@@ -605,23 +605,227 @@ Hunk #4 succeeded at 352 (offset 12 lines).</code></pre>
 <p>默认为TCP方式，配置为</p>
 <pre class=" language-shell"><code class="language-shell">upstream emobile {
     sticky;
-        server 127.0.0.1:22;
+    server 127.0.0.1:22;
     server 127.0.0.1:8088;
-    check interval=3000 rise=2 fall=5 timeout=1000
+    check interval=3000 rise=2 fall=5 timeout=1000 ;
 }</code></pre>
 <p>这个upstream同时配置了基于cookie的回话保持和TCP的健康检测。<br>这个检测每<code>3秒</code>执行一次，如果<code>5次</code>都没有成功就认定这个服务器不可达，超时时间为<code>1</code>秒。设定为不可达之后，请求就不会再向这个服务器发送了，但是仍然每隔<code>3</code>秒检测一下这个服务器的健康度，如果两次连续检查都成功就设定这个服务器为健康，然后再重新把后面的请求向这个服务器发送，实现和<code>HAProxy</code>一样的功能，语法也类似。</p>
 <p>但是<code>TCP</code>检测有一个不好处，就是只要这个端口可以<code>telnet</code>通就认定为可用，如上面我把<code>SSH</code>的<code>22</code>端口和<code>tomcat</code>的<code>8088</code>端口放在一起，<code>nginx</code>认为两个服务器都是健康的，于是平均的向他们发送请求，所以这样总有一半的用户请求到的是<code>404</code>。</p>
 <p>那么如何避免这种问题呢，可以使用<code>HTTP</code>模式，让<code>NGINX</code>主动去<code>GET</code>请求一个页面，如果请求的返回码为<code>2XX</code>，<code>3XX</code>就认定服务器是好用的，如下:</p>
 <pre class=" language-shell"><code class="language-shell">upstream emobile {
-    sticky;
-        server 127.0.0.1:22;
+    session_sticky;
+    server 127.0.0.1:22;
     server 127.0.0.1:8088;
     check interval=3000 rise=2 fall=5 timeout=1000 type=http;
-        check_http_send "GET /index.html HTTP/1.0\r\n\r\n";
-        check_http_expect_alive http_2xx http_3xx;
-    }</code></pre>
+    check_http_send "GET /index.html HTTP/1.0\r\n\r\n";
+    check_http_expect_alive http_2xx http_3xx;
+}</code></pre>
 <p>上面的配置Nginx会每3秒钟请求一次<code>127.0.0.1:8088/index.html</code>这个页面，并判断HTTP状态码。因为<code>SSH 22</code>端口请求结果肯定是<code>404</code>，所以<code>Nginx</code>就会认为这个不可达，这样就可以避免<code>TCP</code>模式的缺陷。<br>这个<code>check_http_send</code>后面可以接好多种<code>url</code>，最常用的就是<code>GET</code>，还有<code>POST</code>和<code>HEAD</code>，如果你想检测特定某个页面，可以访问一下该页面然后查找<code>access log</code>，查看相应的请求。</p>
-<p>原文链接：<a href="https://blog.csdn.net/lvshaorong/article/details/78336848" target="_blank" rel="noopener">https://blog.csdn.net/lvshaorong/article/details/78336848</a></p>
+<p><strong>下面我们扩展一下Tengine自带的两个模块<code>ngx_http_upstream_check_module</code>和 <code>ngx_http_upstream_session_sticky_module</code></strong></p>
+<p><code>ngx_http_upstream_check_module</code>该模块可以为Tengine提供主动式后端服务器健康检查的功能。该模块在Tengine-1.4.0版本以前没有默认开启，它需要在配置编译选项的时候开启：<code>./configure --with-http_upstream_check_module</code>。<strong>可是最新版本2.3.2我编译安装时，还是需要动态加入该模块的<code>--add-module=./modules/ngx_http_upstream_check_module</code>，貌似还是没有默认开启啊。</strong></p>
+<p>*<em>Examples    *</em></p>
+<pre class=" language-shell"><code class="language-shell">http {
+    upstream cluster1 {
+        # simple round-robin
+        server 192.168.0.1:80;
+        server 192.168.0.2:80;
+
+        check interval=3000 rise=2 fall=5 timeout=1000 type=http;
+        check_http_send "HEAD / HTTP/1.0\r\n\r\n";
+        check_http_expect_alive http_2xx http_3xx;
+    }
+
+    upstream cluster2 {
+        # simple round-robin
+        server 192.168.0.3:80;
+        server 192.168.0.4:80;
+
+        check interval=3000 rise=2 fall=5 timeout=1000 type=http;
+        check_keepalive_requests 100;
+        check_http_send "HEAD / HTTP/1.1\r\nConnection: keep-alive\r\n\r\n";
+        check_http_expect_alive http_2xx http_3xx;
+    }
+
+    server {
+        listen 80;
+
+        location /1 {
+            proxy_pass http://cluster1;
+        }
+
+        location /2 {
+            proxy_pass http://cluster2;
+        }
+
+        location /status {
+            check_status;
+
+            access_log   off;
+            allow SOME.IP.ADD.RESS;
+            deny all;
+        }
+    }
+}</code></pre>
+<p><strong>指令</strong></p>
+<blockquote>
+<p>Syntax: <strong>check</strong> <code>interval=milliseconds [fall=count] [rise=count] [timeout=milliseconds] [default_down=true|false] [type=tcp|http|ssl_hello|mysql|ajp] [port=check_port]</code><br>Default: 如果没有配置参数，默认值是：<code>interval=30000 fall=5 rise=2 timeout=1000 default_down=true type=tcp</code><br>Context: <code>upstream</code></p>
+</blockquote>
+<p>该指令可以打开后端服务器的健康检查功能。</p>
+<p>指令后面的参数意义是：</p>
+<ul>
+<li><p><code>interval</code>：向后端发送的健康检查包的间隔。</p>
+</li>
+<li><p><code>fall</code>(fall_count): 如果连续失败次数达到fall_count，服务器就被认为是down。</p>
+</li>
+<li><p><code>rise</code>(rise_count): 如果连续成功次数达到rise_count，服务器就被认为是up。</p>
+</li>
+<li><p><code>timeout</code>: 后端健康请求的超时时间。</p>
+</li>
+<li><p><code>default_down</code>: 设定初始时服务器的状态，如果是true，就说明默认是down的，如果是false，就是up的。默认值是true，也就是一开始服务器认为是不可用，要等健康检查包达到一定成功次数以后才会被认为是健康的。</p>
+</li>
+<li><pre><code>type</code></pre><p>：健康检查包的类型，现在支持以下多种类型</p>
+<ul>
+<li><code>tcp</code>：简单的tcp连接，如果连接成功，就说明后端正常。</li>
+<li><code>ssl_hello</code>：发送一个初始的SSL hello包并接受服务器的SSL hello包。</li>
+<li><code>http</code>：发送HTTP请求，通过后端的回复包的状态来判断后端是否存活。</li>
+<li><code>mysql</code>: 向mysql服务器连接，通过接收服务器的greeting包来判断后端是否存活。</li>
+<li><code>ajp</code>：向后端发送AJP协议的Cping包，通过接收Cpong包来判断后端是否存活。</li>
+</ul>
+</li>
+<li><p><code>port</code>: 指定后端服务器的检查端口。你可以指定不同于真实服务的后端服务器的端口，比如后端提供的是443端口的应用，你可以去检查80端口的状态来判断后端健康状况。默认是0，表示跟后端server提供真实服务的端口一样。该选项出现于Tengine-1.4.0。</p>
+</li>
+</ul>
+<blockquote>
+<p>Syntax: <strong>check_keepalive_requests</strong> <code>request_num</code><br>Default: <code>1</code><br>Context: <code>upstream</code></p>
+</blockquote>
+<p>该指令可以配置一个连接发送的请求数，其默认值为1，表示Tengine完成1次请求后即关闭连接。</p>
+<blockquote>
+<p> Syntax: <strong>check_http_send</strong> <code>http_packet</code><br>Default: <code>&quot;GET / HTTP/1.0\r\n\r\n&quot;</code><br>Context: <code>upstream</code></p>
+</blockquote>
+<p>该指令可以配置http健康检查包发送的请求内容。为了减少传输数据量，推荐采用<code>&quot;HEAD&quot;</code>方法。</p>
+<p>当采用长连接进行健康检查时，需在该指令中添加keep-alive请求头，如：<code>&quot;HEAD / HTTP/1.1\r\nConnection: keep-alive\r\n\r\n&quot;</code>。<br>同时，在采用<code>&quot;GET&quot;</code>方法的情况下，请求uri的size不宜过大，确保可以在1个<code>interval</code>内传输完成，否则会被健康检查模块视为后端服务器或网络异</p>
+<blockquote>
+<p>Syntax: <strong>check_http_expect_alive</strong> <code>[ http_2xx | http_3xx | http_4xx | http_5xx ]</code><br>Default: <code>http_2xx | http_3xx</code><br>Context: <code>upstream</code></p>
+</blockquote>
+<p>该指令指定HTTP回复的成功状态，默认认为2XX和3XX的状态是健康的。</p>
+<blockquote>
+<p> Syntax: <strong>check_shm_size</strong> <code>size</code><br>Default: <code>1M</code><br>Context: <code>http</code></p>
+</blockquote>
+<p>所有的后端服务器健康检查状态都存于共享内存中，该指令可以设置共享内存的大小。默认是1M，如果你有1千台以上的服务器并在配置的时候出现了错误，就可能需要扩大该内存的大小。</p>
+<blockquote>
+<p>Syntax: <strong>check_status</strong> <code>[html|csv|json]</code><br>Default: <code>check_status html</code><br>Context: <code>location</code></p>
+</blockquote>
+<p>显示服务器的健康状态页面。该指令需要在http块中配置。</p>
+<p>在Tengine-1.4.0以后，你可以配置显示页面的格式。支持的格式有: <code>html</code>、<code>csv</code>、 <code>json</code>。默认类型是<code>html</code>。</p>
+<p>你也可以通过请求的参数来指定格式，假设‘/status’是你状态页面的URL， <code>format</code>参数改变页面的格式，比如：</p>
+<pre class=" language-shell"><code class="language-shell">/status?format=html
+/status?format=csv
+/status?format=json</code></pre>
+<p>同时你也可以通过status参数来获取相同服务器状态的列表，比如：</p>
+<pre class=" language-shell"><code class="language-shell">/status?format=html&amp;status=down
+/status?format=csv&amp;status=up</code></pre>
+<p>下面是一个HTML状态页面的例子（server number是后端服务器的数量，generation是Nginx reload的次数。Index是服务器的索引，Upstream是在配置中upstream的名称，Name是服务器IP，Status是服务器的状态，Rise是服务器连续检查成功的次数，Fall是连续检查失败的次数，Check type是检查的方式，Check port是后端专门为健康检查设置的端口）：</p>
+<pre class=" language-shell"><code class="language-shell"><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+    <html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+    <title>Nginx http upstream check status</title>
+    <link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+    <body>
+        <h1>Nginx http upstream check status</h1>
+        <h2>Check upstream server number: 1, generation: 3</h2>
+        <table style="background-color:white" cellspacing="0" cellpadding="3" border="1">
+            <tr bgcolor="#C0C0C0">
+                <th>Index</th>
+                <th>Upstream</th>
+                <th>Name</th>
+                <th>Status</th>
+                <th>Rise counts</th>
+                <th>Fall counts</th>
+                <th>Check type</th>
+                <th>Check port</th>
+            </tr>
+            <tr>
+                <td>0</td>
+                <td>backend</td>
+                <td>106.187.48.116:80</td>
+                <td>up</td>
+                <td>39</td>
+                <td>0</td>
+                <td>http</td>
+                <td>80</td>
+            </tr>
+        </table>
+    </body>
+    </html></code></pre>
+<p>下面是csv格式页面的例子：</p>
+<pre class=" language-shell"><code class="language-shell">0,backend,106.187.48.116:80,up,46,0,http,80</code></pre>
+<p>下面是json格式页面的例子：</p>
+<pre class=" language-shell"><code class="language-shell">{"servers": {
+  "total": 1,
+  "generation": 3,
+  "server": [
+   {"index": 0, "upstream": "backend", "name": "106.187.48.116:80", "status": "up", "rise": 58, "fall": 0, "type": "http", "port": 80}
+  ]
+ }}</code></pre>
+<p><code>ngx_http_upstream_session_sticky_module</code>该模块是一个负载均衡模块，通过cookie实现客户端与后端服务器的会话保持, 在一定条件下可以保证同一个客户端访问的都是同一个后端服务器。</p>
+<p><strong>Example     1</strong></p>
+<pre class=" language-shell"><code class="language-shell"># 默认配置：cookie=route mode=insert fallback=on
+upstream foo {
+    server 192.168.0.1;
+    server 192.168.0.2;
+    session_sticky;
+}
+
+server {
+    location / {
+        proxy_pass http://foo;
+    }
+}</code></pre>
+<p><strong>Example    2</strong></p>
+<pre class=" language-shell"><code class="language-shell">#insert + indirect模式：
+upstream test {
+    session_sticky cookie=uid domain=www.xxx.com fallback=on path=/ mode=insert option=indirect;
+    server  127.0.0.1:8080;
+}
+
+server {
+    location / {
+        #在insert + indirect模式或者prefix模式下需要配置session_sticky_hide_cookie
+        #这种模式不会将保持会话使用的cookie传给后端服务，让保持会话的cookie对后端透明
+        session_sticky_hide_cookie upstream=test;
+        proxy_pass http://test;
+    }
+}</code></pre>
+<p><strong>指令</strong></p>
+<blockquote>
+<p>语法：<strong>session_sticky</strong> <code>[cookie=name] [domain=your_domain] [path=your_path] [maxage=time] [mode=insert|rewrite|prefix] [option=indirect] [maxidle=time] [maxlife=time] [fallback=on|off] [hash=plain|md5]</code><br>默认值：<code>session_sticky cookie=route mode=insert fallback=on</code><br>上下文：<code>upstream</code></p>
+</blockquote>
+<p>说明:</p>
+<p>本指令可以打开会话保持的功能，下面是具体的参数：</p>
+<ul>
+<li><code>cookie</code>设置用来记录会话的cookie名称</li>
+<li><code>domain</code>设置cookie作用的域名，默认不设置</li>
+<li><code>path</code>设置cookie作用的URL路径，默认不设置</li>
+<li><code>maxage</code>设置cookie的生存期，默认不设置，即为session cookie，浏览器关闭即失效</li>
+<li><code>mode</code>设置cookie的模式:</li>
+<li><strong>insert</strong>: 在回复中本模块通过Set-Cookie头直接插入相应名称的cookie。</li>
+<li><strong>prefix</strong>: 不会生成新的cookie，但会在响应的cookie值前面加上特定的前缀，当浏览器带着这个有特定标识的cookie再次请求时，模块在传给后端服务前先删除加入的前缀，后端服务拿到的还是原来的cookie值，这些动作对后端透明。如：”Cookie: NAME=SRV~VALUE”。</li>
+<li><strong>rewrite</strong>: 使用服务端标识覆盖后端设置的用于session sticky的cookie。如果后端服务在响应头中没有设置该cookie，则认为该请求不需要进行session sticky，使用这种模式，后端服务可以控制哪些请求需要sesstion sticky，哪些请求不需要。</li>
+<li><code>option</code> 设置用于session sticky的cookie的选项，可设置成indirect或direct。indirect不会将session sticky的cookie传送给后端服务，该cookie对后端应用完全透明。direct则与indirect相反。</li>
+<li><code>maxidle</code>设置session cookie的最长空闲的超时时间</li>
+<li><code>maxlife</code>设置session cookie的最长生存期</li>
+<li><code>fallback</code>设置是否重试其他机器，当sticky的后端机器挂了以后，是否需要尝试其他机器</li>
+<li><code>hash</code> 设置cookie中server标识是用明文还是使用md5值，默认使用md5</li>
+</ul>
+<blockquote>
+<p>语法: <strong>session_sticky_hide_cookie</strong> upstream=name;<br>默认值: none<br>上下文： server, location</p>
+</blockquote>
+<p>说明：</p>
+<p>配合proxy_pass指令使用。用于在insert+indirect模式和prefix模式下删除请求用于session sticky的cookie，这样就不会将该cookie传递给后端服务。upstream表示需要进行操作的upstream名称。</p>
+<p><a href="https://blog.csdn.net/lvshaorong/article/details/78336848" target="_blank" rel="noopener">本文链接来自1</a></p>
+<p><a href="https://tengine.taobao.org/document_cn/http_upstream_check_cn.html" target="_blank" rel="noopener">本文链接来自2</a></p>
+<p><a href="https://tengine.taobao.org/document_cn/http_upstream_session_sticky_cn.html" target="_blank" rel="noopener">本文链接来自3</a></p>
 
             </div>
             <hr/>
