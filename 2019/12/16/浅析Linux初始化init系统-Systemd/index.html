@@ -1004,30 +1004,33 @@
 <article id="prenext-posts" class="prev-next articles">
     <div class="row article-row">
         
-        <div class="article col s12 m6" data-aos="fade-up" data-aos="fade-up">
+        <div class="article col s12 m6" data-aos="fade-up">
             <div class="article-badge left-badge text-color">
-                <i class="far fa-dot-circle"></i>&nbsp;本篇
-            </div>
+                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
             <div class="card">
-                <a href="/2019/12/16/%E6%B5%85%E6%9E%90Linux%E5%88%9D%E5%A7%8B%E5%8C%96init%E7%B3%BB%E7%BB%9F-Systemd/">
+                <a href="/2019/12/17/shell%E8%84%9A%E6%9C%AC%E4%B8%ADecho%E6%98%BE%E7%A4%BA%E5%B8%A6%E9%A2%9C%E8%89%B2%E7%9A%84%E5%86%85%E5%AE%B9/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/13.jpg" class="responsive-img" alt="浅析Linux初始化init系统-Systemd">
+                        <img src="/medias/featureimages/0.jpg" class="responsive-img" alt="shell脚本中echo显示带颜色的内容">
                         
-                        <span class="card-title">浅析Linux初始化init系统-Systemd</span>
+                        <span class="card-title">shell脚本中echo显示带颜色的内容</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            Systemd 的简介和特点Systemd 是 Linux 系统中最新的初始化系统（init），它主要的设计目标是克服 sysvinit 固有的缺点，提高系统的启动速度。systemd 和 ubuntu 的 upstart 是竞争对手，预计
+                            shell 脚本中echo打印出带颜色的显示内容shell脚本中echo显示内容带颜色需要使用参数-e格式如下：
+echo -e "\033[字背景颜色;文字颜色m字符串内容\033[0m"
+例如：
+
+其中字背景颜色40：为黑色，文字颜色3
                         
                     </div>
                     <div class="publish-info">
-                            <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2019-12-16
-                            </span>
+                        <span class="publish-date">
+                            <i class="far fa-clock fa-fw icon-date"></i>2019-12-17
+                        </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
@@ -1040,7 +1043,6 @@
                         </span>
                     </div>
                 </div>
-
                 
                 <div class="card-action article-tags">
                     
@@ -1048,16 +1050,12 @@
                         <span class="chip bg-color">linux</span>
                     </a>
                     
-                    <a href="/tags/Init/">
-                        <span class="chip bg-color">Init</span>
+                    <a href="/tags/shell/">
+                        <span class="chip bg-color">shell</span>
                     </a>
                     
-                    <a href="/tags/Centos7-x/">
-                        <span class="chip bg-color">Centos7.x</span>
-                    </a>
-                    
-                    <a href="/tags/Systemd/">
-                        <span class="chip bg-color">Systemd</span>
+                    <a href="/tags/echo/">
+                        <span class="chip bg-color">echo</span>
                     </a>
                     
                 </div>

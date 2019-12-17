@@ -4,6 +4,35 @@
   
     
     <entry>
+      <title>shell脚本中echo显示带颜色的内容</title>
+      <link href="/2019/12/17/shell%E8%84%9A%E6%9C%AC%E4%B8%ADecho%E6%98%BE%E7%A4%BA%E5%B8%A6%E9%A2%9C%E8%89%B2%E7%9A%84%E5%86%85%E5%AE%B9/"/>
+      <url>/2019/12/17/shell%E8%84%9A%E6%9C%AC%E4%B8%ADecho%E6%98%BE%E7%A4%BA%E5%B8%A6%E9%A2%9C%E8%89%B2%E7%9A%84%E5%86%85%E5%AE%B9/</url>
+      
+        <content type="html"><![CDATA[<p>shell 脚本中echo打印出带颜色的显示内容<br>shell脚本中echo显示内容带颜色需要使用参数-e<br>格式如下：</p><pre class=" language-shell"><code class="language-shell">echo -e "\033[字背景颜色;文字颜色m字符串内容\033[0m"</code></pre><p>例如：</p><p><img src="https://cntsp.github.io/medias/contents/84.png" alt=""></p><p>其中字背景颜色40：为黑色，文字颜色31m：为红色</p><p><strong>注释：</strong></p><ul><li>字背景颜色和文字内容颜色之间的是英文符号 <strong>;</strong></li><li>文字颜色后面有个m</li><li>字符串内容前后可以没有空格，如果有，同样会输出空格</li></ul><p><strong>下面是相应的字和背景颜色，大家可以随意如何！</strong></p><p><strong>字颜色： 30–37</strong></p><pre class=" language-shell"><code class="language-shell">echo -e “\033[30m 黑色字 \033[0m” echo -e “\033[31m 红色字 \033[0m” echo -e “\033[32m 绿色字 \033[0m” echo -e “\033[33m 黄色字 \033[0m” echo -e “\033[34m 蓝色字 \033[0m” echo -e “\033[35m 紫色字 \033[0m” echo -e “\033[36m 天蓝字 \033[0m” echo -e “\033[37m 白色字 \033[0m” </code></pre><p><strong>字背景颜色范围：40–47</strong></p><pre class=" language-shell"><code class="language-shell">echo -e “\033[40;37m 黑底白字 \033[0m” echo -e “\033[41;37m 红底白字 \033[0m” echo -e “\033[42;37m 绿底白字 \033[0m” echo -e “\033[43;37m 黄底白字 \033[0m” echo -e “\033[44;37m 蓝底白字 \033[0m” echo -e “\033[45;37m 紫底白字 \033[0m” echo -e “\033[46;37m 天蓝底白字 \033[0m” echo -e “\033[47;30m 白底黑字 \033[0m” </code></pre><p><strong>最后面控制选项说明：</strong></p><pre class=" language-shell"><code class="language-shell">\33[0m 关闭所有属性 \33[1m 设置高亮度 \33[4m 下划线 \33[5m 闪烁 \33[7m 反显 \33[8m 消隐 \33[30m — \33[37m 设置前景色 \33[40m — \33[47m 设置背景色 \33[nA 光标上移n行 \33[nB 光标下移n行 \33[nC 光标右移n行 \33[nD 光标左移n行 \33[y;xH设置光标位置 \33[2J 清屏 \33[K 清除从光标到行尾的内容 \33[s 保存光标位置 \33[u 恢复光标位置 \33[?25l 隐藏光标 \33[?25h 显示光标</code></pre>]]></content>
+      
+      
+      <categories>
+          
+          <category> linux系统 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> linux </tag>
+            
+            <tag> shell </tag>
+            
+            <tag> echo </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>浅析Linux初始化init系统-Systemd</title>
       <link href="/2019/12/16/%E6%B5%85%E6%9E%90Linux%E5%88%9D%E5%A7%8B%E5%8C%96init%E7%B3%BB%E7%BB%9F-Systemd/"/>
       <url>/2019/12/16/%E6%B5%85%E6%9E%90Linux%E5%88%9D%E5%A7%8B%E5%8C%96init%E7%B3%BB%E7%BB%9F-Systemd/</url>
@@ -1016,9 +1045,9 @@
       
         <tags>
             
-            <tag> docker </tag>
-            
             <tag> centos7 </tag>
+            
+            <tag> docker </tag>
             
         </tags>
       
