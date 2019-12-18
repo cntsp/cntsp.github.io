@@ -779,6 +779,341 @@ uw6dfy.cye0w06s06dms8q8   4h          2019-11-25T17:59:15+08:00   authentication
 7845e6615fcae889eedd6fe55174d904ddd4d3ca5257f04c4438cc67cf06ba58</code></pre>
 <p>除了上面通过两次命令找token和hash，也可以直接一次性执行如下命令来获取:</p>
 <pre class=" language-bash"><code class="language-bash">kubeadm token create --print-join-command </code></pre>
+<p>补充：如果你部署好后kube-proxy使用的还是iptables模式，这时需要修改为ipvs模式</p>
+<pre class=" language-shell"><code class="language-shell">[root@k8s-master ~]# kubectl get  configmap  -n kube-system
+NAME                                 DATA   AGE
+coredns                              1      24d
+els1.v1                              1      8d
+extension-apiserver-authentication   6      24d
+flu1.v1                              1      8d
+kib1.v1                              1      8d
+kube-flannel-cfg                     2      24d
+kube-proxy                           2      24d
+kubeadm-config                       2      24d
+kubelet-config-1.15                  1      24d
+kubernetes-dashboard-settings        1      4d23h
+kubernetes-dashboard.v1              1      10d
+myfirst-release.v1                   1      10d
+unsung-clam.v1                       1      10d
+[root@k8s-master ~]# kubectl get pods -n kube-system |grep proxy
+kube-proxy-6sp4j                        1/1     Running   0          24d
+kube-proxy-hbnkf                        1/1     Running   0          22d
+kube-proxy-ttjcn                        1/1     Running   0          24d
+
+## 编辑ComfigMap kube-proxy大概在39行左右 把 mode: "" 修改为mode: "ipvs"
+[root@k8s-master ~]# kubectl edit configmap kube-proxy -n kube-system
+configmap/kube-proxy edited
+
+## 对于Kubernetes来说，可以直接将这三个Pod删除之后，会自动重建，因为kube-proxy是由daemonset控制的
+## 下面批量删除
+[root@k8s-master ~]# kubectl get pod -n kube-system | grep kube-proxy | awk '{system("kubectl delete pod "$1" -n kube-system")}'
+pod "kube-proxy-6sp4j" deleted
+pod "kube-proxy-hbnkf" deleted
+pod "kube-proxy-ttjcn" deleted
+
+## 由于我们已经通过ConfigMap修改了kube-proxy的配置，所以后期增加的Node节点，会直接使用ipvs模式。
+[root@k8s-master ~]# kubectl get pods -n kube-system |grep proxy
+kube-proxy-56l57                        1/1     Running   0          16s
+kube-proxy-9cpth                        1/1     Running   0          18s
+kube-proxy-rz27h                        1/1     Running   0          13s
+
+[root@k8s-master ~]# kubectl logs kube-proxy-56l57 -n kube-system
+I1218 02:07:49.322393       1 server_others.go:170] Using ipvs Proxier.
+W1218 02:07:49.337427       1 proxier.go:401] IPVS scheduler not specified, use rr by default
+I1218 02:07:49.337761       1 server.go:534] Version: v1.15.1
+I1218 02:07:49.346725       1 conntrack.go:52] Setting nf_conntrack_max to 655360
+I1218 02:07:49.346910       1 config.go:187] Starting service config controller
+I1218 02:07:49.346945       1 controller_utils.go:1029] Waiting for caches to sync for service config controller
+I1218 02:07:49.347014       1 config.go:96] Starting endpoints config controller
+I1218 02:07:49.347059       1 controller_utils.go:1029] Waiting for caches to sync for endpoints config controller
+I1218 02:07:49.447092       1 controller_utils.go:1036] Caches are synced for service config controller
+I1218 02:07:49.447186       1 controller_utils.go:1036] Caches are synced for endpoints config controller
+
+## 日志中打印出了Using ipvs Proxier，说明ipvs模式已经开启。
+## 使用ipvsadm测试，可以查看之前创建的Service已经使用LVS创建了集群
+[root@k8s-master ~]# ipvsadm -Ln 
+IP Virtual Server version 1.2.1 (size=4096)
+Prot LocalAddress:Port Scheduler Flags
+  -> RemoteAddress:Port           Forward Weight ActiveConn InActConn
+TCP  172.17.0.1:30001 rr
+  -> 10.244.1.101:8080            Masq    1      0          0         
+TCP  172.17.0.1:30003 rr
+  -> 10.244.1.107:8080            Masq    1      0          0         
+  -> 10.244.3.120:8080            Masq    1      0          0         
+  -> 10.244.3.122:8080            Masq    1      0          0         
+TCP  172.17.0.1:30004 rr
+  -> 10.244.1.109:8080            Masq    1      0          0         
+  -> 10.244.3.124:8080            Masq    1      0          0         
+  -> 10.244.3.125:8080            Masq    1      0          0         
+TCP  172.17.0.1:30005 rr
+  -> 10.244.1.113:8080            Masq    1      0          0         
+  -> 10.244.3.131:8080            Masq    1      0          0         
+  -> 10.244.3.132:8080            Masq    1      0          0         
+TCP  172.17.0.1:30100 rr
+  -> 10.244.3.53:3000             Masq    1      0          0         
+TCP  172.17.0.1:30973 rr
+  -> 10.244.1.86:8080             Masq    1      0          0         
+  -> 10.244.3.85:8080             Masq    1      0          0         
+TCP  172.17.0.1:31417 rr
+  -> 10.244.1.60:8443             Masq    1      0          0         
+TCP  172.17.0.1:32515 rr
+  -> 10.244.3.66:5601             Masq    1      0          0         
+TCP  172.17.0.1:32720 rr
+  -> 10.244.3.28:80               Masq    1      0          0         
+TCP  192.168.1.85:30000 rr
+  -> 10.244.3.121:8080            Masq    1      0          303       
+TCP  192.168.1.85:30001 rr
+  -> 10.244.1.101:8080            Masq    1      0          138       
+TCP  192.168.1.85:30002 rr
+  -> 10.244.1.99:8080             Masq    1      0          38        
+  -> 10.244.3.107:8080            Masq    1      0          39        
+  -> 10.244.3.108:8080            Masq    1      0          39        
+TCP  192.168.1.85:30003 rr
+  -> 10.244.1.107:8080            Masq    1      1          85        
+  -> 10.244.3.120:8080            Masq    1      0          85        
+  -> 10.244.3.122:8080            Masq    1      0          85        
+TCP  192.168.1.85:30004 rr
+  -> 10.244.1.109:8080            Masq    1      0          39        
+  -> 10.244.3.124:8080            Masq    1      0          40        
+  -> 10.244.3.125:8080            Masq    1      0          39        
+TCP  192.168.1.85:30005 rr
+  -> 10.244.1.113:8080            Masq    1      0          28        
+  -> 10.244.3.131:8080            Masq    1      0          27        
+  -> 10.244.3.132:8080            Masq    1      1          26        
+TCP  192.168.1.85:30100 rr
+  -> 10.244.3.53:3000             Masq    1      0          6         
+TCP  192.168.1.85:30200 rr persistent 10800
+  -> 10.244.1.67:9090             Masq    1      0          0         
+  -> 10.244.3.56:9090             Masq    1      0          0         
+TCP  192.168.1.85:30300 rr persistent 10800
+  -> 10.244.1.66:9093             Masq    1      0          0         
+  -> 10.244.3.54:9093             Masq    1      0          0         
+  -> 10.244.3.55:9093             Masq    1      0          0         
+TCP  192.168.1.85:30973 rr
+  -> 10.244.1.86:8080             Masq    1      0          0         
+  -> 10.244.3.85:8080             Masq    1      0          0         
+TCP  192.168.1.85:31306 rr
+  -> 10.244.3.28:443              Masq    1      0          0         
+TCP  192.168.1.85:31417 rr
+  -> 10.244.1.60:8443             Masq    1      0          0         
+TCP  192.168.1.85:32515 rr
+  -> 10.244.3.66:5601             Masq    1      0          0         
+TCP  192.168.1.85:32720 rr
+  -> 10.244.3.28:80               Masq    1      0          0         
+TCP  10.96.0.1:443 rr
+  -> 192.168.1.85:6443            Masq    1      24         0         
+TCP  10.96.0.10:53 rr
+  -> 10.244.0.2:53                Masq    1      0          0         
+  -> 10.244.0.3:53                Masq    1      0          0         
+TCP  10.96.0.10:9153 rr
+  -> 10.244.0.2:9153              Masq    1      0          0         
+  -> 10.244.0.3:9153              Masq    1      0          0         
+TCP  10.96.206.146:3000 rr
+  -> 10.244.3.53:3000             Masq    1      0          0         
+TCP  10.97.146.74:8080 rr
+  -> 10.244.1.99:8080             Masq    1      0          0         
+  -> 10.244.3.107:8080            Masq    1      0          0         
+  -> 10.244.3.108:8080            Masq    1      0          0         
+TCP  10.99.35.223:80 rr
+  -> 10.244.1.116:80              Masq    1      0          0         
+  -> 10.244.3.135:80              Masq    1      0          0         
+TCP  10.99.129.252:443 rr
+  -> 10.244.3.66:5601             Masq    1      0          0         
+TCP  10.99.202.26:8080 rr
+  -> 10.244.1.107:8080            Masq    1      0          0         
+  -> 10.244.3.120:8080            Masq    1      0          0         
+  -> 10.244.3.122:8080            Masq    1      0          0         
+TCP  10.100.176.231:8080 rr
+  -> 10.244.1.109:8080            Masq    1      0          0         
+  -> 10.244.3.124:8080            Masq    1      0          0         
+  -> 10.244.3.125:8080            Masq    1      0          0         
+TCP  10.101.14.181:9093 rr persistent 10800
+  -> 10.244.1.66:9093             Masq    1      0          0         
+  -> 10.244.3.54:9093             Masq    1      0          0         
+  -> 10.244.3.55:9093             Masq    1      0          0         
+TCP  10.101.116.209:3306 rr
+  -> 10.244.3.84:3306             Masq    1      0          0         
+TCP  10.102.235.237:44134 rr
+  -> 10.244.1.57:44134            Masq    1      0          0         
+TCP  10.104.118.54:8080 rr
+  -> 10.244.1.101:8080            Masq    1      0          0         
+TCP  10.104.145.175:9090 rr persistent 10800
+  -> 10.244.1.67:9090             Masq    1      0          0         
+  -> 10.244.3.56:9090             Masq    1      0          0         
+TCP  10.105.187.124:80 rr
+  -> 10.244.1.115:80              Masq    1      0          0         
+  -> 10.244.1.117:80              Masq    1      0          0         
+  -> 10.244.3.134:80              Masq    1      0          0         
+  -> 10.244.3.136:80              Masq    1      0          0         
+TCP  10.106.155.187:443 rr
+  -> 10.244.1.65:6443             Masq    1      0          0         
+TCP  10.107.97.209:80 rr
+  -> 10.244.3.48:80               Masq    1      0          0         
+TCP  10.108.122.242:8080 rr
+  -> 10.244.1.86:8080             Masq    1      0          0         
+  -> 10.244.3.85:8080             Masq    1      0          0         
+TCP  10.108.213.51:443 rr
+  -> 10.244.1.60:8443             Masq    1      0          0         
+TCP  10.108.229.146:80 rr
+  -> 10.244.1.118:80              Masq    1      0          0         
+  -> 10.244.3.137:80              Masq    1      0          0         
+TCP  10.109.8.33:80 rr
+  -> 10.244.3.28:80               Masq    1      0          0         
+TCP  10.109.8.33:443 rr
+  -> 10.244.3.28:443              Masq    1      0          0         
+TCP  10.109.29.143:80 rr
+  -> 10.244.1.115:80              Masq    1      0          0         
+  -> 10.244.1.117:80              Masq    1      0          0         
+  -> 10.244.3.134:80              Masq    1      0          0         
+  -> 10.244.3.136:80              Masq    1      0          0         
+TCP  10.109.173.247:9200 rr
+  -> 10.244.1.70:9200             Masq    1      0          0         
+  -> 10.244.3.60:9200             Masq    1      0          0         
+TCP  10.109.220.225:8080 rr
+  -> 10.244.1.113:8080            Masq    1      0          0         
+  -> 10.244.3.131:8080            Masq    1      0          0         
+  -> 10.244.3.132:8080            Masq    1      0          0         
+TCP  10.111.13.187:8080 rr
+  -> 10.244.3.121:8080            Masq    1      0          0         
+TCP  10.244.0.0:30000 rr
+  -> 10.244.3.121:8080            Masq    1      0          0         
+TCP  10.244.0.0:30001 rr
+  -> 10.244.1.101:8080            Masq    1      0          0         
+TCP  10.244.0.0:30002 rr
+  -> 10.244.1.99:8080             Masq    1      0          0         
+  -> 10.244.3.107:8080            Masq    1      0          0         
+  -> 10.244.3.108:8080            Masq    1      0          0         
+TCP  10.244.0.0:30003 rr
+  -> 10.244.1.107:8080            Masq    1      0          0         
+  -> 10.244.3.120:8080            Masq    1      0          0         
+  -> 10.244.3.122:8080            Masq    1      0          0         
+TCP  10.244.0.0:30004 rr
+  -> 10.244.1.109:8080            Masq    1      0          0         
+  -> 10.244.3.124:8080            Masq    1      0          0         
+  -> 10.244.3.125:8080            Masq    1      0          0         
+TCP  10.244.0.0:30005 rr
+  -> 10.244.1.113:8080            Masq    1      0          0         
+  -> 10.244.3.131:8080            Masq    1      0          0         
+  -> 10.244.3.132:8080            Masq    1      0          0         
+TCP  10.244.0.0:30100 rr
+  -> 10.244.3.53:3000             Masq    1      0          0         
+TCP  10.244.0.0:30200 rr persistent 10800
+  -> 10.244.1.67:9090             Masq    1      0          0         
+  -> 10.244.3.56:9090             Masq    1      0          0         
+TCP  10.244.0.0:30300 rr persistent 10800
+  -> 10.244.1.66:9093             Masq    1      0          0         
+  -> 10.244.3.54:9093             Masq    1      0          0         
+  -> 10.244.3.55:9093             Masq    1      0          0         
+TCP  10.244.0.0:30973 rr
+  -> 10.244.1.86:8080             Masq    1      0          0         
+  -> 10.244.3.85:8080             Masq    1      0          0         
+TCP  10.244.0.0:31306 rr
+  -> 10.244.3.28:443              Masq    1      0          0         
+TCP  10.244.0.0:31417 rr
+  -> 10.244.1.60:8443             Masq    1      0          0         
+TCP  10.244.0.0:32515 rr
+  -> 10.244.3.66:5601             Masq    1      0          0         
+TCP  10.244.0.0:32720 rr
+  -> 10.244.3.28:80               Masq    1      0          0         
+TCP  10.244.0.1:30000 rr
+  -> 10.244.3.121:8080            Masq    1      0          0         
+TCP  10.244.0.1:30001 rr
+  -> 10.244.1.101:8080            Masq    1      0          0         
+TCP  10.244.0.1:30002 rr
+  -> 10.244.1.99:8080             Masq    1      0          0         
+  -> 10.244.3.107:8080            Masq    1      0          0         
+  -> 10.244.3.108:8080            Masq    1      0          0         
+TCP  10.244.0.1:30003 rr
+  -> 10.244.1.107:8080            Masq    1      0          0         
+  -> 10.244.3.120:8080            Masq    1      0          0         
+  -> 10.244.3.122:8080            Masq    1      0          0         
+TCP  10.244.0.1:30004 rr
+  -> 10.244.1.109:8080            Masq    1      0          0         
+  -> 10.244.3.124:8080            Masq    1      0          0         
+  -> 10.244.3.125:8080            Masq    1      0          0         
+TCP  10.244.0.1:30005 rr
+  -> 10.244.1.113:8080            Masq    1      0          0         
+  -> 10.244.3.131:8080            Masq    1      0          0         
+  -> 10.244.3.132:8080            Masq    1      0          0         
+TCP  10.244.0.1:30100 rr
+  -> 10.244.3.53:3000             Masq    1      0          0         
+TCP  10.244.0.1:30200 rr persistent 10800
+  -> 10.244.1.67:9090             Masq    1      0          0         
+  -> 10.244.3.56:9090             Masq    1      0          0         
+TCP  10.244.0.1:30300 rr persistent 10800
+  -> 10.244.1.66:9093             Masq    1      0          0         
+  -> 10.244.3.54:9093             Masq    1      0          0         
+  -> 10.244.3.55:9093             Masq    1      0          0         
+TCP  10.244.0.1:30973 rr
+  -> 10.244.1.86:8080             Masq    1      0          0         
+  -> 10.244.3.85:8080             Masq    1      0          0         
+TCP  10.244.0.1:31306 rr
+  -> 10.244.3.28:443              Masq    1      0          0         
+TCP  10.244.0.1:31417 rr
+  -> 10.244.1.60:8443             Masq    1      0          0         
+TCP  10.244.0.1:32515 rr
+  -> 10.244.3.66:5601             Masq    1      0          0         
+TCP  10.244.0.1:32720 rr
+  -> 10.244.3.28:80               Masq    1      0          0         
+TCP  127.0.0.1:30000 rr
+  -> 10.244.3.121:8080            Masq    1      0          0         
+TCP  127.0.0.1:30001 rr
+  -> 10.244.1.101:8080            Masq    1      0          0         
+TCP  127.0.0.1:30002 rr
+  -> 10.244.1.99:8080             Masq    1      0          0         
+  -> 10.244.3.107:8080            Masq    1      0          0         
+  -> 10.244.3.108:8080            Masq    1      0          0         
+TCP  127.0.0.1:30003 rr
+  -> 10.244.1.107:8080            Masq    1      0          0         
+  -> 10.244.3.120:8080            Masq    1      0          0         
+  -> 10.244.3.122:8080            Masq    1      0          0         
+TCP  127.0.0.1:30004 rr
+  -> 10.244.1.109:8080            Masq    1      0          0         
+  -> 10.244.3.124:8080            Masq    1      0          0         
+  -> 10.244.3.125:8080            Masq    1      0          0         
+TCP  127.0.0.1:30005 rr
+  -> 10.244.1.113:8080            Masq    1      0          0         
+  -> 10.244.3.131:8080            Masq    1      0          0         
+  -> 10.244.3.132:8080            Masq    1      0          0         
+TCP  127.0.0.1:30100 rr
+  -> 10.244.3.53:3000             Masq    1      0          0         
+TCP  127.0.0.1:30200 rr persistent 10800
+  -> 10.244.1.67:9090             Masq    1      0          0         
+  -> 10.244.3.56:9090             Masq    1      0          0         
+TCP  127.0.0.1:30300 rr persistent 10800
+  -> 10.244.1.66:9093             Masq    1      0          0         
+  -> 10.244.3.54:9093             Masq    1      0          0         
+  -> 10.244.3.55:9093             Masq    1      0          0         
+TCP  127.0.0.1:30973 rr
+  -> 10.244.1.86:8080             Masq    1      0          0         
+  -> 10.244.3.85:8080             Masq    1      0          0         
+TCP  127.0.0.1:31306 rr
+  -> 10.244.3.28:443              Masq    1      0          0         
+TCP  127.0.0.1:31417 rr
+  -> 10.244.1.60:8443             Masq    1      0          0         
+TCP  127.0.0.1:32515 rr
+  -> 10.244.3.66:5601             Masq    1      0          0         
+TCP  127.0.0.1:32720 rr
+  -> 10.244.3.28:80               Masq    1      0          0         
+TCP  172.17.0.1:30000 rr
+  -> 10.244.3.121:8080            Masq    1      0          0         
+TCP  172.17.0.1:30002 rr
+  -> 10.244.1.99:8080             Masq    1      0          0         
+  -> 10.244.3.107:8080            Masq    1      0          0         
+  -> 10.244.3.108:8080            Masq    1      0          0         
+TCP  172.17.0.1:30200 rr persistent 10800
+  -> 10.244.1.67:9090             Masq    1      0          0         
+  -> 10.244.3.56:9090             Masq    1      0          0         
+TCP  172.17.0.1:30300 rr persistent 10800
+  -> 10.244.1.66:9093             Masq    1      0          0         
+  -> 10.244.3.54:9093             Masq    1      0          0         
+  -> 10.244.3.55:9093             Masq    1      0          0         
+TCP  172.17.0.1:31306 rr
+  -> 10.244.3.28:443              Masq    1      0          0         
+UDP  10.96.0.10:53 rr
+  -> 10.244.0.2:53                Masq    1      0          0         
+  -> 10.244.0.3:53                Masq    1      0          0       
+</code></pre>
 
             </div>
             <hr/>
@@ -1027,7 +1362,7 @@ uw6dfy.cye0w06s06dms8q8   4h          2019-11-25T17:59:15+08:00   authentication
                             简单说明是一个可读性高，用来表达数据序列的格式。YAML 的意思其实是： 仍是一种标记语言，但为了强调这种语言以数据作为中心，而不是以标记语言为重点
 基本语法
 缩进时不允许使用Tab键，只允许使用空格
-缩进的空格数据目不重要，只要相同层级的
+缩进的空格个数不重要，只要相同层级的元
                         
                     </div>
                     <div class="publish-info">
