@@ -5,9 +5,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="keywords" content="tengine编译安装, 阿培">
-    <meta name="description" content="CentOS Linux release 7.6.1810 (Core)编译安装tengine
-安装依赖包
-yum -y install gcc  gcc-c++  bzip2 perl curl curl-devel wget expat">
+    <meta name="description" content="CentOS Linux release 7.6.1810 (Core)编译安装tengine安装依赖包yum -y install gcc  gcc-c++  bzip2 perl curl curl-devel wget expat-d">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -479,23 +477,20 @@ yum -y install gcc  gcc-c++  bzip2 perl curl curl-devel wget expat">
         <hr class="clearfix">
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <p>CentOS Linux release 7.6.1810 (Core)编译安装tengine</p>
-<p><strong>安装依赖包</strong></p>
-<pre class=" language-shell"><code class="language-shell">yum -y install gcc  gcc-c++  bzip2 perl curl curl-devel wget expat-devel gettext-devel openssl-devel libxml2 libxml2-devel libjpeg-devel libpng-devel freetype-devel libmcrypt-devel autoconf</code></pre>
-<p><strong>配置扩展包安装源</strong></p>
-<pre class=" language-shell"><code class="language-shell">yum -y install epel* 
+                <h2 id="CentOS-Linux-release-7-6-1810-Core-编译安装tengine"><a href="#CentOS-Linux-release-7-6-1810-Core-编译安装tengine" class="headerlink" title="CentOS Linux release 7.6.1810 (Core)编译安装tengine"></a>CentOS Linux release 7.6.1810 (Core)编译安装tengine</h2><h3 id="安装依赖包"><a href="#安装依赖包" class="headerlink" title="安装依赖包"></a>安装依赖包</h3><pre class=" language-shell"><code class="language-shell">yum -y install gcc  gcc-c++  bzip2 perl curl curl-devel wget expat-devel gettext-devel openssl-devel libxml2 libxml2-devel libjpeg-devel libpng-devel freetype-devel libmcrypt-devel autoconf</code></pre>
+<h2 id="配置扩展包安装源"><a href="#配置扩展包安装源" class="headerlink" title="配置扩展包安装源"></a>配置扩展包安装源</h2><pre class=" language-shell"><code class="language-shell">yum -y install epel* 
 yum -y install libmcrypt libmcrypt-devel mcrypt mhash</code></pre>
-<p><strong>安装编译所需要的核心组件：</strong></p>
-<p>1   pcre：是一个Perl库，包括 perl 兼容的正则表达式库。nginx rewrite依赖于PCRE库，所以在安装Tengine前一定要先安装PCRE</p>
+<p>###安装编译所需要的核心组件：</p>
+<h3 id="1-pcre"><a href="#1-pcre" class="headerlink" title="1   pcre"></a>1   pcre</h3><p>一个Perl库，包括 perl 兼容的正则表达式库。nginx rewrite依赖于PCRE库，所以在安装Tengine前一定要先安装PCRE</p>
 <pre class=" language-shell"><code class="language-shell">cd /usr/local/src  && wget https://ftp.pcre.org/pub/pcre/pcre-8.42.tar.gz  && tar zxvf pcre-8.42.tar.gz && cd pcre-8.42 && ./configure --prefix=/usr/local/pcre && make && make install</code></pre>
-<p>2   zlib: Zlib是提供资料压缩之用的函式库，当Tengine想启用GZIP压缩的时候就需要使用到Zlib</p>
+<h3 id="2-zlib"><a href="#2-zlib" class="headerlink" title="2   zlib"></a>2   zlib</h3><p>Zlib是提供资料压缩之用的函式库，当Tengine想启用GZIP压缩的时候就需要使用到Zlib</p>
 <pre class=" language-shell"><code class="language-shell">cd /usr/local/src && wget http://zlib.net/zlib-1.2.11.tar.gz && tar zxvf zlib-1.2.11.tar.gz && cd zlib-1.2.11  && ./configure --prefix=/usr/local/zlib  && make && make install</code></pre>
-<p>3   jemalloc：是一个更好的内存管理工具，使用jemalloc可以更好的优化Tengine的内存管理</p>
+<h3 id="3-jemalloc"><a href="#3-jemalloc" class="headerlink" title="3   jemalloc"></a>3   jemalloc</h3><p>jemalloc是一个更好的内存管理工具，使用jemalloc可以更好的优化Tengine的内存管理</p>
 <pre class=" language-shell"><code class="language-shell">cd /usr/local/src && wget https://github.com/jemalloc/jemalloc/releases/download/5.1.0/jemalloc-5.1.0.tar.bz2 && tar xvf jemalloc-5.1.0.tar.bz2 && cd jemalloc-5.1.0 && ./configure --prefix=/usr/local/jemalloc && make && make install </code></pre>
-<p>4   OpenSSL：是一个强大的安全套接字层密码库，囊括主要的密码算法、常用的密钥和证书封装管理功能及SSL协议，并提供丰富的应用程序供测试或其它目的使用。主要是为了让tengine支持Https的访问请求</p>
+<p>###4   OpenSSL</p>
+<p>OpenSSL是一个强大的安全套接字层密码库，囊括主要的密码算法、常用的密钥和证书封装管理功能及SSL协议，并提供丰富的应用程序供测试或其它目的使用。主要是为了让tengine支持Https的访问请求</p>
 <pre class=" language-shell"><code class="language-shell">cd /usr/local/src && wget https://www.openssl.org/source/openssl-1.1.1.tar.gz  && tar zxvf openssl-1.1.1.tar.gz && cd openssl-1.1.1 && ./config --prefix=/usr/local/openssl && make && make install </code></pre>
-<p>5   安装Tengine</p>
-<p>从官网下载 <a href="http://tengine.taobao.org/" target="_blank" rel="noopener">http://tengine.taobao.org/</a></p>
+<h3 id="5-安装Tengine"><a href="#5-安装Tengine" class="headerlink" title="5   安装Tengine"></a>5   安装Tengine</h3><p>从官网下载 <a href="http://tengine.taobao.org/" target="_blank" rel="noopener">http://tengine.taobao.org/</a></p>
 <pre class=" language-shell"><code class="language-shell">cd /usr/local/src && wget http://tengine.taobao.org/download/tengine-2.3.2.tar.gz && tar -zxvf tengine-2.3.2.tar.gz && cd tengine-2.3.2
 # 配置编译安装
 ./configure --prefix=/usr/local/tengine \
@@ -538,8 +533,7 @@ WantedBy=multi-user.target
 chmod 755 tengine.service
 systemctl enable tengine.service
 systemctl start tengine.service</code></pre>
-<p>6  tengine主配置文件</p>
-<pre class=" language-shell"><code class="language-shell">user nobody ;                                
+<h3 id="6-tengine主配置文件"><a href="#6-tengine主配置文件" class="headerlink" title="6  tengine主配置文件"></a>6  tengine主配置文件</h3><pre class=" language-shell"><code class="language-shell">user nobody ;                                
 worker_processes auto;
 worker_cpu_affinity auto;                                                              
 worker_rlimit_nofile 65535;                                                      
@@ -851,12 +845,11 @@ http {
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            安装方式：单节点+L7负载均衡方案B-使用权威CA机构颁发的证书
-如果您公开发布您的应用，理想情况下应该使用由权威CA机构颁发的证书。
+                            安装方式：单节点+L7负载均衡方案B-使用权威CA机构颁发的证书如果您公开发布您的应用，理想情况下应该使用由权威CA机构颁发的证书。
 
 提示
 
-证书必须是PEM格式，PEM只是一种证书类型，并不是说文件必须是PEM为后缀，具体可以查看证书
+证书必须是PEM格式，PEM只是一种证书类型，并不是说文件必须是PEM为后缀，具体可以查看证书类
                         
                     </div>
                     <div class="publish-info">

@@ -5,12 +5,11 @@
 <head>
     <meta charset="utf-8">
     <meta name="keywords" content="rancher2管理k8s集群, 阿培">
-    <meta name="description" content="安装方式：单节点+L7负载均衡方案B-使用权威CA机构颁发的证书
-如果您公开发布您的应用，理想情况下应该使用由权威CA机构颁发的证书。
+    <meta name="description" content="安装方式：单节点+L7负载均衡方案B-使用权威CA机构颁发的证书如果您公开发布您的应用，理想情况下应该使用由权威CA机构颁发的证书。
 
 提示
 
-证书必须是PEM格式，PEM只是一种证书类型，并不是说文件必须是PEM为后缀，具体可以查看证书">
+证书必须是PEM格式，PEM只是一种证书类型，并不是说文件必须是PEM为后缀，具体可以查看证书类">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -478,8 +477,7 @@
         <hr class="clearfix">
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h2 id="安装方式：单节点-L7负载均衡"><a href="#安装方式：单节点-L7负载均衡" class="headerlink" title="安装方式：单节点+L7负载均衡"></a>安装方式：单节点+L7负载均衡</h2><p><strong>方案B-使用权威CA机构颁发的证书</strong></p>
-<p>如果您公开发布您的应用，理想情况下应该使用由权威CA机构颁发的证书。</p>
+                <h2 id="安装方式：单节点-L7负载均衡"><a href="#安装方式：单节点-L7负载均衡" class="headerlink" title="安装方式：单节点+L7负载均衡"></a>安装方式：单节点+L7负载均衡</h2><h3 id="方案B-使用权威CA机构颁发的证书"><a href="#方案B-使用权威CA机构颁发的证书" class="headerlink" title="方案B-使用权威CA机构颁发的证书"></a>方案B-使用权威CA机构颁发的证书</h3><p>如果您公开发布您的应用，理想情况下应该使用由权威CA机构颁发的证书。</p>
 <blockquote>
 <p><strong>提示</strong></p>
 <ul>
@@ -496,7 +494,7 @@
 -e CATTLE_SYSTEM_CATALOG=bundled \
 -e AUDIT_LEVEL=3 \
 rancher/rancher:v2.3.3  --no-cacerts</code></pre>
-<p><strong>配置七层负载均衡器</strong></p>
+<p>###配置七层负载均衡器</p>
 <p>默认情况下，rancher容器会将80端口上的请求重定向到443端口上。如果Rancher Server通过负载均衡器来代理，这个时候请求是通过负载均衡器发送给Rancher Server，而并非客户端直接访问Rancher Server。在非全局<code>https</code>的环境中，如果以外部负载均衡器作为ssl终止，这个时候通过负载均衡器的<code>https</code>请求将需要被反向代理到Rancher Server http(80)上。在负载均衡器上配置<code>X-Forwarded-Proto: https</code>参数，Rancher Server http(80)上收到负载均衡器的请求后，就不会再重定向到https(443)上。</p>
 <p>负载均衡器或代理必须配置为支持以下内容:</p>
 <ul>
@@ -594,8 +592,7 @@ gzip_types
   text/css text/plain text/x-component
   font/opentype application/x-font-ttf application/vnd.ms-fontobject font/woff2
   image/x-icon image/png image/jpeg;</code></pre>
-<p>下面贴一张部署成功后的访问截图</p>
-<p><img src="https://cntsp.github.io/medias/contents/85.png" alt=""></p>
+<h3 id="下面贴三张部署成功后的访问截图"><a href="#下面贴三张部署成功后的访问截图" class="headerlink" title="下面贴三张部署成功后的访问截图"></a>下面贴三张部署成功后的访问截图</h3><p><img src="https://cntsp.github.io/medias/contents/85.png" alt=""></p>
 <p><img src="https://cntsp.github.io/medias/contents/86.png" alt=""></p>
 <p><img src="https://cntsp.github.io/medias/contents/87.png" alt=""></p>
 <p><a href="https://docs.rancher.cn/rancher2x/installation/single-node/single-node-install-external-lb.html#_2-2-%E6%96%B9%E6%A1%88b-%E4%BD%BF%E7%94%A8%E6%9D%83%E5%A8%81ca%E6%9C%BA%E6%9E%84%E9%A2%81%E5%8F%91%E7%9A%84%E8%AF%81%E4%B9%A6" target="_blank" rel="noopener">rancher2.x官方文档</a></p>
@@ -841,12 +838,11 @@ gzip_types
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            安装方式：单节点+L7负载均衡方案B-使用权威CA机构颁发的证书
-如果您公开发布您的应用，理想情况下应该使用由权威CA机构颁发的证书。
+                            安装方式：单节点+L7负载均衡方案B-使用权威CA机构颁发的证书如果您公开发布您的应用，理想情况下应该使用由权威CA机构颁发的证书。
 
 提示
 
-证书必须是PEM格式，PEM只是一种证书类型，并不是说文件必须是PEM为后缀，具体可以查看证书
+证书必须是PEM格式，PEM只是一种证书类型，并不是说文件必须是PEM为后缀，具体可以查看证书类
                         
                     </div>
                     <div class="publish-info">
@@ -900,9 +896,7 @@ gzip_types
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            CentOS Linux release 7.6.1810 (Core)编译安装tengine
-安装依赖包
-yum -y install gcc  gcc-c++  bzip2 perl curl curl-devel wget expat
+                            CentOS Linux release 7.6.1810 (Core)编译安装tengine安装依赖包yum -y install gcc  gcc-c++  bzip2 perl curl curl-devel wget expat-d
                         
                     </div>
                     <div class="publish-info">
