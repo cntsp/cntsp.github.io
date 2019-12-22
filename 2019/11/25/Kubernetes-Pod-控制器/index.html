@@ -528,7 +528,7 @@ Deployment
 <li>有序部署，有序扩展，即Pod是有顺序的，在部署或者扩展的时候要依据定义好的顺序依次进行(即从0到N-1，在下一个Pod运行之前所有之前的Pod必须都是Running和Ready状态)，基于init containers来实现</li>
 <li>有序收缩，有序删除(即从N-1到0)</li>
 </ul>
-<h2 id="Horizontal-Pod-Autoscaling"><a href="#Horizontal-Pod-Autoscaling" class="headerlink" title="Horizontal Pod Autoscaling"></a>Horizontal Pod Autoscaling</h2><p>应用的资源使用率通常都有高峰和低估的时候，如果削峰填谷，提高集群的整体资源利用率，让service中的Pod个数自动调整呢？这就有来与Horizontal Pod Autoscaling了，顾名思义，使 Pod 水平缩放</p>
+<h2 id="Horizontal-Pod-Autoscaling"><a href="#Horizontal-Pod-Autoscaling" class="headerlink" title="Horizontal Pod Autoscaling"></a>Horizontal Pod Autoscaling</h2><p>应用的资源使用率通常都有高峰和低估的时候，如果削峰填谷，提高集群的整体资源利用率，让service中的Pod个数自动调整呢？这就是Horizontal Pod Autoscaling了，顾名思义，使 Pod 水平自动缩放</p>
 
             </div>
             <hr/>
