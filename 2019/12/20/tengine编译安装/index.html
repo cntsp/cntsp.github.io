@@ -487,8 +487,7 @@ yum -y install libmcrypt libmcrypt-devel mcrypt mhash</code></pre>
 <pre class=" language-shell"><code class="language-shell">cd /usr/local/src && wget http://zlib.net/zlib-1.2.11.tar.gz && tar zxvf zlib-1.2.11.tar.gz && cd zlib-1.2.11  && ./configure --prefix=/usr/local/zlib  && make && make install</code></pre>
 <h3 id="3-jemalloc"><a href="#3-jemalloc" class="headerlink" title="3   jemalloc"></a>3   jemalloc</h3><p>jemalloc是一个更好的内存管理工具，使用jemalloc可以更好的优化Tengine的内存管理</p>
 <pre class=" language-shell"><code class="language-shell">cd /usr/local/src && wget https://github.com/jemalloc/jemalloc/releases/download/5.1.0/jemalloc-5.1.0.tar.bz2 && tar xvf jemalloc-5.1.0.tar.bz2 && cd jemalloc-5.1.0 && ./configure --prefix=/usr/local/jemalloc && make && make install </code></pre>
-<p>###4   OpenSSL</p>
-<p>OpenSSL是一个强大的安全套接字层密码库，囊括主要的密码算法、常用的密钥和证书封装管理功能及SSL协议，并提供丰富的应用程序供测试或其它目的使用。主要是为了让tengine支持Https的访问请求</p>
+<h3 id="4-OpenSSL"><a href="#4-OpenSSL" class="headerlink" title="4   OpenSSL"></a>4   OpenSSL</h3><p>OpenSSL是一个强大的安全套接字层密码库，囊括主要的密码算法、常用的密钥和证书封装管理功能及SSL协议，并提供丰富的应用程序供测试或其它目的使用。主要是为了让tengine支持Https的访问请求</p>
 <pre class=" language-shell"><code class="language-shell">cd /usr/local/src && wget https://www.openssl.org/source/openssl-1.1.1.tar.gz  && tar zxvf openssl-1.1.1.tar.gz && cd openssl-1.1.1 && ./config --prefix=/usr/local/openssl && make && make install </code></pre>
 <h3 id="5-安装Tengine"><a href="#5-安装Tengine" class="headerlink" title="5   安装Tengine"></a>5   安装Tengine</h3><p>从官网下载 <a href="http://tengine.taobao.org/" target="_blank" rel="noopener">http://tengine.taobao.org/</a></p>
 <pre class=" language-shell"><code class="language-shell">cd /usr/local/src && wget http://tengine.taobao.org/download/tengine-2.3.2.tar.gz && tar -zxvf tengine-2.3.2.tar.gz && cd tengine-2.3.2
