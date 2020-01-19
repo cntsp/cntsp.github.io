@@ -2126,12 +2126,14 @@
       
       <categories>
           
-          <category> linux基础 </category>
+          <category> Web服务器 </category>
           
       </categories>
       
       
         <tags>
+            
+            <tag> nginx </tag>
             
             <tag> TCP链接状态 </tag>
             
